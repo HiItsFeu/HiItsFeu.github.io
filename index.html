@@ -16,7 +16,14 @@
             --acc: #ff3d2e;
             --hot: #ff9a1f;
             --line: #2c2c31;
-            --spot: rgba(255,61,46,.16);
+            --spot-core-rgb: 255,205,190;
+            --spot-mid-rgb: 255,75,52;
+            --spot-rgb: 255,61,46;
+            --spot-core-size: 70px;
+            --spot-mid-size: 140px;
+            --spot-size: 220px;
+            --glass: rgba(24,24,27,.48);
+            --glass-line: rgba(255,255,255,.09);
             color-scheme: dark
         }
 
@@ -184,8 +191,10 @@
             display: grid;
             grid-template-columns: 1.5fr 1fr;
             gap: 2rem;
-            background: var(--surf);
-            border: 1px solid var(--line);
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(16px) saturate(130%);
+            backdrop-filter: blur(16px) saturate(130%);
+            border: 1px solid var(--glass-line);
             border-radius: 0;
             padding: 1.25rem
         }
@@ -266,9 +275,35 @@
         }
 
         .date {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .35rem .6rem;
             color: var(--mut);
             font-size: .95rem
         }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding-left: .6rem;
+            border-left: 1px solid var(--line)
+        }
+
+            .status::before {
+                content: "";
+                width: .45rem;
+                height: .45rem;
+                border-radius: 50%;
+                background: var(--mut);
+                opacity: .6
+            }
+
+            .status[data-state=ongoing]::before {
+                background: var(--hot);
+                opacity: 1
+            }
 
         .txt h3 {
             font-size: clamp(1.7rem,3.2vw,2.3rem);
@@ -378,7 +413,11 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity .4s;
-            background: radial-gradient(circle 320px at var(--mx,50%) var(--my,50%),var(--spot),transparent 70%)
+            /* Lumière en volume, derrière tout le contenu (z-index 0 < .page à 1) : elle n'éclaire que le fond.
+               3 couches empilées (la première listée est au-dessus), chacune avec un fondu gaussien
+               (alpha ≈ A·e^(-4r²)) : cœur blanc-chaud très intense, halo orange, brume rouge.
+               Les couches suivent la souris à des vitesses différentes (--m*, --n*, --h*) pour la profondeur. */
+            background: radial-gradient(circle var(--spot-core-size) at var(--mx,50%) var(--my,50%), rgba(var(--spot-core-rgb),.950) 0%, rgba(var(--spot-core-rgb),.810) 20%, rgba(var(--spot-core-rgb),.500) 40%, rgba(var(--spot-core-rgb),.225) 60%, rgba(var(--spot-core-rgb),.073) 80%, rgba(var(--spot-core-rgb),0) 100%), radial-gradient(circle var(--spot-mid-size) at var(--nx,50%) var(--ny,50%), rgba(var(--spot-mid-rgb),.600) 0%, rgba(var(--spot-mid-rgb),.511) 20%, rgba(var(--spot-mid-rgb),.316) 40%, rgba(var(--spot-mid-rgb),.142) 60%, rgba(var(--spot-mid-rgb),.046) 80%, rgba(var(--spot-mid-rgb),0) 100%), radial-gradient(circle var(--spot-size) at var(--hx,50%) var(--hy,50%), rgba(var(--spot-rgb),.240) 0%, rgba(var(--spot-rgb),.204) 20%, rgba(var(--spot-rgb),.126) 40%, rgba(var(--spot-rgb),.057) 60%, rgba(var(--spot-rgb),.018) 80%, rgba(var(--spot-rgb),0) 100%)
         }
 
             .spot.on {
@@ -448,13 +487,18 @@
         you reach by scrolling right, and so on. Projects without "order" come last, newest first.
         date     : "YYYY-MM" (shown on the slide, also used to break ties between equal orders)
         duration : free text, e.g. "3 weeks"
+        ongoing  : true if the project is still in production (shows "In progress" next to the date).
+        Leave it out (or false) for a finished project (shows "Completed").
         video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
         Leave "" if there is none.
+        videos   : (optional) several videos, same format as "video",
+        e.g. ["https://youtu.be/AAAAAAAAAAA", "videos/demo.mp4"].
+        You can use "video", "videos" or both (the single "video" comes first).
         photos   : list of images in the repo, e.g. ["images/shot1.jpg", "images/shot2.jpg"].
-        They appear with the video in a small gallery (video first). Leave [] if there are none.
+        They appear with the videos in a small gallery (videos first). Leave [] if there are none.
         link     : (optional) repository or project page */
         const PROJECTS = [
-        { name: "CPU Engine, still in progress", order: 1, date: "2026-10", duration: "4 weeks",
+        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", ongoing: true,
         bio: "A custom Engine running on CPU, rasterizer in C++ with SDL3 : window, framebuffer and scanline triangle filling, no GPU.",
         video: "", photos: ["Pictures/PGPEngine1.png"], link: "" },
         { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks",
@@ -472,7 +516,7 @@
         { name: "Dialogue and Cutscene System", order: 6, date: "2026-06", duration: "1 week",
         bio: "A dialogue and cutscene LevelSequence system for Guadeloupe built on Unreal Engine.",
         video: "https://www.youtube.com/watch?v=2vAAXGh2Jo8", photos: [], link: "" },
-        { name: "Turbo Drift 2, still in progress", order: 7, date: "2026-05", duration: "Undefined",
+        { name: "Turbo Drift 2", order: 7, date: "2026-05", duration: "Undefined", ongoing: true,
         bio: "A car game, based on a student project Turbo Drift. My biggest game project, build on UE 5.7, all handmade (expect the game engine xD). By doing that, i want to deeply learn UE but also blender, 3D pipeline and offcourse gpp.",
         video: "", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "" },
         { name: "Turbo Drift", order: 8, date: "2026-05", duration: "1 month",
@@ -520,20 +564,21 @@
         projects.forEach((p, i) => {
         const s = el("article", "slide");
         const items = [];
-        if (p.video) items.push({ video: true });
+        const vids = [p.video, ...(p.videos || [])].filter(Boolean);
+        vids.forEach((v, n) => items.push({ video: v, label: vids.length > 1 ? "Video " + (n + 1) : "Video" }));
         (p.photos || []).forEach((src, n) => items.push({ src, alt: p.name + " – photo " + (n + 1) }));
         const gallery = el("div", "gallery"), media = el("div", "media"), thumbs = el("div", "thumbs"), thumbBtns = [];
         gallery.append(media);
         const show = k => {
-        const it = items[k], yt = it.video && ytId(p.video);
+        const it = items[k], yt = it.video && ytId(it.video);
         let node;
         if (yt) {
         node = el("iframe");
         node.src = "https://www.youtube-nocookie.com/embed/" + yt;
-        node.title = "Demo: " + p.name; node.loading = "lazy"; node.allowFullscreen = true;
+        node.title = "Demo: " + p.name + (vids.length > 1 ? " – " + it.label : ""); node.loading = "lazy"; node.allowFullscreen = true;
         node.allow = "accelerometer; encrypted-media; picture-in-picture; fullscreen";
         } else if (it.video) {
-        node = el("video"); node.src = p.video; node.controls = true; node.preload = "metadata"; node.playsInline = true;
+        node = el("video"); node.src = it.video; node.controls = true; node.preload = "metadata"; node.playsInline = true;
         } else {
         node = el("img"); node.src = it.src; node.alt = it.alt;
         }
@@ -546,9 +591,9 @@
         if (items.length > 1) {
         items.forEach((it, k) => {
         const b = el("button");
-        if (it.video) b.textContent = "▶ Video";
+        if (it.video) b.textContent = "▶ " + it.label;
         else { const im = el("img"); im.src = it.src; im.alt = ""; im.loading = "lazy"; b.append(im); }
-        b.setAttribute("aria-label", it.video ? "Demo video" : it.alt);
+        b.setAttribute("aria-label", it.video ? "Demo " + it.label.toLowerCase() : it.alt);
         b.addEventListener("click", () => show(k));
         thumbs.append(b); thumbBtns.push(b);
         });
@@ -557,7 +602,11 @@
         show(0);
         }
         const txt = el("div", "txt");
-        txt.append(el("p", "date", monthFmt.format(new Date(p.date + "-01T12:00:00"))), el("h3", "", p.name), el("p", "", p.bio));
+        const meta = el("p", "date", monthFmt.format(new Date(p.date + "-01T12:00:00")));
+        const status = el("span", "status", p.ongoing ? "In progress" : "Completed");
+        status.dataset.state = p.ongoing ? "ongoing" : "done";
+        meta.append(status);
+        txt.append(meta, el("h3", "", p.name), el("p", "", p.bio));
         const dl = el("dl");
         dl.append(el("dt", "", "Production time"), el("dd", "", p.duration));
         txt.append(dl);
@@ -620,16 +669,23 @@
         /* Light that follows the mouse (fine pointers only) */
         if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
         const spot = $("spot");
-        let tx = 0, ty = 0, cx = 0, cy = 0, running = false;
+        let tx = 0, ty = 0, running = false;
+        /* 3 couches de lumière : cœur (rapide), halo (moyen), brume (lent) */
+        const layers = [["--mx", "--my", .2], ["--nx", "--ny", .11], ["--hx", "--hy", .06]]
+        .map(([x, y, k]) => ({ x, y, k, cx: 0, cy: 0 }));
         const tick = () => {
-        cx += (tx - cx) * (calm ? 1 : .18); cy += (ty - cy) * (calm ? 1 : .18);
-        spot.style.setProperty("--mx", cx + "px"); spot.style.setProperty("--my", cy + "px");
-        if (Math.abs(tx - cx) > .5 || Math.abs(ty - cy) > .5) requestAnimationFrame(tick); else running = false;
+        let moving = false;
+        layers.forEach(l => {
+        l.cx += (tx - l.cx) * (calm ? 1 : l.k); l.cy += (ty - l.cy) * (calm ? 1 : l.k);
+        spot.style.setProperty(l.x, l.cx + "px"); spot.style.setProperty(l.y, l.cy + "px");
+        if (Math.abs(tx - l.cx) > .5 || Math.abs(ty - l.cy) > .5) moving = true;
+        });
+        if (moving) requestAnimationFrame(tick); else running = false;
         };
         addEventListener("pointermove", e => {
         if (e.pointerType !== "mouse") return;
         tx = e.clientX; ty = e.clientY;
-        if (!spot.classList.contains("on")) { cx = tx; cy = ty; spot.classList.add("on"); }
+        if (!spot.classList.contains("on")) { layers.forEach(l => { l.cx = tx; l.cy = ty; }); spot.classList.add("on"); }
         if (!running) { running = true; requestAnimationFrame(tick); }
         });
         document.documentElement.addEventListener("pointerleave", () => spot.classList.remove("on"));
