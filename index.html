@@ -327,32 +327,115 @@
                 padding: 0 .25rem .25rem
             }
         }
+
+        :root {
+            --spot: rgba(154,149,255,.2)
+        }
+
+        @media (prefers-color-scheme:light) {
+            :root {
+                --spot: rgba(74,67,221,.13)
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y proximity
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+            html {
+                scroll-behavior: auto
+            }
+        }
+
+        .page {
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            scroll-snap-align: start
+        }
+
+        .about header {
+            width: 100%;
+            margin: auto;
+            align-items: center
+        }
+
+        .cue {
+            align-self: center;
+            padding: 1.5rem;
+            color: var(--mut);
+            text-decoration: none
+        }
+
+            .cue:hover {
+                color: var(--fg)
+            }
+
+        #projects .body {
+            margin-block: auto;
+            padding-block: 2rem
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%
+        }
+
+        .spot {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .4s;
+            background: radial-gradient(circle 320px at var(--mx,50%) var(--my,50%),var(--spot),transparent 70%)
+        }
+
+            .spot.on {
+                opacity: 1
+            }
+
+        @media (hover:none) {
+            .spot {
+                display: none
+            }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div>
-            <h1 id="name"></h1>
-            <p class="title" id="title"></p>
-            <ul class="links" id="links"></ul>
-        </div>
-        <div class="bio" id="bio"></div>
-    </header>
-
-    <main>
-        <div class="projects-head">
-            <h2 class="section">Projects</h2>
-            <div class="arrows">
-                <button id="prev" aria-label="Older project">‹</button>
-                <button id="next" aria-label="Newer project">›</button>
+    <section class="page about" id="about">
+        <header>
+            <div>
+                <h1 id="name"></h1>
+                <p class="title" id="title"></p>
+                <ul class="links" id="links"></ul>
             </div>
+            <div class="bio" id="bio"></div>
+        </header>
+        <a class="cue" href="#projects">Projects ↓</a>
+    </section>
+
+    <main class="page" id="projects">
+        <div class="body">
+            <div class="projects-head">
+                <h2 class="section">Projects</h2>
+                <div class="arrows">
+                    <button id="prev" aria-label="Older project">‹</button>
+                    <button id="next" aria-label="Newer project">›</button>
+                </div>
+            </div>
+            <nav class="menu" id="menu" aria-label="Project list"></nav>
+            <div class="track" id="track" tabindex="0" aria-label="Projects, oldest on the left, newest on the right"></div>
         </div>
-        <nav class="menu" id="menu" aria-label="Project list"></nav>
-        <div class="track" id="track" tabindex="0" aria-label="Projects, oldest on the left, newest on the right"></div>
+        <footer><span id="copy"></span><a href="#about">↑ About</a></footer>
     </main>
 
-    <footer id="foot"></footer>
+    <div class="spot" id="spot" aria-hidden="true"></div>
 
     <script>
         /* ====== EDIT THIS: your information ====== */
@@ -374,9 +457,10 @@
         ]
         };
 
-        /* One object per project. Order does not matter: projects are sorted by date automatically
-        (oldest on the left, newest on the right, opening on the newest).
-        date     : "YYYY-MM"
+        /* One object per project.
+        order    : display position. 1 = shown first (the page opens on it, on the right), 2 = the next one
+        you reach by scrolling right, and so on. Projects without "order" come last, newest first.
+        date     : "YYYY-MM" (shown on the slide, also used to break ties between equal orders)
         duration : free text, e.g. "3 weeks"
         video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
         Leave "" if there is none.
@@ -384,31 +468,31 @@
         They appear with the video in a small gallery (video first). Leave [] if there are none.
         link     : (optional) repository or project page */
         const PROJECTS = [
-        { name: "CPU Engine", date: "2026-10", duration: "4 weeks",
+        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks",
         bio: "[Still in Progress]. A custom Engine running on CPU, rasterizer in C++ with SDL3: window, framebuffer and scanline triangle filling, no GPU.",
         video: "", photos: [], link: "" },
-        { name: "A simple slime", date: "2026-10", duration: "3 weeks",
+        { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks",
         bio: "A game prototype focused on gamefeels and gameplay. Made fully in Unity with a handmade character controller.",
         video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
-        { name: "Fps prototype", date: "2026-08", duration: "1 month",
+        { name: "Fps prototype", order: 3, date: "2026-08", duration: "1 month",
         bio: "A tiny fps prototype built on Unreal 4. The goal was to stress test my abilities to create something under a strict timeline.",
         video: "", photos: [], link: "" },
-        { name: "Guadeloupe: The Secret of the Three Rivers", date: "2026-07", duration: "1 month",
+        { name: "Guadeloupe: The Secret of the Three Rivers", order: 4, date: "2026-07", duration: "1 month",
         bio: "Professional project, handled by BlackFrogStudio. This game is about Guadeloupe and its lore, the player trip across the island and try to solve its mysteries.",
         video: "https://www.youtube.com/watch?v=zlhlM9s28EE", photos: [], link: "" },
-        { name: "Spline Tools (UE5)", date: "2026-07", duration: "2 weeks",
+        { name: "Spline Tools (UE5)", order: 5, date: "2026-07", duration: "2 weeks",
         bio: "Blueprint and C++ editor tools for Unreal Engine 5: snapping splines to terrain, moving along curves, high customization of parameters.",
         video: "https://www.youtube.com/watch?v=yAbLEiAEBwk", photos: [], link: "" },
-        { name: "Dialogue and Cutscene System", date: "2026-06", duration: "1 week",
+        { name: "Dialogue and Cutscene System", order: 6, date: "2026-06", duration: "1 week",
         bio: "A dialogue and cutscene LevelSequence system for Guadeloupe built on Unreal Engine.",
         video: "https://www.youtube.com/watch?v=2vAAXGh2Jo8", photos: [], link: "" },
-        { name: "Turbo Drift 2", date: "2026-05", duration: "Undefined",
+        { name: "Turbo Drift 2", order: 7, date: "2026-05", duration: "Undefined",
         bio: "[Still in Progress]. A car game, based on a student project Turbo Drift. My biggest game project, build on UE 5.7, all handmade (expect the game engine xD). By doing that, i want to deeply learn UE but also blender, 3D pipeline and offcourse gpp.",
         video: "", photos: [], link: "" },
-        { name: "Turbo Drift", date: "2026-05", duration: "1 month",
-        bio: "A car game prototype made on home made game engine, fully c++ and vulkan.",
+        { name: "Turbo Drift", order: 8, date: "2026-05", duration: "1 month",
+        bio: "A car game prototype made on home made game engine, fully c++ and vulkan. Handmade car sounds and sfx, assets are made by the art team.",
         video: "https://www.youtube.com/watch?v=UNN34BJ2Xj8", photos: [], link: "" },
-        { name: "LayBug", date: "2026-05", duration: "2 days",
+        { name: "LayBug", order: 9, date: "2026-05", duration: "2 days",
         bio: "A game jam game.",
         video: "https://www.youtube.com/watch?v=B9UFAe060Mc", photos: [], link: "" }
         ];
@@ -437,10 +521,12 @@
         if (!l.url.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
         li.append(a); $("links").append(li);
         });
-        $("foot").textContent = "© " + new Date().getFullYear() + " " + PROFILE.name;
+        $("copy").textContent = "© " + new Date().getFullYear() + " " + PROFILE.name;
 
-        /* Projects: oldest on the left, newest on the right */
-        const projects = [...PROJECTS].sort((a, b) => a.date.localeCompare(b.date));
+        /* Projects: order 1 on the right, following orders to its left */
+        const projects = [...PROJECTS]
+        .sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date))
+        .reverse(); // order 1 ends up on the far right
         const track = $("track"), menu = $("menu");
         const slides = [], tabs = [];
         let active = projects.length - 1;
@@ -544,6 +630,24 @@
         /* Open on the newest project */
         update(active, true);
         go(active, true);
+
+        /* Light that follows the mouse (fine pointers only) */
+        if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        const spot = $("spot");
+        let tx = 0, ty = 0, cx = 0, cy = 0, running = false;
+        const tick = () => {
+        cx += (tx - cx) * (calm ? 1 : .18); cy += (ty - cy) * (calm ? 1 : .18);
+        spot.style.setProperty("--mx", cx + "px"); spot.style.setProperty("--my", cy + "px");
+        if (Math.abs(tx - cx) > .5 || Math.abs(ty - cy) > .5) requestAnimationFrame(tick); else running = false;
+        };
+        addEventListener("pointermove", e => {
+        if (e.pointerType !== "mouse") return;
+        tx = e.clientX; ty = e.clientY;
+        if (!spot.classList.contains("on")) { cx = tx; cy = ty; spot.classList.add("on"); }
+        if (!running) { running = true; requestAnimationFrame(tick); }
+        });
+        document.documentElement.addEventListener("pointerleave", () => spot.classList.remove("on"));
+        }
     </script>
 </body>
 </html>
