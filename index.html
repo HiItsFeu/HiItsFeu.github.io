@@ -9,28 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #14172b;
-            --surf: #1e2245;
-            --fg: #eceaf7;
-            --mut: #a3a5c7;
-            --acc: #9a95ff;
-            --hot: #ffd166;
-            --line: #2e3366;
+            --bg: #0d0d0f;
+            --surf: #18181b;
+            --fg: #ececec;
+            --mut: #8e8e96;
+            --acc: #ff3d2e;
+            --hot: #ff9a1f;
+            --line: #2c2c31;
+            --spot: rgba(255,61,46,.16);
             color-scheme: dark
         }
 
-        @media (prefers-color-scheme:light) {
-            :root {
-                --bg: #f3f2fb;
-                --surf: #fff;
-                --fg: #1a1c33;
-                --mut: #5d6085;
-                --acc: #4a43dd;
-                --hot: #9a5b00;
-                --line: #d9d8ee;
-                color-scheme: light
-            }
-        }
+
 
         * {
             box-sizing: border-box;
@@ -96,7 +86,7 @@
             width: 9rem;
             aspect-ratio: 4/5;
             object-fit: cover;
-            border-radius: 16px;
+            border-radius: 0;
             margin-bottom: .5rem;
             background: var(--surf)
         }
@@ -125,7 +115,7 @@
             .arrows button {
                 width: 2.75rem;
                 height: 2.75rem;
-                border-radius: 50%;
+                border-radius: 0;
                 border: 1px solid var(--line);
                 background: var(--surf);
                 color: var(--fg);
@@ -196,13 +186,13 @@
             gap: 2rem;
             background: var(--surf);
             border: 1px solid var(--line);
-            border-radius: 20px;
+            border-radius: 0;
             padding: 1.25rem
         }
 
         .media {
             aspect-ratio: 16/9;
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
             background: #000;
             display: grid;
@@ -240,7 +230,7 @@
                 aspect-ratio: 16/9;
                 padding: 0;
                 border: 2px solid transparent;
-                border-radius: 8px;
+                border-radius: 0;
                 overflow: hidden;
                 background: var(--bg);
                 color: var(--fg);
@@ -263,7 +253,7 @@
             }
 
         .novid {
-            color: #a3a5c7;
+            color: var(--mut);
             padding: 1rem;
             text-align: center
         }
@@ -328,15 +318,9 @@
             }
         }
 
-        :root {
-            --spot: rgba(154,149,255,.2)
-        }
 
-        @media (prefers-color-scheme:light) {
-            :root {
-                --spot: rgba(74,67,221,.13)
-            }
-        }
+
+
 
         html {
             scroll-behavior: smooth;
@@ -350,6 +334,8 @@
         }
 
         .page {
+            position: relative;
+            z-index: 1;
             min-height: 100vh;
             min-height: 100svh;
             display: flex;
@@ -388,7 +374,7 @@
         .spot {
             position: fixed;
             inset: 0;
-            z-index: 50;
+            z-index: 0;
             pointer-events: none;
             opacity: 0;
             transition: opacity .4s;
