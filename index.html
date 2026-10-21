@@ -315,7 +315,10 @@
         dl {
             margin-top: auto;
             border-top: 1px solid var(--line);
-            padding-top: .9rem
+            padding-top: .9rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(8.5rem,1fr));
+            gap: .9rem 1.5rem
         }
 
         dt {
@@ -487,6 +490,8 @@
         you reach by scrolling right, and so on. Projects without "order" come last, newest first.
         date     : "YYYY-MM" (shown on the slide, also used to break ties between equal orders)
         duration : free text, e.g. "3 weeks"
+        team     : number of people who worked on the project, e.g. 1 (shown as "Solo") or 4 (shown as "4 people").
+        Free text also works, e.g. "4 (2 programmers, 2 artists)". Leave null to hide the line.
         ongoing  : true if the project is still in production (shows "In progress" next to the date).
         Leave it out (or false) for a finished project (shows "Completed").
         video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
@@ -498,32 +503,32 @@
         They appear with the videos in a small gallery (videos first). Leave [] if there are none.
         link     : (optional) repository or project page */
         const PROJECTS = [
-        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", ongoing: true,
-        bio: "A custom Engine running on CPU, rasterizer in C++ with SDL3 : window, framebuffer and scanline triangle filling, no GPU.",
+        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", team: null, ongoing: true,
+        bio: "A custom C++ software engine running entirely on the CPU using SDL3. Features window handling, framebuffer management, and scanline triangle rasterization.",
         video: "", photos: ["Pictures/PGPEngine1.png"], link: "" },
-        { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks",
-        bio: "A game prototype focused on gamefeels and gameplay. Made fully in Unity with a handmade character controller.",
+        { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks", team: null,
+        bio: "A Unity game prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",
         video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
-        { name: "Fps prototype", order: 3, date: "2026-08", duration: "1 month",
-        bio: "A tiny fps prototype built on Unreal 4. The goal was to stress test my abilities to create something under a strict timeline.",
+        { name: "Fps prototype", order: 3, date: "2026-08", duration: "1 month", team: null,
+        bio: "A compact FPS prototype built in Unreal Engine 4, created to test my ability to scope and execute a project under a strict timeline.",
         video: "https://www.youtube.com/watch?v=nlRbgm4-v0M", photos: [], link: "" },
-        { name: "Guadeloupe: The Secret of the Three Rivers", order: 4, date: "2026-07", duration: "1 month",
-        bio: "Professional project, handled by BlackFrogStudio. This game is about Guadeloupe and its lore, the player trip across the island and try to solve its mysteries.",
+        { name: "Guadeloupe: The Secret of the Three Rivers", order: 4, date: "2026-07", duration: "1 month", team: null,
+        bio: "Internship project at Black Frog Studio. An exploration game centered on Guadeloupe's rich folklore, where players travel across the island to solve its mysteries. Developed custom internal tools for level designers.",
         video: "https://www.youtube.com/watch?v=zlhlM9s28EE", photos: [], link: "" },
-        { name: "Spline Tools (UE5)", order: 5, date: "2026-07", duration: "2 weeks",
-        bio: "Blueprint and C++ editor tools for Unreal Engine 5: snapping splines to terrain, moving along curves, high customization of parameters.",
+        { name: "Spline Tools (UE5)", order: 5, date: "2026-07", duration: "2 weeks", team: null,
+        bio: "A suite of C++ and Blueprint editor tools for Unreal Engine 5, featuring terrain-spline snapping, curve-based movement, and highly configurable parameters.",
         videos: ["https://www.youtube.com/watch?v=yAbLEiAEBwk", "https://www.youtube.com/watch?v=c-JQNT7x82A"], photos: [], link: "" },
-        { name: "Dialogue and Cutscene System", order: 6, date: "2026-06", duration: "1 week",
-        bio: "A dialogue and cutscene LevelSequence system for Guadeloupe built on Unreal Engine.",
+        { name: "Dialogue and Cutscene System", order: 6, date: "2026-06", duration: "1 week", team: null,
+        bio: "A custom dialogue and cutscene system built for the Guadeloupe project in Unreal Engine using Level Sequences.",
         videos: ["https://www.youtube.com/watch?v=2vAAXGh2Jo8", "https://www.youtube.com/watch?v=SifTLRT01S0"], photos: [], link: "" },
-        { name: "Turbo Drift 2", order: 7, date: "2026-05", duration: "Undefined", ongoing: true,
-        bio: "A car game, based on a student project Turbo Drift. My biggest game project, build on UE 5.7, all handmade (expect the game engine xD). By doing that, i want to deeply learn UE but also blender, 3D pipeline and offcourse gpp.",
+        { name: "Turbo Drift 2", order: 7, date: "2026-05", duration: "Undefined", team: null, ongoing: true,
+        bio: "A racing game derived from my student project Turbo Drift. As my most ambitious project to date, built in Unreal Engine 5.7, everything was created from scratch—from 3D art pipelines in Blender to core gameplay programming.",
         video: "", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "" },
-        { name: "Turbo Drift", order: 8, date: "2026-05", duration: "1 month",
-        bio: "A car game prototype made on home made game engine, fully c++ and vulkan. Handmade car sounds and sfx, assets are made by the art team.",
+        { name: "Turbo Drift", order: 8, date: "2026-05", duration: "1 month", team: null,
+        bio: "A racing game prototype built on a custom C++ and Vulkan engine, featuring custom vehicle audio and 3D assets created by the art team.",
         videos: ["https://www.youtube.com/watch?v=UNN34BJ2Xj8", "https://www.youtube.com/watch?v=o79piqJLBgM"], photos: [], link: "" },
-        { name: "LayBug", order: 9, date: "2026-05", duration: "2 days",
-        bio: "A game jam game, won favorite jury's game.",
+        { name: "LayBug", order: 9, date: "2026-05", duration: "2 days", team: null,
+        bio: "A game jam entry that won the Jury's Choice Award.",
         video: "https://www.youtube.com/watch?v=B9UFAe060Mc", photos: [], link: "" }
         ];
         /* ====== End of the editable area ====== */
@@ -608,7 +613,9 @@
         meta.append(status);
         txt.append(meta, el("h3", "", p.name), el("p", "", p.bio));
         const dl = el("dl");
-        dl.append(el("dt", "", "Production time"), el("dd", "", p.duration));
+        const stat = (label, value) => { const d = el("div"); d.append(el("dt", "", label), el("dd", "", value)); dl.append(d); };
+        stat("Production time", p.duration);
+        if (p.team != null && p.team !== "") stat("Team size", typeof p.team === "number" ? (p.team === 1 ? "Solo" : p.team + " people") : p.team);
         txt.append(dl);
         if (p.link) { const a = el("a", "", "View project"); a.href = p.link; a.target = "_blank"; a.rel = "noopener"; txt.append(a); }
         s.append(gallery, txt); track.append(s); slides.push(s);
