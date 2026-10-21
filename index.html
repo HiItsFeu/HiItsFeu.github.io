@@ -215,6 +215,53 @@
                 border: 0
             }
 
+            .media img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain
+            }
+
+        .gallery {
+            display: grid;
+            gap: .6rem;
+            align-content: start
+        }
+
+        .thumbs {
+            display: flex;
+            gap: .5rem;
+            overflow-x: auto;
+            scrollbar-width: none
+        }
+
+            .thumbs button {
+                flex: 0 0 auto;
+                width: 4.75rem;
+                aspect-ratio: 16/9;
+                padding: 0;
+                border: 2px solid transparent;
+                border-radius: 8px;
+                overflow: hidden;
+                background: var(--bg);
+                color: var(--fg);
+                font: inherit;
+                font-size: .85rem;
+                cursor: pointer;
+                opacity: .7
+            }
+
+                .thumbs button[aria-current=true] {
+                    border-color: var(--acc);
+                    opacity: 1
+                }
+
+            .thumbs img {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover
+            }
+
         .novid {
             color: #a3a5c7;
             padding: 1rem;
@@ -310,8 +357,8 @@
     <script>
         /* ====== EDIT THIS: your information ====== */
         const PROFILE = {
-        name: "Ludwig Gurget",
-        title: "Student Gameplay Programmer",
+        name: "Your name",
+        title: "Game and interactive experience developer",
         // Portrait shown next to your bio. Put the image in the repo next to index.html
         // (default file name: photo.jpg). If the file is missing, no photo is shown.
         photo: "photo.jpg",
@@ -392,19 +439,42 @@
 
         projects.forEach((p, i) => {
         const s = el("article", "slide");
-        const media = el("div", "media");
-        const yt = p.video && ytId(p.video);
+        const items = [];
+        if (p.video) items.push({ video: true });
+        (p.photos || []).forEach((src, n) => items.push({ src, alt: p.name + " – photo " + (n + 1) }));
+        const gallery = el("div", "gallery"), media = el("div", "media"), thumbs = el("div", "thumbs"), thumbBtns = [];
+        gallery.append(media);
+        const show = k => {
+        const it = items[k], yt = it.video && ytId(p.video);
+        let node;
         if (yt) {
-        const f = el("iframe");
-        f.src = "https://www.youtube-nocookie.com/embed/" + yt;
-        f.title = "Demo: " + p.name; f.loading = "lazy"; f.allowFullscreen = true;
-        f.allow = "accelerometer; encrypted-media; picture-in-picture; fullscreen";
-        media.append(f);
-        } else if (p.video) {
-        const v = el("video"); v.src = p.video; v.controls = true; v.preload = "metadata"; v.playsInline = true;
-        media.append(v);
+        node = el("iframe");
+        node.src = "https://www.youtube-nocookie.com/embed/" + yt;
+        node.title = "Demo: " + p.name; node.loading = "lazy"; node.allowFullscreen = true;
+        node.allow = "accelerometer; encrypted-media; picture-in-picture; fullscreen";
+        } else if (it.video) {
+        node = el("video"); node.src = p.video; node.controls = true; node.preload = "metadata"; node.playsInline = true;
         } else {
+        node = el("img"); node.src = it.src; node.alt = it.alt;
+        }
+        media.replaceChildren(node);
+        thumbBtns.forEach((b, j) => b.setAttribute("aria-current", j === k));
+        };
+        if (!items.length) {
         media.append(el("p", "novid", "Demo video coming soon"));
+        } else {
+        if (items.length > 1) {
+        items.forEach((it, k) => {
+        const b = el("button");
+        if (it.video) b.textContent = "▶ Video";
+        else { const im = el("img"); im.src = it.src; im.alt = ""; im.loading = "lazy"; b.append(im); }
+        b.setAttribute("aria-label", it.video ? "Demo video" : it.alt);
+        b.addEventListener("click", () => show(k));
+        thumbs.append(b); thumbBtns.push(b);
+        });
+        gallery.append(thumbs);
+        }
+        show(0);
         }
         const txt = el("div", "txt");
         txt.append(el("p", "date", monthFmt.format(new Date(p.date + "-01T12:00:00"))), el("h3", "", p.name), el("p", "", p.bio));
@@ -412,7 +482,7 @@
         dl.append(el("dt", "", "Production time"), el("dd", "", p.duration));
         txt.append(dl);
         if (p.link) { const a = el("a", "", "View project"); a.href = p.link; a.target = "_blank"; a.rel = "noopener"; txt.append(a); }
-        s.append(media, txt); track.append(s); slides.push(s);
+        s.append(gallery, txt); track.append(s); slides.push(s);
 
         const t = el("button", "", p.name);
         t.addEventListener("click", () => go(i));
