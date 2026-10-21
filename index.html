@@ -678,7 +678,7 @@
         const spot = $("spot");
         let tx = 0, ty = 0, running = false;
         /* 3 couches de lumière : cœur (rapide), halo (moyen), brume (lent) */
-        const layers = [["--mx", "--my", .2], ["--nx", "--ny", .11], ["--hx", "--hy", .06]]
+        const layers = [["--mx", "--my", .5], ["--nx", "--ny", .35], ["--hx", "--hy", .22]]
         .map(([x, y, k]) => ({ x, y, k, cx: 0, cy: 0 }));
         const tick = () => {
         let moving = false;
