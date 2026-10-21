@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14172b;--surf:#1e2245;--fg:#eceaf7;--mut:#a3a5c7;--acc:#9a95ff;--hot:#ffd166;--line:#2e3366;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#f3f2fb;--surf:#fff;--fg:#1a1c33;--mut:#5d6085;--acc:#4a43dd;--hot:#9a5b00;--line:#d9d8ee;color-scheme:light}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:400 1.0625rem/1.6 "Bricolage Grotesque",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+header{max-width:1100px;margin:0 auto;padding:clamp(2rem,6vw,5rem) 1.5rem 2.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:2.5rem;align-items:end}
+h1{font-size:clamp(2.8rem,8vw,5.5rem);line-height:.95;font-weight:800;letter-spacing:-.035em}
+.titre{color:var(--mut);margin-top:1rem;font-size:1.25rem}
+.liens{display:flex;gap:1.25rem;flex-wrap:wrap;margin-top:1.5rem;padding:0;list-style:none}
+.bio{display:grid;gap:1rem;max-width:60ch}
+.projets-tete{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+h2.section{font-size:1.75rem;font-weight:800;letter-spacing:-.02em}
+.fleches{display:flex;gap:.5rem}
+.fleches button{width:2.75rem;height:2.75rem;border-radius:50%;border:1px solid var(--line);background:var(--surf);color:var(--fg);font-size:1.25rem;cursor:pointer}
+.fleches button:disabled{opacity:.35;cursor:default}
+.menu{max-width:1100px;margin:.75rem auto 0;padding:0 1.5rem;display:flex;gap:.25rem;overflow-x:auto;scrollbar-width:none}
+.menu button{background:none;border:0;border-bottom:3px solid transparent;color:var(--mut);font:inherit;padding:.7rem .9rem;cursor:pointer;white-space:nowrap}
+.menu button[aria-current=true]{color:var(--fg);font-weight:700;border-color:var(--acc)}
+.track{position:relative;display:flex;gap:1.5rem;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:1.75rem max(1.5rem,calc(50vw - 550px));scroll-padding-inline:max(1.5rem,calc(50vw - 550px));cursor:grab}
+.track::-webkit-scrollbar,.menu::-webkit-scrollbar{display:none}
+.track.drag{scroll-snap-type:none;cursor:grabbing;user-select:none}
+.slide{flex:0 0 min(1000px,88vw);scroll-snap-align:start;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:1.25rem}
+.media{aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;display:grid;place-items:center}
+.media video,.media iframe{width:100%;height:100%;border:0}
+.novid{color:#a3a5c7;padding:1rem;text-align:center}
+.txt{display:flex;flex-direction:column;gap:.9rem;padding:.5rem .5rem .5rem 0}
+.date{color:var(--mut);font-size:.95rem}
+.txt h3{font-size:clamp(1.7rem,3.2vw,2.3rem);line-height:1.05;font-weight:800;letter-spacing:-.025em}
+dl{margin-top:auto;border-top:1px solid var(--line);padding-top:.9rem}
+dt{color:var(--mut);font-size:.95rem}
+dd{font-size:1.4rem;font-weight:700;color:var(--hot)}
+footer{max-width:1100px;margin:0 auto;padding:1rem 1.5rem 3rem;color:var(--mut);font-size:.95rem}
+@media (max-width:760px){
+ header{grid-template-columns:1fr;gap:1.5rem}
+ .slide{grid-template-columns:1fr;gap:1rem}
+ .txt{padding:0 .25rem .25rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="nom"></h1>
+    <p class="titre" id="titre"></p>
+    <ul class="liens" id="liens"></ul>
+  </div>
+  <div class="bio" id="bio"></div>
+</header>
+
+<main>
+  <div class="projets-tete">
+    <h2 class="section">Projets</h2>
+    <div class="fleches">
+      <button id="prev" aria-label="Projet plus récent">‹</button>
+      <button id="next" aria-label="Projet plus ancien">›</button>
+    </div>
+  </div>
+  <nav class="menu" id="menu" aria-label="Liste des projets"></nav>
+  <div class="track" id="track" tabindex="0" aria-label="Projets, du plus récent au plus ancien"></div>
+</main>
+
+<footer id="pied"></footer>
+
+<script>
+/* ====== À MODIFIER : tes informations ====== */
+const PROFIL = {
+  nom: "Ton nom",
+  titre: "Développeur de jeux et d’expériences interactives",
+  bio: [
+    "Je conçois et programme des systèmes de gameplay, des outils d’éditeur et des expériences interactives sur Unity et Unreal Engine 5.",
+    "J’aime les petits systèmes bien finis : une animation qui répond au joueur, un outil qui fait gagner une heure à l’équipe, un prototype qui tient debout.",
+    "Remplace ce texte par ton parcours, tes études, tes outils préférés."
+  ],
+  liens: [
+    { label: "GitHub", url: "https://github.com/ton-pseudo" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/ton-profil" },
+    { label: "Contact", url: "mailto:ton@email.com" }
+  ]
+};
+
+/* Un objet par projet. L’ordre n’a pas d’importance : tri automatique par date (le plus récent d’abord).
+   date  : "AAAA-MM"
+   video : lien YouTube (youtube.com ou youtu.be) OU fichier du dépôt, ex. "videos/demo.mp4". Laisse "" s’il n’y en a pas.
+   lien  : (facultatif) dépôt ou page du projet */
+const PROJETS = [
+  { nom: "PGP Engine", date: "2026-10", duree: "À renseigner",
+    bio: "Rasterizer logiciel en C++ avec SDL3 : fenêtre, framebuffer et remplissage de triangles par scanlines, sans GPU.",
+    video: "", lien: "" },
+  { nom: "Outils de splines (UE5)", date: "2026-07", duree: "À renseigner",
+    bio: "Outils d’éditeur Blueprint et C++ pour Unreal Engine 5 : alignement de splines sur le terrain et déplacement le long des courbes.",
+    video: "", lien: "" },
+  { nom: "Système de dialogues et cinématiques", date: "2026-06", duree: "À renseigner",
+    bio: "Dialogues et cutscenes sous Unity avec Timeline, TextMeshPro et DOTween.",
+    video: "", lien: "" },
+  { nom: "NoButton", date: "2026-05", duree: "À renseigner",
+    bio: "Un bouton d’interface qui fuit le curseur, animé avec DOTween et gestion fine des raycasts.",
+    video: "", lien: "" }
+];
+/* ====== Fin de la zone à modifier ====== */
+
+const $ = id => document.getElementById(id);
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+const moisFmt = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
+const ytId = u => (u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/) || [])[1];
+const calme = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Profil */
+document.title = PROFIL.nom + " – Portfolio";
+$("nom").textContent = PROFIL.nom;
+$("titre").textContent = PROFIL.titre;
+PROFIL.bio.forEach(p => $("bio").append(el("p", "", p)));
+PROFIL.liens.forEach(l => {
+  const li = el("li"), a = el("a", "", l.label);
+  a.href = l.url;
+  if (!l.url.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
+  li.append(a); $("liens").append(li);
+});
+$("pied").textContent = "© " + new Date().getFullYear() + " " + PROFIL.nom;
+
+/* Projets : du plus récent au plus ancien */
+const projets = [...PROJETS].sort((a, b) => b.date.localeCompare(a.date));
+const track = $("track"), menu = $("menu");
+const slides = [], tabs = [];
+let actif = 0;
+
+projets.forEach((p, i) => {
+  const s = el("article", "slide");
+  const media = el("div", "media");
+  const yt = p.video && ytId(p.video);
+  if (yt) {
+    const f = el("iframe");
+    f.src = "https://www.youtube-nocookie.com/embed/" + yt;
+    f.title = "Démo : " + p.nom; f.loading = "lazy"; f.allowFullscreen = true;
+    f.allow = "accelerometer; encrypted-media; picture-in-picture; fullscreen";
+    media.append(f);
+  } else if (p.video) {
+    const v = el("video"); v.src = p.video; v.controls = true; v.preload = "metadata"; v.playsInline = true;
+    media.append(v);
+  } else {
+    media.append(el("p", "novid", "Vidéo de démo à venir"));
+  }
+  const txt = el("div", "txt");
+  const d = new Date(p.date + "-01T12:00:00");
+  txt.append(el("p", "date", moisFmt.format(d)), el("h3", "", p.nom), el("p", "", p.bio));
+  const dl = el("dl");
+  dl.append(el("dt", "", "Temps de production"), el("dd", "", p.duree));
+  txt.append(dl);
+  if (p.lien) { const a = el("a", "", "Voir le projet"); a.href = p.lien; a.target = "_blank"; a.rel = "noopener"; txt.append(a); }
+  s.append(media, txt); track.append(s); slides.push(s);
+
+  const t = el("button", "", p.nom);
+  t.addEventListener("click", () => aller(i));
+  menu.append(t); tabs.push(t);
+});
+
+const padG = () => parseFloat(getComputedStyle(track).paddingLeft);
+function aller(i) {
+  i = Math.max(0, Math.min(slides.length - 1, i));
+  track.scrollTo({ left: slides[i].offsetLeft - padG(), behavior: calme ? "auto" : "smooth" });
+}
+function maj(i) {
+  actif = i;
+  tabs.forEach((t, j) => t.setAttribute("aria-current", j === i));
+  tabs[i].scrollIntoView({ block: "nearest", inline: "nearest", behavior: calme ? "auto" : "smooth" });
+  $("prev").disabled = i === 0;
+  $("next").disabled = i === slides.length - 1;
+  slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
+}
+let raf;
+track.addEventListener("scroll", () => {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(() => {
+    const x = track.scrollLeft, g = padG();
+    let i = slides.reduce((m, s, j) => Math.abs(s.offsetLeft - g - x) < Math.abs(slides[m].offsetLeft - g - x) ? j : m, 0);
+    if (x >= track.scrollWidth - track.clientWidth - 2) i = slides.length - 1;
+    if (i !== actif) maj(i);
+  });
+});
+$("prev").addEventListener("click", () => aller(actif - 1));
+$("next").addEventListener("click", () => aller(actif + 1));
+track.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") { e.preventDefault(); aller(actif - 1); }
+  if (e.key === "ArrowRight") { e.preventDefault(); aller(actif + 1); }
+});
+
+/* Glisser à la souris (le tactile est natif) */
+let drag = null;
+track.addEventListener("pointerdown", e => {
+  if (e.pointerType !== "mouse" || e.target.closest("video,iframe,a,button")) return;
+  drag = { x: e.clientX, s: track.scrollLeft };
+  track.classList.add("drag"); track.setPointerCapture(e.pointerId);
+});
+track.addEventListener("pointermove", e => { if (drag) track.scrollLeft = drag.s - (e.clientX - drag.x); });
+const fin = () => { if (!drag) return; drag = null; track.classList.remove("drag"); aller(actif); };
+track.addEventListener("pointerup", fin);
+track.addEventListener("pointercancel", fin);
+
+maj(0);
+</script>
+</body>
+</html>
