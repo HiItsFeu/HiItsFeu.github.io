@@ -506,8 +506,8 @@
         link     : (optional) repository or project page */
         const PROJECTS = [
         { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", team: "2",
-        bio: "C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multri-threading, blinn-phong lighting, multiple lights, terrain generation, built-in debuger.",
-        video: "https://youtu.be/hFcULMIPu58", photos: ["Pictures/DebugerCPUEngine.png"], link: "" },
+        bio: "C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multri-threading, blinn-phong lighting, multiple lights, terrain generation.",
+        video: "https://youtu.be/hFcULMIPu58", photos: [], link: "" },
         { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks", team: "2",
         bio: "A Unity game prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",
         video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
@@ -681,9 +681,7 @@
         const RADIUS = 280;           // range of the light around the mouse (px)
         const BASE = 0.26;            // diamond size at rest (1 = touching neighbours)
         const MAX = 0.9;              // diamond size right under the mouse: they grow smoothly from BASE to MAX
-        const BASE_FILL = "#0f0f12";  // resting colour: almost the background colour
-        const BASE_RIM = "rgba(255,255,255,.02)";
-        const FILL = "186,56,28";     // lit colour (deep red-orange, toned down for readability)
+        const BASE_RIM = "rgba(255,255,255,.05)";   // resting outline (the diamonds are outlines only, no interior)
         const RIM = "240,160,115";    // luminous outline of lit diamonds
         const LIGHT = "190,62,28";    // light cast on the background by lit diamonds
         const LIGHT_DIV = 8;          // the light is drawn at 1/8 resolution, blurred, then upscaled
@@ -697,9 +695,10 @@
 
         /* Colour strings built once instead of every frame */
         const LIGHT_STYLE = Array.from({ length: 256 }, (_, q) => "rgba(" + LIGHT + "," + (.38 * (q / 255) * (q / 255)).toFixed(3) + ")");
-        const FILL_STYLE = Array.from({ length: STEPS }, (_, b) => "rgba(" + FILL + "," + (b + 1) / STEPS + ")");
         const RIM_STYLE = Array.from({ length: STEPS }, (_, b) => "rgba(" + RIM + "," + (.62 * (b + 1) / STEPS).toFixed(3) + ")");
         const GLOW_ALPHA = [.3, .55, .8];
+        const BG = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#0d0d0f";
+        const MASK_R = BASE * CELL + 3;   // covers the resting outline of a diamond while it is lit
 
         let W = 0, H = 0, dpr = 1, cols = 0, rows = 0;
         let lit = new Float32Array(0), pts = new Float32Array(0), act = new Uint32Array(0), nxt = new Uint32Array(0);
@@ -710,16 +709,18 @@
         const diamond = (path, x, y, r) => { path.moveTo(x, y - r); path.lineTo(x + r, y); path.lineTo(x, y + r); path.lineTo(x - r, y); path.closePath(); };
         const fit = (c, x) => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); x.setTransform(dpr, 0, 0, dpr, 0, 0); };
 
-        /* Resting pattern: drawn once per size, every diamond slightly lighter than the background */
+        /* Resting pattern: drawn once per size, outlines only, barely lighter than the background */
         function drawBase() {
-        const body = new Path2D(), r = BASE * CELL;
+        const body = new Path2D(), r = BASE * CELL, OFF = 4000;
         for (let j = 0; j < rows; j++) for (let i = j & 1; i < cols; i += 2) diamond(body, i * CELL, j * CELL, r);
         bctx.clearRect(0, 0, W, H);
+        bctx.lineWidth = .75;
         bctx.save();
-        bctx.shadowColor = "rgba(0,0,0,.4)"; bctx.shadowBlur = 4 * dpr; bctx.shadowOffsetX = dpr; bctx.shadowOffsetY = 2 * dpr;
-        bctx.fillStyle = BASE_FILL; bctx.fill(body);
+        bctx.translate(-OFF, 0);
+        bctx.shadowColor = "rgba(0,0,0,.4)"; bctx.shadowBlur = 4 * dpr; bctx.shadowOffsetX = (OFF + 1) * dpr; bctx.shadowOffsetY = 2 * dpr;
+        bctx.strokeStyle = "#000"; bctx.stroke(body);
         bctx.restore();
-        bctx.lineWidth = .75; bctx.strokeStyle = BASE_RIM; bctx.stroke(body);
+        bctx.strokeStyle = BASE_RIM; bctx.stroke(body);
         }
 
         function resize() {
@@ -808,7 +809,21 @@
         prev = cur;
 
         if (n) {
-        /* 2. light cast on the background by the lit diamonds */
+        /* 2. group the lit diamonds by brightness level */
+        const levels = new Array(STEPS), glow = [null, null, null], shade = new Path2D(), mask = new Path2D();
+        for (let p = 0; p < n; p += 3) {
+        const x = pts[p], y = pts[p + 1], l = pts[p + 2], r = (BASE + (MAX - BASE) * l) * CELL;
+        const b = Math.min(STEPS - 1, Math.floor(Math.min(1, l * 1.4) * STEPS));
+        diamond(levels[b] || (levels[b] = new Path2D()), x, y, r);
+        diamond(shade, x, y, r);
+        diamond(mask, x, y, MASK_R);
+        if (l > .25) { const g = l > .75 ? 2 : l > .5 ? 1 : 0; diamond(glow[g] || (glow[g] = new Path2D()), x, y, r); }
+        }
+
+        /* 3. a lit diamond is the resting one growing: hide the resting outline underneath */
+        ctx.fillStyle = BG; ctx.fill(mask);
+
+        /* 4. light cast on the background by the lit diamonds */
         lctx.shadowColor = "rgba(" + LIGHT + ",.9)"; lctx.shadowBlur = 5;
         for (let p = 0; p < n; p += 3) {
         const l = pts[p + 2];
@@ -821,29 +836,18 @@
         ctx.drawImage(lc, cur[0], cur[1], cur[2] - cur[0], cur[3] - cur[1],
         cur[0] * LIGHT_DIV, cur[1] * LIGHT_DIV, (cur[2] - cur[0]) * LIGHT_DIV, (cur[3] - cur[1]) * LIGHT_DIV);
 
-        /* 3. group the lit diamonds by brightness level */
-        const levels = new Array(STEPS), glow = [null, null, null], shade = new Path2D();
-        for (let p = 0; p < n; p += 3) {
-        const x = pts[p], y = pts[p + 1], l = pts[p + 2], r = (BASE + (MAX - BASE) * l) * CELL;
-        const b = Math.min(STEPS - 1, Math.floor(Math.min(1, l * 1.4) * STEPS));
-        diamond(levels[b] || (levels[b] = new Path2D()), x, y, r);
-        diamond(shade, x, y, r);
-        if (l > .25) { const g = l > .75 ? 2 : l > .5 ? 1 : 0; diamond(glow[g] || (glow[g] = new Path2D()), x, y, r); }
-        }
-
-        /* 4. very light drop shadow (shape drawn off-screen so only its shadow shows) */
+        /* 5. very light drop shadow of the outlines (drawn off-screen so only the shadow shows) */
+        ctx.lineWidth = 1.25; ctx.lineJoin = "miter";
         const OFF = 4000;
         ctx.save();
         ctx.translate(-OFF, 0);
         ctx.shadowColor = "rgba(0,0,0,.3)"; ctx.shadowBlur = 5 * dpr; ctx.shadowOffsetX = (OFF + 1) * dpr; ctx.shadowOffsetY = 2.5 * dpr;
-        ctx.fillStyle = "#000"; ctx.fill(shade);
+        ctx.strokeStyle = "#000"; ctx.stroke(shade);
         ctx.restore();
 
-        /* 5. lit diamonds with their luminous outline, brighter levels last */
-        ctx.lineWidth = 1.25; ctx.lineJoin = "miter";
+        /* 6. luminous outlines only (no interior), brighter levels last */
         for (let b = 0; b < STEPS; b++) {
         if (!levels[b]) continue;
-        ctx.fillStyle = FILL_STYLE[b]; ctx.fill(levels[b]);
         ctx.strokeStyle = RIM_STYLE[b]; ctx.stroke(levels[b]);
         }
         ctx.save();
