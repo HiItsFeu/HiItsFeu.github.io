@@ -302,6 +302,11 @@
                 opacity: 1
             }
 
+            .status[data-state=done]::before {
+                background: #43c06a;
+                opacity: 1
+            }
+
         .txt h3 {
             font-size: clamp(1.7rem,3.2vw,2.3rem);
             line-height: 1.05;
@@ -500,9 +505,9 @@
         They appear with the videos in a small gallery (videos first). Leave [] if there are none.
         link     : (optional) repository or project page */
         const PROJECTS = [
-        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", team: "2", ongoing: true,
+        { name: "CPU Engine", order: 1, date: "2026-10", duration: "4 weeks", team: "2",
         bio: "C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multri-threading, blinn-phong lighting, multiple lights, terrain generation.",
-        video: "https://youtu.be/hFcULMIPu58", photos: ["Pictures/PGPEngine1.png"], link: "" },
+        video: "https://youtu.be/hFcULMIPu58", photos: [], link: "" },
         { name: "A simple slime", order: 2, date: "2026-10", duration: "3 weeks", team: "2",
         bio: "A Unity game prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",
         video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
@@ -683,12 +688,24 @@
         const LIGHT = "190,62,28";    // light cast on the background by lit diamonds
         const LIGHT_DIV = 8;          // the light is drawn at 1/8 resolution, blurred, then upscaled
         const STEPS = 16;             // brightness levels while a diamond lights up (more = smoother fade)
+        const MAX_FPS = 60;           // frame cap of the animation (0 = follow the screen refresh rate)
+        const FRINGE = 110;           // px around the lit diamonds reached by their light: only this area is redrawn
         const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
         const baseCv = $("gridBase"), bctx = baseCv.getContext("2d");
         const cv = $("gridFx"), ctx = cv.getContext("2d");
         const lc = document.createElement("canvas"), lctx = lc.getContext("2d");
-        let W = 0, H = 0, dpr = 1, cols = 0, rows = 0, lit = new Float32Array(0), pts = new Float32Array(0);
+
+        /* Colour strings built once instead of every frame */
+        const LIGHT_STYLE = Array.from({ length: 256 }, (_, q) => "rgba(" + LIGHT + "," + (.38 * (q / 255) * (q / 255)).toFixed(3) + ")");
+        const FILL_STYLE = Array.from({ length: STEPS }, (_, b) => "rgba(" + FILL + "," + (b + 1) / STEPS + ")");
+        const RIM_STYLE = Array.from({ length: STEPS }, (_, b) => "rgba(" + RIM + "," + (.62 * (b + 1) / STEPS).toFixed(3) + ")");
+        const GLOW_ALPHA = [.3, .55, .8];
+
+        let W = 0, H = 0, dpr = 1, cols = 0, rows = 0;
+        let lit = new Float32Array(0), pts = new Float32Array(0), act = new Uint32Array(0), nxt = new Uint32Array(0);
+        let actN = 0, n = 0, nN = 0, prev = null;
         let mx = 0, my = 0, tx = 0, ty = 0, inside = false, running = false, last = 0;
+        let grow = 1, shrink = 1, changed = false, minX = 0, maxX = 0, minY = 0, maxY = 0;
 
         const diamond = (path, x, y, r) => { path.moveTo(x, y - r); path.lineTo(x + r, y); path.lineTo(x, y + r); path.lineTo(x - r, y); path.closePath(); };
         const fit = (c, x) => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); x.setTransform(dpr, 0, 0, dpr, 0, 0); };
@@ -712,70 +729,106 @@
         fit(baseCv, bctx); drawBase();
         if (!fine) return;
         fit(cv, ctx);
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
         lc.width = Math.ceil(W / LIGHT_DIV); lc.height = Math.ceil(H / LIGHT_DIV);
         lit = new Float32Array(cols * rows);
         pts = new Float32Array(cols * rows * 3);
+        act = new Uint32Array(cols * rows); nxt = new Uint32Array(cols * rows);
+        actN = 0; prev = null;
         }
+
+        /* The animation only runs while something changes: it stops once the diamonds have settled */
+        const start = () => { if (!running) { running = true; last = 0; requestAnimationFrame(frame); } };
         let rt;
         addEventListener("resize", () => {
         clearTimeout(rt);
-        rt = setTimeout(() => { resize(); if (fine && inside && !running) { running = true; last = 0; requestAnimationFrame(frame); } }, 120);
+        rt = setTimeout(() => { resize(); if (fine && inside) start(); }, 120);
         });
         resize();
         if (!fine) return;
 
+        /* Updates one diamond's light level and records it if it is visible */
+        function upd(k, cx, cy, target) {
+        const o = lit[k];
+        let l = o + (target - o) * (target > o ? grow : shrink);
+        if (l < .01) l = 0;
+        lit[k] = l;
+        const dl = l - o;
+        if (dl > 2e-4 || dl < -2e-4) changed = true;
+        if (l > 0) {
+        nxt[nN++] = k; pts[n++] = cx; pts[n++] = cy; pts[n++] = l;
+        if (cx < minX) minX = cx; if (cx > maxX) maxX = cx; if (cy < minY) minY = cy; if (cy > maxY) maxY = cy;
+        }
+        }
+
         function frame(now) {
+        if (MAX_FPS && last && now - last < 1000 / MAX_FPS - 4) { requestAnimationFrame(frame); return; }
         const dt = last ? Math.min((now - last) / 16.67, 4) : 1;
         last = now;
         const follow = calm ? 1 : 1 - Math.pow(1 - .4, dt);
         mx += (tx - mx) * follow; my += (ty - my) * follow;
-        const grow = calm ? 1 : 1 - Math.pow(1 - .35, dt), shrink = calm ? 1 : 1 - Math.pow(1 - .07, dt);
-        let alive = Math.abs(tx - mx) > .5 || Math.abs(ty - my) > .5, n = 0;
+        grow = calm ? 1 : 1 - Math.pow(1 - .35, dt); shrink = calm ? 1 : 1 - Math.pow(1 - .07, dt);
+        changed = Math.abs(tx - mx) > .5 || Math.abs(ty - my) > .5;
+        n = 0; nN = 0; minX = minY = Infinity; maxX = maxY = -Infinity;
 
-        /* 1. light level of every diamond: 0 = resting, 1 = fully lit */
-        for (let j = 0; j < rows; j++) {
-        const cy = j * CELL;
-        for (let i = j & 1; i < cols; i += 2) {
-        const cx = i * CELL, k = j * cols + i;
-        let target = 0;
+        /* 1. light level of the diamonds: only those near the mouse and those still fading are visited */
+        let i0 = 0, i1 = -1, j0 = 0, j1 = -1;
         if (inside) {
-        const dx = cx - mx, dy = cy - my;
+        i0 = Math.max(0, Math.floor((mx - RADIUS) / CELL)); i1 = Math.min(cols - 1, Math.ceil((mx + RADIUS) / CELL));
+        j0 = Math.max(0, Math.floor((my - RADIUS) / CELL)); j1 = Math.min(rows - 1, Math.ceil((my + RADIUS) / CELL));
+        for (let j = j0; j <= j1; j++) {
+        const cy = j * CELL, dy = cy - my;
+        for (let i = i0 + ((i0 ^ j) & 1); i <= i1; i += 2) {
+        const cx = i * CELL, dx = cx - mx;
+        let target = 0;
         if (dx > -RADIUS && dx < RADIUS && dy > -RADIUS && dy < RADIUS) {
-        const d = Math.hypot(dx, dy);
+        const d = Math.sqrt(dx * dx + dy * dy);
         if (d < RADIUS) target = Math.pow(1 - d / RADIUS, 1.3);
         }
-        }
-        let l = lit[k];
-        l += (target - l) * (target > l ? grow : shrink);
-        if (l < .01) l = 0;
-        lit[k] = l;
-        if (l > 0) { alive = true; pts[n++] = cx; pts[n++] = cy; pts[n++] = l; }
+        upd(j * cols + i, cx, cy, target);
         }
         }
+        }
+        for (let a = 0; a < actN; a++) {
+        const k = act[a], j = (k / cols) | 0, i = k - j * cols;
+        if (inside && i >= i0 && i <= i1 && j >= j0 && j <= j1) continue;
+        upd(k, i * CELL, j * CELL, 0);
+        }
+        const swap = act; act = nxt; nxt = swap; actN = nN;
 
-        ctx.clearRect(0, 0, W, H);
+        /* Area to redraw (in light-canvas pixels): where diamonds are now, plus where they were */
+        const M = FRINGE;
+        const cur = n ? [Math.max(0, Math.floor((minX - M) / LIGHT_DIV)), Math.max(0, Math.floor((minY - M) / LIGHT_DIV)),
+        Math.min(lc.width, Math.ceil((maxX + M) / LIGHT_DIV)), Math.min(lc.height, Math.ceil((maxY + M) / LIGHT_DIV))] : null;
+        const u = cur && prev ? [Math.min(cur[0], prev[0]), Math.min(cur[1], prev[1]), Math.max(cur[2], prev[2]), Math.max(cur[3], prev[3])] : (cur || prev);
+        if (u) {
+        lctx.clearRect(u[0], u[1], u[2] - u[0], u[3] - u[1]);
+        ctx.clearRect(u[0] * LIGHT_DIV, u[1] * LIGHT_DIV, (u[2] - u[0]) * LIGHT_DIV, (u[3] - u[1]) * LIGHT_DIV);
+        }
+        prev = cur;
+
         if (n) {
         /* 2. light cast on the background by the lit diamonds */
-        lctx.clearRect(0, 0, lc.width, lc.height);
         lctx.shadowColor = "rgba(" + LIGHT + ",.9)"; lctx.shadowBlur = 5;
         for (let p = 0; p < n; p += 3) {
         const l = pts[p + 2];
         if (l < .05) continue;
-        const path = new Path2D();
-        diamond(path, pts[p] / LIGHT_DIV, pts[p + 1] / LIGHT_DIV, (BASE + (MAX - BASE) * l) * CELL * 1.5 / LIGHT_DIV);
-        lctx.fillStyle = "rgba(" + LIGHT + "," + (.38 * l * l).toFixed(3) + ")";
-        lctx.fill(path);
+        const x = pts[p] / LIGHT_DIV, y = pts[p + 1] / LIGHT_DIV, r = (BASE + (MAX - BASE) * l) * CELL * 1.5 / LIGHT_DIV;
+        lctx.fillStyle = LIGHT_STYLE[(l * 255 + .5) | 0];
+        lctx.beginPath(); lctx.moveTo(x, y - r); lctx.lineTo(x + r, y); lctx.lineTo(x, y + r); lctx.lineTo(x - r, y); lctx.closePath();
+        lctx.fill();
         }
-        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(lc, 0, 0, lc.width * LIGHT_DIV, lc.height * LIGHT_DIV);
+        ctx.drawImage(lc, cur[0], cur[1], cur[2] - cur[0], cur[3] - cur[1],
+        cur[0] * LIGHT_DIV, cur[1] * LIGHT_DIV, (cur[2] - cur[0]) * LIGHT_DIV, (cur[3] - cur[1]) * LIGHT_DIV);
 
         /* 3. group the lit diamonds by brightness level */
-        const levels = Array.from({ length: STEPS }, () => new Path2D()), shade = new Path2D(), glow = [new Path2D(), new Path2D(), new Path2D()];
+        const levels = new Array(STEPS), glow = [null, null, null], shade = new Path2D();
         for (let p = 0; p < n; p += 3) {
-        const l = pts[p + 2], r = (BASE + (MAX - BASE) * l) * CELL;
-        diamond(levels[Math.min(STEPS - 1, Math.floor(Math.min(1, l * 1.4) * STEPS))], pts[p], pts[p + 1], r);
-        diamond(shade, pts[p], pts[p + 1], r);
-        if (l > .25) diamond(glow[l > .75 ? 2 : l > .5 ? 1 : 0], pts[p], pts[p + 1], r);
+        const x = pts[p], y = pts[p + 1], l = pts[p + 2], r = (BASE + (MAX - BASE) * l) * CELL;
+        const b = Math.min(STEPS - 1, Math.floor(Math.min(1, l * 1.4) * STEPS));
+        diamond(levels[b] || (levels[b] = new Path2D()), x, y, r);
+        diamond(shade, x, y, r);
+        if (l > .25) { const g = l > .75 ? 2 : l > .5 ? 1 : 0; diamond(glow[g] || (glow[g] = new Path2D()), x, y, r); }
         }
 
         /* 4. very light drop shadow (shape drawn off-screen so only its shadow shows) */
@@ -789,27 +842,27 @@
         /* 5. lit diamonds with their luminous outline, brighter levels last */
         ctx.lineWidth = 1.25; ctx.lineJoin = "miter";
         for (let b = 0; b < STEPS; b++) {
-        const a = (b + 1) / STEPS;
-        ctx.fillStyle = "rgba(" + FILL + "," + a + ")"; ctx.fill(levels[b]);
-        ctx.strokeStyle = "rgba(" + RIM + "," + (.62 * a).toFixed(3) + ")"; ctx.stroke(levels[b]);
+        if (!levels[b]) continue;
+        ctx.fillStyle = FILL_STYLE[b]; ctx.fill(levels[b]);
+        ctx.strokeStyle = RIM_STYLE[b]; ctx.stroke(levels[b]);
         }
         ctx.save();
         ctx.strokeStyle = "rgba(" + RIM + ",.8)"; ctx.shadowColor = "rgba(215,115,65,.6)"; ctx.shadowBlur = 4 * dpr;
-        glow.forEach((g, i) => { ctx.globalAlpha = [.3, .55, .8][i]; ctx.stroke(g); });
+        for (let g = 0; g < 3; g++) if (glow[g]) { ctx.globalAlpha = GLOW_ALPHA[g]; ctx.stroke(glow[g]); }
         ctx.restore();
         }
 
-        if (alive || inside) requestAnimationFrame(frame);
-        else { running = false; last = 0; ctx.clearRect(0, 0, W, H); }
+        if (changed || (!inside && n)) requestAnimationFrame(frame);
+        else { running = false; last = 0; }
         }
 
         addEventListener("pointermove", e => {
         if (e.pointerType !== "mouse") return;
         tx = e.clientX; ty = e.clientY;
         if (!inside) { inside = true; if (!running) { mx = tx; my = ty; } }
-        if (!running) { running = true; last = 0; requestAnimationFrame(frame); }
+        start();
         });
-        document.documentElement.addEventListener("pointerleave", () => { inside = false; });
+        document.documentElement.addEventListener("pointerleave", () => { inside = false; if (prev) start(); });
         })();
     </script>
 </body>
