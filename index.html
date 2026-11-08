@@ -205,7 +205,7 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
-            padding: 1.75rem max(1.5rem,calc(50vw - 550px));
+            padding: clamp(.75rem,2.5svh,1.75rem) max(1.5rem,calc(50vw - 550px));
             scroll-padding-inline: max(1.5rem,calc(50vw - 550px));
             cursor: grab
         }
@@ -221,7 +221,7 @@
             }
 
         .slide {
-            flex: 0 0 min(1000px,88vw);
+            flex: 0 0 min(1000px,88vw,max(560px,calc(1000px - (700px - 100svh) * 3)));
             scroll-snap-align: start;
             display: grid;
             grid-template-columns: 1.5fr 1fr;
@@ -374,24 +374,28 @@
         }
 
         .team {
+            container-type: inline-size;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: .1rem .35rem;
+            gap: .1rem .3rem;
             min-height: calc(1.4rem * 1.6)
         }
 
+            /* --n = number of icons: each one takes its share of the free width, between .8rem and 1.45rem */
             .team svg {
                 display: block;
-                width: 1.45rem;
-                height: 1.45rem;
+                flex: none;
+                width: clamp(.8rem, calc((100cqw - (var(--n) - 1) * .3rem) / var(--n)), 1.45rem);
+                aspect-ratio: 1;
+                height: auto;
                 fill: currentColor
             }
 
         footer {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 1rem 1.5rem 3rem;
+            padding: 1rem 1.5rem clamp(1rem,4svh,3rem);
             color: var(--mut);
             font-size: .95rem
         }
@@ -418,7 +422,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-snap-type: y proximity
+            scroll-snap-type: y mandatory
         }
 
         @media (prefers-reduced-motion:reduce) {
@@ -434,7 +438,8 @@
             min-height: 100svh;
             display: flex;
             flex-direction: column;
-            scroll-snap-align: start
+            scroll-snap-align: start;
+            scroll-snap-stop: always
         }
 
         .about header {
@@ -463,7 +468,7 @@
 
         #projects .body {
             margin-block: auto;
-            padding-block: 2rem
+            padding-block: clamp(.5rem,3svh,2rem)
         }
 
         footer {
@@ -629,7 +634,7 @@
         if (count < 1) return text;
         const label = /^\d+$/.test(text) ? (count === 1 ? "Solo" : count + " people") : text;
         const box = el("span", "team");
-        box.setAttribute("role", "img"); box.setAttribute("aria-label", label); box.title = label;
+        box.setAttribute("role", "img"); box.setAttribute("aria-label", label); box.title = label; box.style.setProperty("--n", count);
         for (let i = 0; i < count; i++) box.append(personIcon());
         return box;
         };
@@ -748,6 +753,55 @@
         /* Open on the newest project */
         update(active, true);
         go(active, true);
+
+        /* Page scrolling: one gesture = one section (profile <-> projects), never an in-between position.
+        The wheel is handled directly; any other scroll that still reaches the page (wheel over a video, keyboard, scrollbar)
+        is turned into the same section jump. Touch swipes stay native (CSS scroll-snap). */
+        (() => {
+        const page = $("projects"), body = page.querySelector(".body");
+        const hasEnd = "onscrollend" in window;
+        let lastT = 0, lastD = 0, busy = false, busyTimer = 0, settleTimer = 0, settled = 0, touching = false, fingerDown = false;
+        const stops = () => {
+        const max = Math.round(document.documentElement.scrollHeight - innerHeight), top = Math.round(page.offsetTop);
+        const over = page.offsetHeight - innerHeight;                      // how much taller than the screen the projects page is
+        const slack = parseFloat(getComputedStyle(body).paddingTop) - 2;   // top padding that can be hidden without cutting any content
+        return over <= slack || top >= max ? [0, max] : [0, top, max];
+        };
+        const nearest = (s, y) => s.reduce((c, v, i) => Math.abs(v - y) < Math.abs(s[c] - y) ? i : c, 0);
+        const settle = () => { if (fingerDown) return; touching = false; settled = stops()[nearest(stops(), scrollY)]; };
+        const release = () => { busy = false; clearTimeout(busyTimer); clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); };
+        function step(dir) {
+        const s = stops(), c = nearest(s, scrollY), next = Math.max(0, Math.min(s.length - 1, c + dir));
+        if (next === c) return;
+        busy = true; clearTimeout(busyTimer); busyTimer = setTimeout(release, hasEnd ? 1500 : 900);
+        scrollTo({ top: s[next], behavior: calm ? "auto" : "smooth" });
+        }
+        addEventListener("scrollend", () => { if (busy) release(); });
+
+        addEventListener("wheel", e => {
+        if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;  // pinch-zoom and horizontal gestures stay native
+        e.preventDefault();
+        const t = e.timeStamp, d = Math.abs(e.deltaY);
+        const fresh = t - lastT > 90 || d > lastD * 1.8 + 2;               // a new gesture, or a clear new push during a trackpad's inertia tail
+        lastT = t; lastD = d;
+        if (busy || !fresh || d < 2) return;
+        step(e.deltaY > 0 ? 1 : -1);
+        }, { passive: false });
+
+        /* Scrolls that did not go through the wheel handler above */
+        addEventListener("scroll", () => {
+        if (busy || touching) return;
+        const dy = scrollY - settled;
+        if (Math.abs(dy) > 6) step(dy > 0 ? 1 : -1);
+        else { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); }
+        }, { passive: true });
+        addEventListener("touchstart", () => { fingerDown = touching = true; }, { passive: true });
+        const touchEnd = () => { fingerDown = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 400); };
+        addEventListener("touchend", touchEnd, { passive: true });
+        addEventListener("touchcancel", touchEnd, { passive: true });
+        addEventListener("resize", () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 200); });
+        settle();
+        })();
 
         /* Diamond pattern on the whole background. Only the diamonds near the mouse light up and emit light */
         (() => {
