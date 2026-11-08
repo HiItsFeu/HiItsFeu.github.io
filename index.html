@@ -357,7 +357,8 @@
             border-top: 1px solid var(--line);
             padding-top: .9rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit,minmax(8.5rem,1fr));
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(0,1fr);
             gap: .9rem 1.5rem
         }
 
@@ -371,6 +372,21 @@
             font-weight: 700;
             color: var(--hot)
         }
+
+        .team {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .1rem .35rem;
+            min-height: calc(1.4rem * 1.6)
+        }
+
+            .team svg {
+                display: block;
+                width: 1.45rem;
+                height: 1.45rem;
+                fill: currentColor
+            }
 
         footer {
             max-width: 1100px;
@@ -598,6 +614,26 @@
         });
         $("copy").textContent = "© " + new Date().getFullYear() + " " + PROFILE.name;
 
+        /* Team size: one simplified person icon per team member (free text without a leading number stays text) */
+        const SVG = "http://www.w3.org/2000/svg";
+        const personIcon = () => {
+        const svg = document.createElementNS(SVG, "svg"), head = document.createElementNS(SVG, "circle"), body = document.createElementNS(SVG, "path");
+        svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+        head.setAttribute("cx", "12"); head.setAttribute("cy", "7.5"); head.setAttribute("r", "4.5");
+        body.setAttribute("d", "M3 22c0-5 4-9 9-9s9 4 9 9z");
+        svg.append(head, body);
+        return svg;
+        };
+        const teamNode = team => {
+        const text = String(team).trim(), m = text.match(/^(\d+)/), count = m ? +m[1] : 0;
+        if (count < 1) return text;
+        const label = /^\d+$/.test(text) ? (count === 1 ? "Solo" : count + " people") : text;
+        const box = el("span", "team");
+        box.setAttribute("role", "img"); box.setAttribute("aria-label", label); box.title = label;
+        for (let i = 0; i < count; i++) box.append(personIcon());
+        return box;
+        };
+
         /* Projects: order 1 on the right, following orders to its left */
         const projects = [...PROJECTS]
         .sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date))
@@ -653,9 +689,9 @@
         meta.append(status);
         txt.append(meta, el("h3", "", p.name), el("p", "", p.bio));
         const dl = el("dl");
-        const stat = (label, value) => { const d = el("div"); d.append(el("dt", "", label), el("dd", "", value)); dl.append(d); };
+        const stat = (label, value) => { const d = el("div"), dd = el("dd", "", typeof value === "string" ? value : null); if (typeof value !== "string") dd.append(value); d.append(el("dt", "", label), dd); dl.append(d); };
         stat("Production time", p.duration);
-        if (p.team != null && p.team !== "") stat("Team size", typeof p.team === "number" ? (p.team === 1 ? "Solo" : p.team + " people") : p.team);
+        if (p.team != null && p.team !== "") stat("Team size", teamNode(p.team));
         txt.append(dl);
         if (p.link) { const a = el("a", "", "View project"); a.href = p.link; a.target = "_blank"; a.rel = "noopener"; txt.append(a); }
         s.append(gallery, txt); track.append(s); slides.push(s);
