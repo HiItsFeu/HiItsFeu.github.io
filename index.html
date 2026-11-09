@@ -16,7 +16,8 @@
             --acc: #ff3d2e;
             --hot: #ff9a1f;
             --line: #2c2c31;
-            --glass: rgba(24,24,27,.48);
+            --glass: rgba(24,24,27,.42);
+            --glass-fx: blur(5px) saturate(125%); /* one shared frosted-glass look: squares stay visible but soft */
             --glass-line: rgba(255,255,255,.09);
             color-scheme: dark
         }
@@ -110,15 +111,20 @@
 
         .arrows {
             display: flex;
-            gap: .5rem
+            flex-direction: column;
+            gap: .5rem;
+            flex: none
         }
 
             .arrows button {
                 width: 2.75rem;
                 height: 2.75rem;
+                background: var(--glass);
+                -webkit-backdrop-filter: var(--glass-fx);
+                backdrop-filter: var(--glass-fx);
+                border: 1px solid var(--glass-line);
+                border-bottom: 3px solid #4a4a52;
                 border-radius: 0;
-                border: 1px solid var(--line);
-                background: var(--surf);
                 color: var(--fg);
                 font-size: 1.25rem;
                 cursor: pointer;
@@ -127,7 +133,7 @@
 
         @media (hover:hover) {
             .arrows button:hover:not(:disabled) {
-                background-color: #303036;
+                background-color: rgba(78,78,86,.5);
                 border-color: var(--acc);
                 transform: scale(1.06)
             }
@@ -157,8 +163,8 @@
 
             .menu button {
                 background: var(--glass);
-                -webkit-backdrop-filter: blur(16px) saturate(130%);
-                backdrop-filter: blur(16px) saturate(130%);
+                -webkit-backdrop-filter: var(--glass-fx);
+                backdrop-filter: var(--glass-fx);
                 border: 1px solid var(--glass-line);
                 border-radius: 0;
                 border-bottom: 3px solid #4a4a52;
@@ -208,8 +214,8 @@
             grid-template-columns: 1.5fr 1fr;
             gap: 2rem;
             background: var(--glass);
-            -webkit-backdrop-filter: blur(16px) saturate(130%);
-            backdrop-filter: blur(16px) saturate(130%);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
             border: 1px solid var(--glass-line);
             border-radius: 0;
             padding: 1.25rem
@@ -402,8 +408,7 @@
 
 
         html {
-            scroll-behavior: smooth;
-            scroll-snap-type: y mandatory
+            scroll-behavior: smooth
         }
 
         @media (prefers-reduced-motion:reduce) {
@@ -418,9 +423,7 @@
             min-height: 100vh;
             min-height: 100svh;
             display: flex;
-            flex-direction: column;
-            scroll-snap-align: start;
-            scroll-snap-stop: always
+            flex-direction: column
         }
 
         .about header {
@@ -430,8 +433,8 @@
             padding: clamp(1.5rem,4vw,3rem);
             align-items: center;
             background: var(--glass);
-            -webkit-backdrop-filter: blur(16px) saturate(130%);
-            backdrop-filter: blur(16px) saturate(130%);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
             border: 1px solid var(--glass-line);
             border-radius: 0
         }
@@ -480,14 +483,23 @@
             margin: 0 auto;
             padding: 0 1.5rem;
             display: grid;
-            grid-template-columns: 7rem minmax(0,1fr)
+            grid-template-columns: 8rem minmax(0,1fr);
+            column-gap: 1.75rem
         }
 
+        .deck {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0
+        }
+
+        /* Timeline: detached from the projects by the grid gap; the scale is readable (neighbouring dates are labelled) */
         .timeline {
             position: relative;
             overflow: hidden;
-            -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
-            mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent)
+            -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+            mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent)
         }
 
             .timeline::after {
@@ -496,54 +508,85 @@
                 right: 0;
                 top: 0;
                 bottom: 0;
-                width: 1px;
-                background: var(--line)
+                width: 2px;
+                background: rgba(255,255,255,.2)
             }
 
         .ticks i {
             position: absolute;
             right: 0;
             top: 50%;
-            width: .6rem;
-            height: 1px;
-            background: var(--mut)
+            width: .7rem;
+            height: 2px;
+            background: rgba(255,255,255,.5)
         }
+
+            .ticks i span {
+                font-style: normal;
+                position: absolute;
+                right: calc(100% + .7rem);
+                top: 50%;
+                transform: translateY(-50%);
+                white-space: nowrap;
+                font-size: .82rem;
+                line-height: 1;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+                color: #b4b4bc;
+                text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg)
+            }
 
         .mark {
             position: absolute;
             right: 0;
             top: 50%;
-            width: 1.4rem;
-            height: 3px;
-            margin-top: -1px;
-            background: var(--acc)
+            width: 1.6rem;
+            height: 4px;
+            margin-top: -2px;
+            background: var(--acc);
+            box-shadow: 0 0 12px rgba(255,61,46,.55)
         }
 
         .when {
             position: absolute;
-            right: 2rem;
+            right: 2.2rem;
             top: 50%;
             transform: translateY(-50%);
             text-align: right;
-            white-space: pre-line;
-            font-weight: 800;
-            font-size: 1.15rem;
-            line-height: 1.1;
-            letter-spacing: -.02em
+            line-height: 1;
+            text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg)
         }
+
+            .when .m {
+                display: block;
+                font-size: 1.7rem;
+                font-weight: 800;
+                letter-spacing: -.02em;
+                color: var(--fg)
+            }
+
+            .when .y {
+                display: block;
+                margin-top: .3rem;
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--hot)
+            }
 
         .wheel {
             --peek: clamp(2rem, 7svh, 3.75rem);
             width: min(100%, 1000px, max(560px, calc(1000px - (700px - 100svh) * 3)));
+            flex: 0 1 auto;
+            min-width: 0;
             display: grid;
             grid-template-columns: minmax(0,1fr);
             padding-block: var(--peek);
             overflow: hidden;
             perspective: 1400px;
             touch-action: none;
-            cursor: grab;
-            -webkit-mask-image: linear-gradient(transparent, #000 calc(var(--peek) * .9), #000 calc(100% - var(--peek) * .9), transparent);
-            mask-image: linear-gradient(transparent, #000 calc(var(--peek) * .9), #000 calc(100% - var(--peek) * .9), transparent)
+            cursor: grab
+            /* no mask here: a mask on an ancestor would stop the slides' backdrop blur from seeing the diamond background.
+               The fade at the top and bottom is done by each slide's own opacity instead (see draw()) */
         }
 
             .wheel.drag {
@@ -558,21 +601,43 @@
 
         @media (max-width:760px) {
             .stage {
-                grid-template-columns: 2.25rem minmax(0,1fr);
+                grid-template-columns: 2.4rem minmax(0,1fr);
+                column-gap: .6rem;
                 padding: 0 1rem
+            }
+
+            .deck {
+                gap: .5rem
+            }
+
+            .arrows button {
+                width: 2.25rem;
+                height: 2.25rem
             }
 
             .mark {
                 width: .9rem
             }
 
+            .ticks i span {
+                display: none
+            }
+
             .when {
-                right: .9rem;
+                right: 1rem;
                 writing-mode: vertical-rl;
                 transform: translateY(-50%) rotate(180deg);
-                white-space: nowrap;
-                font-size: .95rem
+                white-space: nowrap
             }
+
+                .when .m, .when .y {
+                    display: inline;
+                    font-size: .95rem
+                }
+
+                .when .y {
+                    margin: 0 0 0 .4em
+                }
         }
     </style>
 </head>
@@ -594,10 +659,6 @@
         <div class="body">
             <div class="projects-head">
                 <h2 class="section">Projects</h2>
-                <div class="arrows">
-                    <button id="prev" aria-label="Newer project">↑</button>
-                    <button id="next" aria-label="Older project">↓</button>
-                </div>
             </div>
             <nav class="menu" id="menu" aria-label="Project list"></nav>
             <div class="stage">
@@ -606,7 +667,13 @@
                     <span class="mark"></span>
                     <time class="when" id="when"></time>
                 </div>
-                <div class="wheel" id="track" tabindex="0" role="group" aria-label="Projects, newest at the top. Swipe up or scroll down for older ones"></div>
+                <div class="deck">
+                    <div class="wheel" id="track" tabindex="0" role="group" aria-label="Projects, newest at the top. Swipe up or scroll down for older ones"></div>
+                    <div class="arrows">
+                        <button id="prev" aria-label="Newer project">↑</button>
+                        <button id="next" aria-label="Older project">↓</button>
+                    </div>
+                </div>
             </div>
         </div>
         <footer><span id="copy"></span><a href="#about">↑ About</a></footer>
@@ -686,6 +753,7 @@
         const $ = id => document.getElementById(id);
         const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
         const monthFmt = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
+        const monthShort = d => d.toLocaleString("en", { month: "long" }).slice(0, 3);   // first 3 letters only
         const ytId = u => (u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/) || [])[1];
         const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -797,10 +865,10 @@
 
         /* Wheel: the cards sit on a vertical drum. pos = (fractional) index in front of the viewer, goal = index it settles on */
         const when = $("when"), ticks = $("ticks");
-        const STEP = 30, PITCH = 38;          // degrees between two cards / px between two timeline ticks
-        let pos = 0, goal = 0, R = 0, rafW = 0, pageStep = () => {};
+        const STEP = 30, PITCH = 56;          // degrees between two cards / px between two timeline ticks
+        let pos = 0, goal = 0, R = 0, rafW = 0;
         const behavior = instant => (instant || calm) ? "auto" : "smooth";
-        projects.forEach(() => ticks.append(el("i")));
+        projects.forEach(p => { const i = el("i"), dt = new Date(p.date + "-01T12:00:00"); i.append(el("span", "", monthShort(dt) + " " + dt.getFullYear())); ticks.append(i); });
         const tickEls = [...ticks.children];
 
         function update(i, instant) {
@@ -810,7 +878,7 @@
         menu.scrollTo({ left: t.offsetLeft - (menu.clientWidth - t.offsetWidth) / 2, behavior: behavior(instant) });
         slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
         const dt = new Date(projects[i].date + "-01T12:00:00");
-        when.textContent = dt.toLocaleString("en", { month: "long" }) + "\n" + dt.getFullYear();
+        when.replaceChildren(el("span", "m", monthShort(dt)), el("span", "y", String(dt.getFullYear())));
         when.dateTime = projects[i].date;
         }
 
@@ -821,13 +889,14 @@
         if (!vis) return;
         if (s.load) { s.load(); s.load = null; }
         s.style.transform = `translateZ(${-R}px) rotateX(${-d * STEP}deg) translateZ(${R}px)`;
-        s.style.opacity = Math.max(0, 1 - a * .6).toFixed(3);
+        s.style.opacity = Math.max(0, 1 - a * .75).toFixed(3);
         s.inert = a > .5;
         });
         tickEls.forEach((t, i) => {
         const d = i - pos;
         t.style.transform = `translateY(${d * PITCH}px)`;
         t.style.opacity = Math.max(0, 1 - Math.abs(d) * .22).toFixed(3);
+        t.firstChild.style.opacity = Math.min(1, Math.max(0, (Math.abs(d) - .45) * 2.2)).toFixed(3);   // the centre date is shown big by .when
         });
         const n = Math.round(pos);
         if (n !== active && n >= 0 && n < slides.length) update(n);
@@ -884,7 +953,7 @@
         if (!d.moved) return;
         const dy = e.clientY - d.y, fast = Math.abs(dy / Math.max(1, e.timeStamp - d.t)) > .5;
         const t = Math.max(0, Math.min(slides.length - 1, fast ? (dy < 0 ? Math.ceil(pos) : Math.floor(pos)) : Math.round(pos)));
-        if (t === d.i && Math.abs(dy) > 40 && (dy < 0 ? t === slides.length - 1 : t === 0)) pageStep(dy < 0 ? 1 : -1);
+        if (t === d.i && Math.abs(dy) > 40 && (dy < 0 ? t === slides.length - 1 : t === 0)) scrollBy({ top: (dy < 0 ? 1 : -1) * innerHeight * .8, behavior: calm ? "auto" : "smooth" });   // swipe past either end: hand over to the page
         go(t);
         };
         track.addEventListener("pointerup", endDrag);
@@ -895,56 +964,19 @@
         go(0, true);
         measure();
 
-        /* Page scrolling: one gesture = one section (profile <-> projects), never an in-between position.
-        The wheel is handled directly; any other scroll that still reaches the page (wheel over a video, keyboard, scrollbar)
-        is turned into the same section jump. Touch swipes stay native (CSS scroll-snap). */
+        /* Mouse wheel over the projects: turns the project wheel. At either end (or anywhere else on the page)
+        the wheel is left alone, so the site keeps its normal native scrolling. */
         (() => {
-        const page = $("projects"), body = page.querySelector(".body");
-        const hasEnd = "onscrollend" in window;
-        let lastT = 0, lastD = 0, busy = false, busyTimer = 0, settleTimer = 0, settled = 0, touching = false, fingerDown = false;
-        const stops = () => {
-        const max = Math.round(document.documentElement.scrollHeight - innerHeight), top = Math.round(page.offsetTop);
-        const over = page.offsetHeight - innerHeight;                      // how much taller than the screen the projects page is
-        const slack = parseFloat(getComputedStyle(body).paddingTop) - 2;   // top padding that can be hidden without cutting any content
-        return over <= slack || top >= max ? [0, max] : [0, top, max];
-        };
-        const nearest = (s, y) => s.reduce((c, v, i) => Math.abs(v - y) < Math.abs(s[c] - y) ? i : c, 0);
-        const settle = () => { if (fingerDown) return; touching = false; settled = stops()[nearest(stops(), scrollY)]; };
-        const release = () => { busy = false; clearTimeout(busyTimer); clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); };
-        function step(dir) {
-        const s = stops(), c = nearest(s, scrollY), next = Math.max(0, Math.min(s.length - 1, c + dir));
-        if (next === c) return;
-        busy = true; clearTimeout(busyTimer); busyTimer = setTimeout(release, hasEnd ? 1500 : 900);
-        scrollTo({ top: s[next], behavior: calm ? "auto" : "smooth" });
-        }
-        addEventListener("scrollend", () => { if (busy) release(); });
-        pageStep = step;
-
-        addEventListener("wheel", e => {
-        if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;  // pinch-zoom and horizontal gestures stay native
-        e.preventDefault();
+        const stage = document.querySelector(".stage");
+        let lastT = 0, lastD = 0, owned = 0;
+        stage.addEventListener("wheel", e => {
+        if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;   // pinch-zoom and horizontal gestures stay native
         const t = e.timeStamp, d = Math.abs(e.deltaY);
-        const fresh = t - lastT > 90 || d > lastD * 1.8 + 2;               // a new gesture, or a clear new push during a trackpad's inertia tail
+        const fresh = t - lastT > 90 || d > lastD * 1.8 + 2;                // a new gesture, or a clear new push during a trackpad's inertia tail
         lastT = t; lastD = d;
-        if (busy || !fresh || d < 2) return;
-        const dir = e.deltaY > 0 ? 1 : -1;
-        if (scrollY > page.offsetTop - innerHeight / 2 && go(goal + dir)) return;   // on the projects page the wheel turns the project wheel first
-        step(dir);
+        if (fresh && d >= 2 && go(goal + (e.deltaY > 0 ? 1 : -1))) { owned = t; e.preventDefault(); return; }
+        if (t - owned < 120) { owned = t; e.preventDefault(); }             // inertia tail of a gesture the project wheel took: do not leak it to the page
         }, { passive: false });
-
-        /* Scrolls that did not go through the wheel handler above */
-        addEventListener("scroll", () => {
-        if (busy || touching) return;
-        const dy = scrollY - settled;
-        if (Math.abs(dy) > 6) step(dy > 0 ? 1 : -1);
-        else { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); }
-        }, { passive: true });
-        addEventListener("touchstart", () => { fingerDown = touching = true; }, { passive: true });
-        const touchEnd = () => { fingerDown = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 400); };
-        addEventListener("touchend", touchEnd, { passive: true });
-        addEventListener("touchcancel", touchEnd, { passive: true });
-        addEventListener("resize", () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 200); });
-        settle();
         })();
 
         /* Diamond pattern on the whole background. Only the diamonds near the mouse light up and emit light */
