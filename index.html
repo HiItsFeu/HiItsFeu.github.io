@@ -198,31 +198,12 @@
             }
         }
 
-        .track {
-            position: relative;
-            display: flex;
-            gap: 1.5rem;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            padding: clamp(.75rem,2.5svh,1.75rem) max(1.5rem,calc(50vw - 550px));
-            scroll-padding-inline: max(1.5rem,calc(50vw - 550px));
-            cursor: grab
+        .menu::-webkit-scrollbar {
+            display: none
         }
 
-            .track::-webkit-scrollbar, .menu::-webkit-scrollbar {
-                display: none
-            }
-
-            .track.drag {
-                scroll-snap-type: none;
-                cursor: grabbing;
-                user-select: none
-            }
-
         .slide {
-            flex: 0 0 min(1000px,88vw,max(560px,calc(1000px - (700px - 100svh) * 3)));
-            scroll-snap-align: start;
+            grid-area: 1 / 1;
             display: grid;
             grid-template-columns: 1.5fr 1fr;
             gap: 2rem;
@@ -492,6 +473,107 @@
                 display: none
             }
         }
+
+        /* ===== Vertical wheel + timeline ===== */
+        .stage {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 7rem minmax(0,1fr)
+        }
+
+        .timeline {
+            position: relative;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+            mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent)
+        }
+
+            .timeline::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background: var(--line)
+            }
+
+        .ticks i {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: .6rem;
+            height: 1px;
+            background: var(--mut)
+        }
+
+        .mark {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 1.4rem;
+            height: 3px;
+            margin-top: -1px;
+            background: var(--acc)
+        }
+
+        .when {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: right;
+            white-space: pre-line;
+            font-weight: 800;
+            font-size: 1.15rem;
+            line-height: 1.1;
+            letter-spacing: -.02em
+        }
+
+        .wheel {
+            --peek: clamp(2rem, 7svh, 3.75rem);
+            width: min(100%, 1000px, max(560px, calc(1000px - (700px - 100svh) * 3)));
+            display: grid;
+            grid-template-columns: minmax(0,1fr);
+            padding-block: var(--peek);
+            overflow: hidden;
+            perspective: 1400px;
+            touch-action: none;
+            cursor: grab;
+            -webkit-mask-image: linear-gradient(transparent, #000 calc(var(--peek) * .9), #000 calc(100% - var(--peek) * .9), transparent);
+            mask-image: linear-gradient(transparent, #000 calc(var(--peek) * .9), #000 calc(100% - var(--peek) * .9), transparent)
+        }
+
+            .wheel.drag {
+                cursor: grabbing;
+                user-select: none
+            }
+
+        .date .status {
+            padding-left: 0;
+            border-left: 0
+        }
+
+        @media (max-width:760px) {
+            .stage {
+                grid-template-columns: 2.25rem minmax(0,1fr);
+                padding: 0 1rem
+            }
+
+            .mark {
+                width: .9rem
+            }
+
+            .when {
+                right: .9rem;
+                writing-mode: vertical-rl;
+                transform: translateY(-50%) rotate(180deg);
+                white-space: nowrap;
+                font-size: .95rem
+            }
+        }
     </style>
 </head>
 <body>
@@ -513,12 +595,19 @@
             <div class="projects-head">
                 <h2 class="section">Projects</h2>
                 <div class="arrows">
-                    <button id="prev" aria-label="Older project">‹</button>
-                    <button id="next" aria-label="Newer project">›</button>
+                    <button id="prev" aria-label="Newer project">↑</button>
+                    <button id="next" aria-label="Older project">↓</button>
                 </div>
             </div>
             <nav class="menu" id="menu" aria-label="Project list"></nav>
-            <div class="track" id="track" tabindex="0" aria-label="Projects, oldest on the left, newest on the right"></div>
+            <div class="stage">
+                <div class="timeline" aria-hidden="true">
+                    <div class="ticks" id="ticks"></div>
+                    <span class="mark"></span>
+                    <time class="when" id="when"></time>
+                </div>
+                <div class="wheel" id="track" tabindex="0" role="group" aria-label="Projects, newest at the top. Swipe up or scroll down for older ones"></div>
+            </div>
         </div>
         <footer><span id="copy"></span><a href="#about">↑ About</a></footer>
     </main>
@@ -639,13 +728,13 @@
         return box;
         };
 
-        /* Projects: order 1 on the right, following orders to its left */
+        /* Projects: order 1 on top, following orders below it */
         const projects = [...PROJECTS]
         .sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date))
-        .reverse(); // order 1 ends up on the far right
+        ;
         const track = $("track"), menu = $("menu");
         const slides = [], tabs = [];
-        let active = projects.length - 1;
+        let active = 0;
 
         projects.forEach((p, i) => {
         const s = el("article", "slide");
@@ -685,10 +774,10 @@
         });
         gallery.append(thumbs);
         }
-        show(0);
+        s.load = () => show(0);   // media are created only when the card gets close to the front
         }
         const txt = el("div", "txt");
-        const meta = el("p", "date", monthFmt.format(new Date(p.date + "-01T12:00:00")));
+        const meta = el("p", "date");
         const status = el("span", "status", p.ongoing ? "In progress" : "Completed");
         status.dataset.state = p.ongoing ? "ongoing" : "done";
         meta.append(status);
@@ -706,53 +795,105 @@
         menu.append(t); tabs.push(t);
         });
 
-        const padLeft = () => parseFloat(getComputedStyle(track).paddingLeft);
+        /* Wheel: the cards sit on a vertical drum. pos = (fractional) index in front of the viewer, goal = index it settles on */
+        const when = $("when"), ticks = $("ticks");
+        const STEP = 30, PITCH = 38;          // degrees between two cards / px between two timeline ticks
+        let pos = 0, goal = 0, R = 0, rafW = 0, pageStep = () => {};
         const behavior = instant => (instant || calm) ? "auto" : "smooth";
-        function go(i, instant) {
-        i = Math.max(0, Math.min(slides.length - 1, i));
-        track.scrollTo({ left: slides[i].offsetLeft - padLeft(), behavior: behavior(instant) });
-        }
+        projects.forEach(() => ticks.append(el("i")));
+        const tickEls = [...ticks.children];
+
         function update(i, instant) {
         active = i;
         tabs.forEach((t, j) => t.setAttribute("aria-current", j === i));
         const t = tabs[i];
         menu.scrollTo({ left: t.offsetLeft - (menu.clientWidth - t.offsetWidth) / 2, behavior: behavior(instant) });
+        slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
+        const dt = new Date(projects[i].date + "-01T12:00:00");
+        when.textContent = dt.toLocaleString("en", { month: "long" }) + "\n" + dt.getFullYear();
+        when.dateTime = projects[i].date;
+        }
+
+        function draw() {
+        slides.forEach((s, i) => {
+        const d = i - pos, a = Math.abs(d), vis = a < 1.7;
+        s.style.visibility = vis ? "" : "hidden";
+        if (!vis) return;
+        if (s.load) { s.load(); s.load = null; }
+        s.style.transform = `translateZ(${-R}px) rotateX(${-d * STEP}deg) translateZ(${R}px)`;
+        s.style.opacity = Math.max(0, 1 - a * .6).toFixed(3);
+        s.inert = a > .5;
+        });
+        tickEls.forEach((t, i) => {
+        const d = i - pos;
+        t.style.transform = `translateY(${d * PITCH}px)`;
+        t.style.opacity = Math.max(0, 1 - Math.abs(d) * .22).toFixed(3);
+        });
+        const n = Math.round(pos);
+        if (n !== active && n >= 0 && n < slides.length) update(n);
+        }
+
+        function tick() {
+        pos += (goal - pos) * (calm ? 1 : .16);
+        if (Math.abs(goal - pos) < .002) pos = goal;
+        draw();
+        rafW = pos === goal ? 0 : requestAnimationFrame(tick);
+        }
+
+        /* Rotates the wheel to project i. Returns false when i does not exist (the caller can then hand over to the page) */
+        function go(i, instant) {
+        if (i < 0 || i > slides.length - 1) return false;
+        goal = i;
         $("prev").disabled = i === 0;
         $("next").disabled = i === slides.length - 1;
-        slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
+        if (instant || calm) { pos = i; draw(); } else if (!rafW) rafW = requestAnimationFrame(tick);
+        return true;
         }
-        let raf;
-        track.addEventListener("scroll", () => {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-        const x = track.scrollLeft, g = padLeft();
-        let i = slides.reduce((m, s, j) => Math.abs(s.offsetLeft - g - x) < Math.abs(slides[m].offsetLeft - g - x) ? j : m, 0);
-        if (x >= track.scrollWidth - track.clientWidth - 2) i = slides.length - 1;
-        if (i !== active) update(i);
-        });
-        });
-        $("prev").addEventListener("click", () => go(active - 1));
-        $("next").addEventListener("click", () => go(active + 1));
+
+        const measure = () => { R = slides[0].offsetHeight * 2; draw(); };   // drum radius: neighbours sit just outside the front card
+        addEventListener("resize", measure); addEventListener("load", measure);
+        if (document.fonts) document.fonts.ready.then(measure);
+
+        $("prev").addEventListener("click", () => go(goal - 1));
+        $("next").addEventListener("click", () => go(goal + 1));
         track.addEventListener("keydown", e => {
-        if (e.key === "ArrowLeft") { e.preventDefault(); go(active - 1); }
-        if (e.key === "ArrowRight") { e.preventDefault(); go(active + 1); }
+        const dir = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
+        if (dir && go(goal + dir)) e.preventDefault();   // at either end the key falls through to the page
         });
 
-        /* Mouse drag (touch scrolling is native) */
+        /* Drag / swipe (mouse and touch): the wheel follows the finger, then snaps. A swipe past either end moves to the next page section */
         let drag = null;
         track.addEventListener("pointerdown", e => {
-        if (e.pointerType !== "mouse" || e.target.closest("video,iframe,a,button")) return;
-        drag = { x: e.clientX, s: track.scrollLeft };
-        track.classList.add("drag"); track.setPointerCapture(e.pointerId);
+        if (e.button || e.target.closest("video,iframe,a,button,.thumbs")) return;
+        drag = { y: e.clientY, p: pos, i: goal, t: e.timeStamp, moved: false };
         });
-        track.addEventListener("pointermove", e => { if (drag) track.scrollLeft = drag.s - (e.clientX - drag.x); });
-        const endDrag = () => { if (!drag) return; drag = null; track.classList.remove("drag"); go(active); };
+        track.addEventListener("pointermove", e => {
+        if (!drag) return;
+        const dy = e.clientY - drag.y;
+        if (!drag.moved) {
+        if (Math.abs(dy) < 6) return;
+        drag.moved = true; track.setPointerCapture(e.pointerId); track.classList.add("drag");
+        cancelAnimationFrame(rafW); rafW = 0;
+        }
+        pos = Math.max(-.3, Math.min(slides.length - .7, drag.p - dy / (slides[0].offsetHeight * .8)));
+        draw();
+        });
+        const endDrag = e => {
+        if (!drag) return;
+        const d = drag; drag = null; track.classList.remove("drag");
+        if (!d.moved) return;
+        const dy = e.clientY - d.y, fast = Math.abs(dy / Math.max(1, e.timeStamp - d.t)) > .5;
+        const t = Math.max(0, Math.min(slides.length - 1, fast ? (dy < 0 ? Math.ceil(pos) : Math.floor(pos)) : Math.round(pos)));
+        if (t === d.i && Math.abs(dy) > 40 && (dy < 0 ? t === slides.length - 1 : t === 0)) pageStep(dy < 0 ? 1 : -1);
+        go(t);
+        };
         track.addEventListener("pointerup", endDrag);
         track.addEventListener("pointercancel", endDrag);
 
         /* Open on the newest project */
-        update(active, true);
-        go(active, true);
+        update(0, true);
+        go(0, true);
+        measure();
 
         /* Page scrolling: one gesture = one section (profile <-> projects), never an in-between position.
         The wheel is handled directly; any other scroll that still reaches the page (wheel over a video, keyboard, scrollbar)
@@ -777,6 +918,7 @@
         scrollTo({ top: s[next], behavior: calm ? "auto" : "smooth" });
         }
         addEventListener("scrollend", () => { if (busy) release(); });
+        pageStep = step;
 
         addEventListener("wheel", e => {
         if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;  // pinch-zoom and horizontal gestures stay native
@@ -785,7 +927,9 @@
         const fresh = t - lastT > 90 || d > lastD * 1.8 + 2;               // a new gesture, or a clear new push during a trackpad's inertia tail
         lastT = t; lastD = d;
         if (busy || !fresh || d < 2) return;
-        step(e.deltaY > 0 ? 1 : -1);
+        const dir = e.deltaY > 0 ? 1 : -1;
+        if (scrollY > page.offsetTop - innerHeight / 2 && go(goal + dir)) return;   // on the projects page the wheel turns the project wheel first
+        step(dir);
         }, { passive: false });
 
         /* Scrolls that did not go through the wheel handler above */
