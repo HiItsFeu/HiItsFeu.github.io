@@ -709,6 +709,8 @@
         duration : free text, e.g. "3 weeks"
         team     : number of people who worked on the project, e.g. 1 (shown as "Solo") or 4 (shown as "4 people").
         Free text also works, e.g. "4 (2 programmers, 2 artists)". Leave null to hide the line.
+        today    : (optional) true to show "Today" instead of the date (timeline + big date). "date" is still
+        required: it is only used for sorting.
         ongoing  : true if the project is still in production (shows "In progress" next to the date).
         Leave it out (or false) for a finished project (shows "Completed").
         video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
@@ -720,7 +722,7 @@
         They appear with the videos in a small gallery (videos first). Leave [] if there are none.
         link     : (optional) repository or project page */
         const PROJECTS = [
-        { name: "Turbo Drift 2", order: 1, date: "2026-05", duration: "Undefined", team: null, ongoing: true,
+        { name: "Turbo Drift 2", order: 1, date: "2026-05", today: true, duration: "Undefined", team: null, ongoing: true,
         bio: "A racing game derived from my student project Turbo Drift. As my most ambitious project to date, built in Unreal Engine 5.7, everything was created from scratch—from 3D art pipelines in Blender to core gameplay programming.",
         video: "https://www.youtube.com/watch?v=13oD5iiuFZU", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "" },
         { name: "CPU Engine", order: 2, date: "2026-11", duration: "1 month", team: "2",
@@ -868,7 +870,7 @@
         const STEP = 30, PITCH = 56;          // degrees between two cards / px between two timeline ticks
         let pos = 0, goal = 0, R = 0, rafW = 0;
         const behavior = instant => (instant || calm) ? "auto" : "smooth";
-        projects.forEach(p => { const i = el("i"), dt = new Date(p.date + "-01T12:00:00"); i.append(el("span", "", monthShort(dt) + " " + dt.getFullYear())); ticks.append(i); });
+        projects.forEach(p => { const i = el("i"), dt = new Date(p.date + "-01T12:00:00"); i.append(el("span", "", p.today ? "Today" : monthShort(dt) + " " + dt.getFullYear())); ticks.append(i); });
         const tickEls = [...ticks.children];
 
         function update(i, instant) {
@@ -878,7 +880,8 @@
         menu.scrollTo({ left: t.offsetLeft - (menu.clientWidth - t.offsetWidth) / 2, behavior: behavior(instant) });
         slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
         const dt = new Date(projects[i].date + "-01T12:00:00");
-        when.replaceChildren(el("span", "m", monthShort(dt)), el("span", "y", String(dt.getFullYear())));
+        if (projects[i].today) when.replaceChildren(el("span", "m", "Today"));
+        else when.replaceChildren(el("span", "m", monthShort(dt)), el("span", "y", String(dt.getFullYear())));
         when.dateTime = projects[i].date;
         }
 
