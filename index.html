@@ -3,513 +3,301 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ludwig Gurget – Gameplay Programmer Portfolio</title>
+    <title>Ludwig Gurget – Gameplay Programmer</title>
     <meta name="description" content="Ludwig Gurget, gameplay programmer specializing in C++ and C#. Games, editor tools and prototypes in Unity and Unreal Engine 5.">
     <meta name="theme-color" content="#0d0d0f">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Ludwig Gurget – Gameplay Programmer">
-    <meta property="og:description" content="Games, editor tools and prototypes in Unity and Unreal Engine 5.">
-    <meta name="twitter:card" content="summary_large_image">
-    <!-- Link preview image: once the site is online, add
-         <meta property="og:image" content="https://YOUR-SITE/Pictures/preview.jpg">  (absolute URL, about 1200x630) -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0d0f'/%3E%3Cpath d='M16 4l12 12-12 12L4 16z' fill='none' stroke='%23ff3d2e' stroke-width='3'/%3E%3C/svg%3E">
-    <link rel="preconnect" href="https://i.ytimg.com">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0d0f'/%3E%3Crect x='9' y='9' width='14' height='14' fill='%23ff6a2b'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0d0d0f;
-            --surf: #18181b;
-            --fg: #ececec;
-            --mut: #8e8e96;
-            --acc: #ff3d2e;
-            --hot: #ff9a1f;
-            --line: #2c2c31;
-            --glass: rgba(24,24,27,.42);
-            --glass-fx: blur(5px) saturate(125%); /* one shared frosted-glass look: squares stay visible but soft */
-            --glass-line: rgba(255,255,255,.09);
+            --fg: #e9e9e6;
+            --mut: #8b8b92;
+            --acc: #ff6a2b;
+            --line: #2a2a2f;
+            --glass: rgba(13,13,15,.66);
             color-scheme: dark
         }
-
-
 
         * {
             box-sizing: border-box;
             margin: 0
         }
 
-        body {
-            background: var(--bg);
-            color: var(--fg);
-            font: 400 1.0625rem/1.6 "Bricolage Grotesque",system-ui,sans-serif;
-            -webkit-font-smoothing: antialiased
-        }
-
-        a {
-            color: var(--acc)
-        }
-
-        :focus-visible {
-            outline: 3px solid var(--acc);
-            outline-offset: 3px
-        }
-
-        header {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: clamp(2rem,6vw,5rem) 1.5rem 2.5rem;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 2.5rem;
-            align-items: end
-        }
-
-        h1 {
-            font-size: clamp(2.8rem,8vw,5.5rem);
-            line-height: .95;
-            font-weight: 800;
-            letter-spacing: -.035em
-        }
-
-        .title {
-            color: var(--mut);
-            margin-top: 1rem;
-            font-size: 1.25rem
-        }
-
-        .links {
-            display: flex;
-            gap: 1.25rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-            padding: 0;
-            list-style: none
-        }
-
-        .bio {
-            display: grid;
-            gap: 1rem;
-            max-width: 60ch
-        }
-
-        .photo {
-            justify-self: start;
-            width: 9rem;
-            aspect-ratio: 4/5;
-            object-fit: cover;
-            border-radius: 0;
-            margin-bottom: .5rem;
-            background: var(--surf)
-        }
-
-        .projects-head {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem
-        }
-
-        h2.section {
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -.02em
-        }
-
-        .arrows {
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-            flex: none
-        }
-
-            .arrows button {
-                width: 2.75rem;
-                height: 2.75rem;
-                background: var(--glass);
-                -webkit-backdrop-filter: var(--glass-fx);
-                backdrop-filter: var(--glass-fx);
-                border: 1px solid var(--glass-line);
-                border-bottom: 3px solid #4a4a52;
-                border-radius: 0;
-                color: var(--fg);
-                font-size: 1.25rem;
-                cursor: pointer;
-                transition: transform .25s cubic-bezier(.2,.8,.2,1), background-color .25s ease, border-color .25s ease, opacity .25s ease
-            }
-
-        @media (hover:hover) {
-            .arrows button:hover:not(:disabled) {
-                background-color: rgba(78,78,86,.5);
-                border-color: var(--acc);
-                transform: scale(1.06)
-            }
-        }
-
-        .arrows button:disabled {
-            opacity: .35;
-            cursor: default
-        }
-
-        @media (prefers-reduced-motion:reduce) {
-            .arrows button {
-                transition: none
-            }
-        }
-
-        .menu {
-            position: relative;
-            max-width: 1100px;
-            margin: .15rem auto -.6rem;
-            padding: .6rem 1.5rem;
-            display: flex;
-            gap: .5rem;
-            overflow-x: auto;
-            scrollbar-width: none
-        }
-
-            .menu button {
-                background: var(--glass);
-                -webkit-backdrop-filter: var(--glass-fx);
-                backdrop-filter: var(--glass-fx);
-                border: 1px solid var(--glass-line);
-                border-radius: 0;
-                border-bottom: 3px solid #4a4a52;
-                color: var(--mut);
-                font: inherit;
-                padding: .7rem .9rem;
-                cursor: pointer;
-                white-space: nowrap;
-                transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background-color .25s ease, color .25s ease, border-color .25s ease
-            }
-
-        @media (hover:hover) {
-            .menu button:hover {
-                background-color: rgba(78,78,86,.5);
-                transform: scale(1.03)
-            }
-        }
-
-        .menu button[aria-current=true] {
-            color: var(--fg);
-            font-weight: 700;
-            border-color: rgba(255,106,43,.55);
-            border-bottom-color: var(--acc);
-            transform: scale(1.04);
-            z-index: 1
-        }
-
-        @media (hover:hover) {
-            .menu button:hover {
-                border-color: var(--acc)
-            }
-        }
-
-        @media (prefers-reduced-motion:reduce) {
-            .menu button {
-                transition: none
-            }
-        }
-
-        .menu::-webkit-scrollbar {
-            display: none
-        }
-
-        .slide {
-            grid-area: 1 / 1;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 2rem;
-            background: var(--glass);
-            -webkit-backdrop-filter: var(--glass-fx);
-            backdrop-filter: var(--glass-fx);
-            border: 1px solid var(--glass-line);
-            border-radius: 0;
-            padding: 1.25rem
-        }
-
-        .media {
-            aspect-ratio: 16/9;
-            border-radius: 0;
-            overflow: hidden;
-            background: #000;
-            display: grid;
-            place-items: center
-        }
-
-            .media video, .media iframe {
-                width: 100%;
-                height: 100%;
-                border: 0
-            }
-
-            .media img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain
-            }
-
-        .gallery {
-            display: grid;
-            gap: .6rem;
-            align-content: start
-        }
-
-        .thumbs {
-            display: flex;
-            gap: .5rem;
-            overflow-x: auto;
-            scrollbar-width: none
-        }
-
-            .thumbs button {
-                flex: 0 0 auto;
-                width: 4.75rem;
-                aspect-ratio: 16/9;
-                padding: 0;
-                border: 2px solid transparent;
-                border-radius: 0;
-                overflow: hidden;
-                background: var(--bg);
-                color: var(--fg);
-                font: inherit;
-                font-size: .85rem;
-                cursor: pointer;
-                opacity: .7
-            }
-
-                .thumbs button[aria-current=true] {
-                    border-color: var(--acc);
-                    opacity: 1
-                }
-
-            .thumbs img {
-                display: block;
-                width: 100%;
-                height: 100%;
-                object-fit: cover
-            }
-
-        .novid {
-            color: var(--mut);
-            padding: 1rem;
-            text-align: center
-        }
-
-        .txt {
-            display: flex;
-            flex-direction: column;
-            gap: .9rem;
-            padding: .5rem .5rem .5rem 0
-        }
-
-        .date {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: .35rem .6rem;
-            color: var(--mut);
-            font-size: .95rem
-        }
-
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding-left: .6rem;
-            border-left: 1px solid var(--line)
-        }
-
-            .status::before {
-                content: "";
-                width: .45rem;
-                height: .45rem;
-                border-radius: 50%;
-                background: var(--mut);
-                opacity: .6
-            }
-
-            .status[data-state=ongoing]::before {
-                background: var(--hot);
-                opacity: 1
-            }
-
-            .status[data-state=done]::before {
-                background: #43c06a;
-                opacity: 1
-            }
-
-        .txt h3 {
-            font-size: clamp(1.7rem,3.2vw,2.3rem);
-            line-height: 1.05;
-            font-weight: 800;
-            letter-spacing: -.025em
-        }
-
-        dl {
-            margin-top: auto;
-            border-top: 1px solid var(--line);
-            padding-top: .9rem;
-            display: grid;
-            grid-auto-flow: column;
-            grid-auto-columns: minmax(0,1fr);
-            gap: .9rem 1.5rem
-        }
-
-        dt {
-            color: var(--mut);
-            font-size: .95rem
-        }
-
-        dd {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--hot)
-        }
-
-        .team {
-            container-type: inline-size;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: .1rem .3rem;
-            min-height: calc(1.4rem * 1.6)
-        }
-
-            /* --n = number of icons: each one takes its share of the free width, between .8rem and 1.45rem */
-            .team svg {
-                display: block;
-                flex: none;
-                width: clamp(.8rem, calc((100cqw - (var(--n) - 1) * .3rem) / var(--n)), 1.45rem);
-                aspect-ratio: 1;
-                height: auto;
-                fill: currentColor
-            }
-
-        footer {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 1rem 1.5rem clamp(1rem,4svh,3rem);
-            color: var(--mut);
-            font-size: .95rem
-        }
-
-        @media (max-width:760px) {
-            header {
-                grid-template-columns: 1fr;
-                gap: 1.5rem
-            }
-
-            .slide {
-                grid-template-columns: 1fr;
-                gap: 1rem
-            }
-
-            .txt {
-                padding: 0 .25rem .25rem
-            }
-        }
-
-
-
-
-
         html {
             scroll-behavior: smooth
         }
 
-        @media (prefers-reduced-motion:reduce) {
-            html {
-                scroll-behavior: auto
-            }
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font: 400 1.05rem/1.6 "Bricolage Grotesque",system-ui,sans-serif;
+            -webkit-font-smoothing: antialiased
         }
 
-        .page {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            min-height: 100svh;
-            display: flex;
-            flex-direction: column
+        a {
+            color: inherit
         }
 
-        .about header {
-            width: min(1100px,calc(100% - 3rem));
-            max-width: none;
-            margin: auto;
-            padding: clamp(1.5rem,4vw,3rem);
-            align-items: center;
-            background: var(--glass);
-            -webkit-backdrop-filter: var(--glass-fx);
-            backdrop-filter: var(--glass-fx);
-            border: 1px solid var(--glass-line);
-            border-radius: 0
+        ::selection {
+            background: var(--acc);
+            color: #000
         }
 
-        .cue {
-            align-self: center;
-            padding: 1.5rem;
-            color: var(--mut);
-            text-decoration: none
+        .m {
+            font: 500 .72rem/1.5 "JetBrains Mono",ui-monospace,monospace;
+            letter-spacing: .05em;
+            color: var(--mut)
         }
 
-            .cue:hover {
-                color: var(--fg)
+            .m b {
+                color: var(--acc);
+                font-weight: 500
             }
 
-        #projects .body {
-            margin-block: auto;
-            padding-block: clamp(.5rem,3svh,2rem)
-        }
-
-        footer {
-            display: flex;
-            justify-content: space-between;
-            width: 100%
-        }
-
-        /* Diamond pattern: background only (z-index 0 < .page at 1), never above content */
-        .grid-base, .grid-fx {
+        #gl {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
+            display: block
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.1rem 1.5rem
+        }
+
+            nav a {
+                text-decoration: none;
+                color: var(--fg)
+            }
+
+            nav .r {
+                display: flex;
+                gap: 1.6rem;
+                align-items: center
+            }
+
+            nav a:hover {
+                color: var(--acc)
+            }
+
+        .hud {
+            position: fixed;
+            left: 1.5rem;
+            bottom: 1.1rem;
+            z-index: 5;
             pointer-events: none
         }
 
-        @media (hover:none) {
-            .grid-fx {
-                display: none
+            .hud.r2 {
+                left: auto;
+                right: 1.5rem;
+                text-align: right
             }
+
+        main {
+            position: relative;
+            z-index: 2
         }
 
-        /* ===== Vertical wheel + timeline ===== */
-        .stage {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: grid;
-            grid-template-columns: 8rem minmax(0,1fr);
-            column-gap: 1.75rem
-        }
-
-        .deck {
+        section {
+            min-height: 100vh;
+            padding: 6.5rem 1.5rem 4.5rem;
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            min-width: 0
+            flex-direction: column;
+            justify-content: center
         }
 
-        /* Timeline: detached from the projects by the grid gap; the scale is readable (neighbouring dates are labelled) */
+        .wrap {
+            max-width: 1240px;
+            margin: 0 auto;
+            width: 100%
+        }
+
+        .glass {
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,.08);
+            padding: 1.6rem
+        }
+
+        .col {
+            max-width: min(600px,100%)
+        }
+
+        h1 {
+            font-size: clamp(3.6rem,14vw,11rem);
+            line-height: .86;
+            font-weight: 800;
+            letter-spacing: -.05em;
+            text-shadow: 0 0 36px #000,0 0 8px #000
+        }
+
+        h2 {
+            font-size: clamp(2rem,5vw,3.4rem);
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -.035em;
+            margin: .5rem 0 1.2rem
+        }
+
+            h2 i {
+                font-style: normal;
+                color: var(--mut)
+            }
+
+        #top {
+            justify-content: flex-end
+        }
+
+            #top .sub {
+                max-width: 34ch;
+                margin-top: 1.4rem;
+                text-shadow: 0 0 14px #000
+            }
+
+        .bio p {
+            margin-bottom: 1rem;
+            color: #cfcfcc
+        }
+
+        .links {
+            display: flex;
+            gap: 1.4rem;
+            flex-wrap: wrap;
+            margin-top: 1.4rem
+        }
+
+            .links a {
+                text-decoration: none;
+                border-bottom: 2px solid var(--acc);
+                padding-bottom: 2px
+            }
+
+                .links a:hover {
+                    color: var(--acc)
+                }
+
+        .live {
+            display: inline-block;
+            width: .5rem;
+            height: .5rem;
+            background: #3ddc84;
+            margin-right: .45rem
+        }
+
+        .done {
+            background: #8b8b92
+        }
+
+        .glassb {
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,.09)
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin: 0 0 .8rem
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-top: 1.3rem
+        }
+
+            .skills .m {
+                width: 100%
+            }
+
+        .chip {
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,.09);
+            border-bottom: 3px solid #4a4a52;
+            color: var(--mut);
+            font: inherit;
+            font-size: .85rem;
+            padding: .28rem .7rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color .25s,border-color .25s
+        }
+
+            .chip:hover {
+                color: var(--fg);
+                border-color: var(--acc)
+            }
+
+            .chip[aria-pressed=true] {
+                color: var(--fg);
+                border-bottom-color: var(--acc)
+            }
+
+        .menu {
+            position: relative;
+            display: flex;
+            gap: .5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: .3rem 0 1rem
+        }
+
+            .menu button {
+                background: var(--glass);
+                -webkit-backdrop-filter: blur(5px);
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255,255,255,.09);
+                border-bottom: 3px solid #4a4a52;
+                color: var(--mut);
+                font: inherit;
+                font-size: .9rem;
+                padding: .55rem .85rem;
+                white-space: nowrap;
+                cursor: pointer;
+                transition: color .25s,border-color .25s
+            }
+
+                .menu button:hover {
+                    color: var(--fg);
+                    border-color: var(--acc)
+                }
+
+                .menu button[aria-current=true] {
+                    color: var(--fg);
+                    border-bottom-color: var(--acc)
+                }
+
+        .stage {
+            display: grid;
+            grid-template-columns: 7.5rem minmax(0,1fr);
+            column-gap: 1.5rem
+        }
+
         .timeline {
             position: relative;
             overflow: hidden;
-            -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
-            mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent)
+            -webkit-mask-image: linear-gradient(transparent,#000 18%,#000 82%,transparent);
+            mask-image: linear-gradient(transparent,#000 18%,#000 82%,transparent)
         }
 
             .timeline::after {
@@ -532,18 +320,15 @@
         }
 
             .ticks i span {
+                font: 700 .74rem "JetBrains Mono",monospace;
                 font-style: normal;
                 position: absolute;
                 right: calc(100% + .7rem);
                 top: 50%;
                 transform: translateY(-50%);
                 white-space: nowrap;
-                font-size: .82rem;
-                line-height: 1;
-                font-weight: 700;
-                font-variant-numeric: tabular-nums;
                 color: #b4b4bc;
-                text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg)
+                text-shadow: 0 0 8px #000
             }
 
         .mark {
@@ -554,7 +339,7 @@
             height: 4px;
             margin-top: -2px;
             background: var(--acc);
-            box-shadow: 0 0 12px rgba(255,61,46,.55)
+            box-shadow: 0 0 12px rgba(255,106,43,.6)
         }
 
         .when {
@@ -564,39 +349,71 @@
             transform: translateY(-50%);
             text-align: right;
             line-height: 1;
-            text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg)
+            text-shadow: 0 0 12px #000
         }
 
-            .when .m {
+            .when b {
                 display: block;
                 font-size: 1.7rem;
                 font-weight: 800;
-                letter-spacing: -.02em;
-                color: var(--fg)
+                letter-spacing: -.02em
             }
 
-            .when .y {
+            .when span {
                 display: block;
-                margin-top: .3rem;
-                font-size: 1rem;
-                font-weight: 700;
-                color: var(--hot)
+                margin-top: .35rem;
+                font: 500 .95rem "JetBrains Mono",monospace;
+                color: var(--acc)
             }
+
+        .deck {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0
+        }
+
+        .arrows {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            flex: none
+        }
+
+            .arrows button {
+                width: 2.75rem;
+                height: 2.75rem;
+                background: var(--glass);
+                -webkit-backdrop-filter: blur(5px);
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255,255,255,.09);
+                border-bottom: 3px solid #4a4a52;
+                color: var(--fg);
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: border-color .25s
+            }
+
+                .arrows button:disabled {
+                    opacity: .3;
+                    cursor: default
+                }
+
+                .arrows button:not(:disabled):hover {
+                    border-color: var(--acc)
+                }
 
         .wheel {
-            --peek: clamp(2rem, 7svh, 3.75rem);
-            width: min(100%, 1000px, max(560px, calc(1000px - (700px - 100svh) * 3)));
-            flex: 0 1 auto;
+            --peek: clamp(2rem,7svh,3.5rem);
+            flex: 1 1 auto;
             min-width: 0;
+            max-width: 980px;
             display: grid;
-            grid-template-columns: minmax(0,1fr);
             padding-block: var(--peek);
             overflow: hidden;
             perspective: 1400px;
             touch-action: none;
             cursor: grab
-            /* no mask here: a mask on an ancestor would stop the slides' backdrop blur from seeing the diamond background.
-               The fade at the top and bottom is done by each slide's own opacity instead (see draw()) */
         }
 
             .wheel.drag {
@@ -604,1157 +421,505 @@
                 user-select: none
             }
 
-        .date .status {
-            padding-left: 0;
-            border-left: 0
+        .slide {
+            grid-area: 1/1;
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 1.6rem;
+            background: var(--glass);
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,.08);
+            padding: 1.2rem
         }
 
-        @media (max-width:760px) {
+        .media {
+            aspect-ratio: 16/9;
+            background: #000;
+            overflow: hidden;
+            display: grid;
+            place-items: center
+        }
+
+            .media iframe, .media video {
+                width: 100%;
+                height: 100%;
+                border: 0
+            }
+
+            .media img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain
+            }
+
+            .media .yt {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                border: 0;
+                background: #000;
+                cursor: pointer
+            }
+
+                .media .yt img {
+                    object-fit: cover;
+                    opacity: .8
+                }
+
+                .media .yt::after {
+                    content: "▶";
+                    position: absolute;
+                    inset: 0;
+                    display: grid;
+                    place-items: center;
+                    font-size: 2.4rem;
+                    color: #fff;
+                    text-shadow: 0 0 18px #000
+                }
+
+        .novid {
+            color: var(--mut)
+        }
+
+        .thumbs {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            margin-top: .6rem
+        }
+
+            .thumbs button {
+                background: #16161a;
+                border: 1px solid var(--line);
+                border-bottom: 3px solid #4a4a52;
+                color: var(--mut);
+                font: 500 .72rem "JetBrains Mono",monospace;
+                padding: .35rem .6rem;
+                cursor: pointer;
+                height: 2rem
+            }
+
+                .thumbs button img {
+                    height: 100%;
+                    display: block
+                }
+
+                .thumbs button[aria-current=true] {
+                    border-bottom-color: var(--acc);
+                    color: var(--fg)
+                }
+
+        .txt h3 {
+            font-size: 1.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin: .5rem 0
+        }
+
+        .txt p {
+            color: #cfcfcc;
+            font-size: .95rem;
+            line-height: 1.5
+        }
+
+        .tags {
+            display: flex;
+            gap: .4rem .8rem;
+            flex-wrap: wrap;
+            list-style: none;
+            padding: 0;
+            margin: .9rem 0
+        }
+
+            .tags li {
+                font: 500 .7rem "JetBrains Mono",monospace;
+                color: var(--mut)
+            }
+
+                .tags li::before {
+                    content: "# ";
+                    color: var(--acc)
+                }
+
+        .txt dl {
+            display: grid;
+            gap: .6rem;
+            margin: 0
+        }
+
+        .txt dt {
+            font: 500 .68rem "JetBrains Mono",monospace;
+            color: var(--mut)
+        }
+
+        .txt dd {
+            margin: 0;
+            font-weight: 700
+        }
+
+            .txt dd b {
+                color: var(--acc);
+                letter-spacing: .1em;
+                margin-right: .5rem;
+                font-weight: 400
+            }
+
+        .cue {
+            display: inline-block;
+            margin-top: .6rem
+        }
+
+        @media(max-width:760px) {
             .stage {
-                grid-template-columns: 2.4rem minmax(0,1fr);
-                column-gap: .6rem;
-                padding: 0 1rem
+                grid-template-columns: 2.6rem minmax(0,1fr);
+                column-gap: .5rem
+            }
+
+            .slide {
+                grid-template-columns: 1fr;
+                gap: 1rem
+            }
+
+            .arrows button {
+                width: 2.2rem;
+                height: 2.2rem
             }
 
             .deck {
                 gap: .5rem
             }
 
-            .arrows button {
-                width: 2.25rem;
-                height: 2.25rem
-            }
-
-            .mark {
-                width: .9rem
+            .when {
+                display: none
             }
 
             .ticks i span {
                 display: none
             }
-
-            .when {
-                right: 1rem;
-                writing-mode: vertical-rl;
-                transform: translateY(-50%) rotate(180deg);
-                white-space: nowrap
-            }
-
-                .when .m, .when .y {
-                    display: inline;
-                    font-size: .95rem
-                }
-
-                .when .y {
-                    margin: 0 0 0 .4em
-                }
         }
 
-
-        /* ===== Roles, tags, action buttons ===== */
-        .role {
-            color: var(--hot);
-            font-weight: 700;
-            font-size: 1rem;
-            margin-top: -.45rem
-        }
-
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .4rem;
-            padding: 0;
-            list-style: none
-        }
-
-            .tags li {
-                font-size: .8rem;
-                color: var(--mut);
-                border: 1px solid var(--line);
-                padding: .05rem .5rem
-            }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .6rem
-        }
-
-        .btn {
-            display: inline-block;
-            background: var(--glass);
-            -webkit-backdrop-filter: var(--glass-fx);
-            backdrop-filter: var(--glass-fx);
-            border: 1px solid var(--glass-line);
-            border-bottom: 3px solid #4a4a52;
-            border-radius: 0;
-            color: var(--fg);
-            font: inherit;
-            font-size: .95rem;
-            padding: .45rem .9rem;
+        .big {
+            font-size: clamp(1.6rem,6vw,4.4rem);
+            font-weight: 800;
+            letter-spacing: -.04em;
+            line-height: 1.05;
             text-decoration: none;
-            cursor: pointer;
-            transition: background-color .25s ease, border-color .25s ease
+            border-bottom: 4px solid var(--acc);
+            word-break: break-all;
+            text-shadow: 0 0 20px #000
         }
 
-            .btn.primary {
-                border-bottom-color: var(--acc)
-            }
-
-            .btn.small {
-                font-size: .85rem;
-                padding: .3rem .7rem;
-                justify-self: start
-            }
-
-        @media (hover:hover) {
-            .btn:hover {
-                background-color: rgba(78,78,86,.5);
-                border-color: var(--acc)
-            }
+        #contact {
+            align-items: center;
+            text-align: center
         }
 
-        /* ===== Filter chips (project filter + skills) ===== */
-        /* Same look as the project-name buttons (.menu button) */
-        .chip {
-            background: var(--glass);
-            -webkit-backdrop-filter: var(--glass-fx);
-            backdrop-filter: var(--glass-fx);
-            border: 1px solid var(--glass-line);
-            border-bottom: 3px solid #4a4a52;
-            border-radius: 0;
-            color: var(--mut);
-            font: inherit;
-            font-size: .85rem;
-            padding: .3rem .7rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background-color .25s ease, color .25s ease, border-color .25s ease
-        }
-
-        @media (hover:hover) {
-            .chip:hover {
-                background-color: rgba(78,78,86,.5);
-                border-color: var(--acc)
-            }
-        }
-
-        .chip[aria-pressed=true] {
-            color: var(--fg);
-            font-weight: 700;
-            border-color: rgba(255,106,43,.55);
-            border-bottom-color: var(--acc)
-        }
-
-        .filters {
-            max-width: 1100px;
-            margin: .9rem auto 0;
-            padding: 0 1.5rem;
+        #ld {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: var(--bg);
             display: flex;
-            flex-wrap: wrap;
-            gap: .4rem
+            align-items: center;
+            justify-content: center;
+            transition: opacity .7s ease .15s
         }
 
-            .filters:empty {
+            #ld.x {
+                opacity: 0;
+                pointer-events: none
+            }
+
+        @media(max-width:760px) {
+            nav .hide {
                 display: none
             }
 
-        .skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .4rem;
-            margin-top: 1.5rem
-        }
-
-        .skills-label {
-            width: 100%;
-            color: var(--mut);
-            font-size: .85rem
-        }
-
-        /* ===== YouTube facade: the video loads only when clicked ===== */
-        .yt {
-            position: relative;
-            display: block;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            border: 0;
-            background: #000;
-            cursor: pointer
-        }
-
-            .yt img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                opacity: .85;
-                transition: opacity .25s ease
-            }
-
-            .yt::after {
-                content: "";
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                width: 4.2rem;
-                height: 3rem;
-                transform: translate(-50%,-50%);
-                background: var(--acc);
-                box-shadow: 0 0 24px rgba(255,61,46,.5)
-            }
-
-            .yt::before {
-                content: "";
-                position: absolute;
-                z-index: 1;
-                left: 50%;
-                top: 50%;
-                transform: translate(-40%,-50%);
-                border-style: solid;
-                border-width: .7rem 0 .7rem 1.1rem;
-                border-color: transparent transparent transparent #fff
-            }
-
-        @media (hover:hover) {
-            .yt:hover img {
-                opacity: 1
+            .hud.r2 {
+                display: none
             }
         }
 
-        /* ===== Case study dialog ===== */
-        body:has(dialog[open]) {
-            overflow: hidden
-        }
-
-        dialog {
-            width: min(780px, calc(100% - 2rem));
-            max-height: calc(100svh - 2rem);
-            margin: auto;
-            padding: 0;
-            overflow: auto;
-            background: #141417;
-            color: var(--fg);
-            border: 1px solid var(--glass-line);
-            border-bottom: 3px solid var(--acc);
-            border-radius: 0
-        }
-
-            dialog::backdrop {
-                background: rgba(0,0,0,.65);
-                -webkit-backdrop-filter: blur(4px);
-                backdrop-filter: blur(4px)
-            }
-
-        .sheet {
-            padding: 1.5rem 1.5rem 1.75rem;
-            display: grid;
-            gap: .6rem
-        }
-
-            .sheet h3 {
-                font-size: 1.9rem;
-                line-height: 1.1;
-                font-weight: 800;
-                letter-spacing: -.02em;
-                padding-right: 6rem
-            }
-
-            .sheet h4 {
-                margin-top: .9rem;
-                color: var(--hot);
-                font-size: .85rem;
-                text-transform: uppercase;
-                letter-spacing: .08em
-            }
-
-            .sheet .btn.close {
-                position: absolute;
-                top: 1rem;
-                right: 1rem
-            }
-
-        pre {
-            background: #0a0a0c;
-            border: 1px solid var(--line);
-            padding: 1rem;
-            overflow: auto;
-            font: .85rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            tab-size: 4
-        }
-
-        /* ===== Devlogs ===== */
-        /* Everything that is not inside a .page sits above the diamond canvases too (they are fixed, z-index 0) */
-        .devlogs, footer {
-            position: relative;
-            z-index: 1
-        }
-
-        .devlogs {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 3rem 1.5rem 1rem
-        }
-
-        .logs {
-            display: grid;
-            gap: 1rem;
-            margin-top: 1.25rem
-        }
-
-        .log {
-            background: var(--glass);
-            -webkit-backdrop-filter: var(--glass-fx);
-            backdrop-filter: var(--glass-fx);
-            border: 1px solid var(--glass-line);
-            padding: 1.1rem 1.25rem
-        }
-
-            .log time {
-                color: var(--mut);
-                font-size: .9rem
-            }
-
-            .log h3 {
-                font-size: 1.4rem;
-                font-weight: 800;
-                letter-spacing: -.02em;
-                line-height: 1.15;
-                margin: .2rem 0 .4rem
-            }
-
-            .log summary {
-                cursor: pointer;
-                color: var(--acc);
-                margin-top: .6rem
-            }
-
-        .log-body p {
-            margin-top: .7rem;
-            max-width: 70ch
-        }
-
-        /* ===== Easter egg + toast ===== */
-        .coffee {
-            background: none;
-            border: 0;
-            font-size: 1.1rem;
-            cursor: pointer;
-            filter: grayscale(1);
-            opacity: .55;
-            transition: opacity .2s ease, filter .2s ease
-        }
-
-            .coffee:hover, .coffee.brew {
-                filter: none;
-                opacity: 1
-            }
-
-            .coffee.brew {
-                animation: shake .45s
-            }
-
-        @keyframes shake {
-            20% {
-                transform: translateX(-3px) rotate(-8deg)
-            }
-
-            40% {
-                transform: translateX(3px) rotate(8deg)
-            }
-
-            60% {
-                transform: translateX(-2px) rotate(-5deg)
-            }
-
-            80% {
-                transform: translateX(2px) rotate(5deg)
-            }
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 1.5rem;
-            z-index: 10;
-            max-width: calc(100% - 2rem);
-            transform: translate(-50%,1rem);
-            opacity: 0;
-            pointer-events: none;
-            background: #1d1d21;
-            border: 1px solid var(--glass-line);
-            border-bottom: 3px solid var(--acc);
-            padding: .6rem 1rem;
-            transition: opacity .3s ease, transform .3s ease
-        }
-
-            .toast.on {
-                opacity: 1;
-                transform: translate(-50%,0)
-            }
-
-        @media (prefers-reduced-motion:reduce) {
-            .coffee.brew {
-                animation: none
-            }
-
-            .toast, .btn, .chip {
-                transition: none
+        @media(prefers-reduced-motion:reduce) {
+            html {
+                scroll-behavior: auto
             }
         }
     </style>
 </head>
 <body>
+    <div id="ld"><div class="m" id="ldt">/*****L*****/udwig<br>// loading <b>00%</b></div></div>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <nav class="m">
+        <a href="#top">/*<b>L</b>*/udwig</a>
+        <div class="r"><a href="#about">01 about</a><a href="#work">02 work</a><a href="#contact">03 contact</a><span class="hide">// local <b id="clk">--:--</b></span></div>
+    </nav>
+    <div class="hud m"><span>fig. 01 · mazda rx-7 (fd3s)</span><br><span>rot <b id="rot">000</b>° · <b id="sec">01</b> / 04</span></div>
+    <div class="hud r2 m">// scroll to rotate<br>// move the mouse, squares react</div>
 
-    <section class="page about" id="about">
-        <header>
-            <div>
-                <h1 id="name"></h1>
-                <p class="title" id="title"></p>
-                <ul class="links" id="links"></ul>
-                <div class="skills" id="skills"><p class="skills-label">Skills – click one to see the projects</p></div>
+    <main>
+        <section id="top">
+            <div class="wrap">
+                <p class="m">// gameplay programmer · c++ / c# · unity &amp; unreal 5</p>
+                <h1>Ludwig<br>Gurget</h1>
+                <p class="sub">I design and program gameplay systems, editor tools and interactive experiences.</p>
             </div>
-            <div class="bio" id="bio"></div>
-        </header>
-        <a class="cue" href="#projects">Projects ↓</a>
-    </section>
+        </section>
 
-    <main class="page" id="projects">
-        <div class="body">
-            <div class="projects-head">
-                <h2 class="section">Projects</h2>
-            </div>
-            <div class="filters" id="filters" role="group" aria-label="Filter projects by tag"></div>
-            <nav class="menu" id="menu" aria-label="Project list"></nav>
-            <div class="stage">
-                <div class="timeline" aria-hidden="true">
-                    <div class="ticks" id="ticks"></div>
-                    <span class="mark"></span>
-                    <time class="when" id="when"></time>
+        <section id="about">
+            <div class="wrap">
+                <div class="col glass bio">
+                    <p class="m">// about</p>
+                    <h2>Small details,<br><i>big difference.</i></h2>
+                    <p>23 y/o Gameplay Programmer (3rd-year student) specializing in C++ and C#.</p>
+                    <p>I love well-crafted systems: an animation that reacts to the player, a tool that saves the team an hour, a prototype that holds together. And if a button could make you a coffee, I'd build it in a heartbeat.</p>
+                    <p>Like many in this industry, my passion for video games naturally led me to study game development, where I gained a good technical foundation.</p>
+                    <div class="skills" id="skills"></div>
+                    <div class="links m"><a href="https://github.com/HiItsFeu">GitHub</a><a href="https://www.linkedin.com/in/ludwig-gurget-769787261">LinkedIn</a><a href="cv.pdf">CV</a></div>
                 </div>
-                <div class="deck">
-                    <div class="wheel" id="track" tabindex="0" role="group" aria-label="Projects, newest at the top. Swipe up or scroll down for older ones"></div>
-                    <div class="arrows">
-                        <button id="prev" aria-label="Newer project">↑</button>
-                        <button id="next" aria-label="Older project">↓</button>
+            </div>
+        </section>
+
+        <section id="work">
+            <div class="wrap">
+                <p class="m">// selected work · scroll, drag or use the arrows to turn the wheel</p>
+                <h2>Projects<i>.md</i></h2>
+                <div class="filters" id="filters" role="group" aria-label="Filter projects by tag"></div>
+                <nav class="menu" id="menu" aria-label="Project list"></nav>
+                <div class="stage">
+                    <div class="timeline" aria-hidden="true"><div class="ticks" id="ticks"></div><span class="mark"></span><time class="when" id="when"></time></div>
+                    <div class="deck">
+                        <div class="wheel" id="track" tabindex="0" role="group" aria-label="Projects, newest at the top"></div>
+                        <div class="arrows"><button id="prev" aria-label="Newer project">↑</button><button id="next" aria-label="Older project">↓</button></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <a class="cue" href="#devlogs" id="devcue" hidden>Devlogs ↓</a>
+        </section>
+
+        <section id="contact">
+            <div class="wrap">
+                <p class="m">// your turn</p>
+                <h2 style="text-shadow:0 0 20px #000">What are we building?</h2>
+                <a class="big" href="mailto:l.gurget@gmail.com">l.gurget@gmail.com</a>
+                <p class="m" style="margin-top:2rem">$ start-project <b>_</b> &nbsp;// © 2026 Ludwig Gurget</p>
+            </div>
+        </section>
     </main>
 
-    <section class="devlogs" id="devlogs" hidden aria-labelledby="devlogsTitle">
-        <h2 class="section" id="devlogsTitle">Devlogs</h2>
-        <div class="logs" id="logs"></div>
-    </section>
-
-    <footer><span id="copy"></span><button class="coffee" id="coffee" type="button" aria-label="Make coffee">☕</button><a href="#about">↑ About</a></footer>
-
-    <dialog id="study" aria-labelledby="studyTitle">
-        <div class="sheet">
-            <button class="btn small close" id="studyClose" type="button">Close ✕</button>
-            <div id="studyBody" style="display:contents"></div>
-        </div>
-    </dialog>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-    <canvas class="grid-base" id="gridBase" aria-hidden="true"></canvas>
-    <canvas class="grid-fx" id="gridFx" aria-hidden="true"></canvas>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        /* ====== EDIT THIS: your information ====== */
-        const PROFILE = {
-        name: "Ludwig Gurget",
-        title: "23 y/o Gameplay Programmer (3rd-year student) specializing in C++ and C#.",
-        // Portrait shown next to your bio. Put the image in the repo next to index.html
-        // (default file name: photo.jpg). If the file is missing, no photo is shown.
-        photo: "photo.jpg",
-        // CV file next to index.html. The "CV" link only appears if the file exists (leave "" to hide it).
-        cv: "cv.pdf",
-        bio: [
-        "I design and program gameplay systems, editor tools and interactive experiences in Unity and Unreal Engine 5.",
-        "I love small details that make a huge difference and well-crafted systems like an animation that reacts to the player, a tool that saves the team an hour, a prototype that holds together. And if a button could make you a coffee, I'd build it in a heartbeat",
-        "Like many in this industry, my passion for video games naturally led me to study game development, where I gained some good technical foundation."
-        ],
-        links: [
-        { label: "GitHub", url: "https://github.com/HiItsFeu" },
-        { label: "LinkedIn", url: "https://www.linkedin.com/in/ludwig-gurget-769787261" },
-        { label: "Contact", url: "mailto:l.gurget@gmail.com" }
-        ]
-        };
+        /* ===== Projects: edit freely. n name · d "YYYY-MM" · dur · t team size (null = hidden, 1 = solo) · v videos · ph photos (files next to index.html) · live = in progress · today = show "Today" ===== */
+        const P=[
+        {n:"Turbo Drift 2",d:"2026-05",today:1,live:1,dur:"Undefined",t:null,tags:["Unreal Engine", "C++", "Gameplay", "3D Art"],bio:"A racing game derived from my student project Turbo Drift. My most ambitious project to date, built from scratch in Unreal Engine 5.7, from the Blender art pipeline to core gameplay programming.",v:["https://www.youtube.com/watch?v=13oD5iiuFZU"],ph:["Pictures/Test4.png","Pictures/SideView.png","Pictures/OrthoView.png","Pictures/TopView.png"]},
+        {n:"CPU Engine",d:"2026-11",dur:"1 month",t:2,tags:["C++", "Engine", "Rendering"],bio:"C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multi-threading, Blinn-Phong lighting, multiple lights, terrain generation.",v:["https://youtu.be/hFcULMIPu58"]},
+        {n:"A simple slime",d:"2026-10",dur:"3 weeks",t:2,tags:["Unity", "C#", "Gameplay"],bio:"A Unity prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",v:["https://www.youtube.com/watch?v=g6VkB29s6fE"]},
+        {n:"Fps prototype",d:"2026-08",dur:"1 month",t:null,tags:["Unreal Engine", "Gameplay"],bio:"A compact FPS prototype built to test my ability to scope and execute a project under a strict timeline.",v:["https://www.youtube.com/watch?v=nlRbgm4-v0M"]},
+        {n:"Guadeloupe: The Secret of the Three Rivers",d:"2026-07",dur:"1 month",t:4,tags:["Unreal Engine", "Tools", "Gameplay"],bio:"Internship project at Black Frog Studio. An exploration game centered on Guadeloupe's folklore, where players travel across the island to solve its mysteries. I developed custom internal tools for level designers.",v:["https://www.youtube.com/watch?v=zlhlM9s28EE"]},
+        {n:"Spline Tools (UE5)",d:"2026-07",dur:"2 weeks",t:null,tags:["Unreal Engine", "C++", "Tools"],bio:"C++ and Blueprint editor tools: terrain-spline snapping, curve-based movement and highly configurable parameters.",v:["https://www.youtube.com/watch?v=yAbLEiAEBwk","https://www.youtube.com/watch?v=c-JQNT7x82A"]},
+        {n:"Dialogue and Cutscene System",d:"2026-06",dur:"1 week",t:null,tags:["Unreal Engine", "Tools", "Gameplay"],bio:"A custom dialogue and cutscene system built for the Guadeloupe project using Level Sequences.",v:["https://www.youtube.com/watch?v=2vAAXGh2Jo8","https://www.youtube.com/watch?v=SifTLRT01S0"]},
+        {n:"Turbo Drift",d:"2026-04",dur:"1 month",t:6,tags:["C++", "Engine", "Gameplay"],bio:"A racing game prototype built on a handmade C++ and Vulkan engine, featuring custom vehicle audio and 3D assets created by the art team.",v:["https://www.youtube.com/watch?v=UNN34BJ2Xj8","https://www.youtube.com/watch?v=o79piqJLBgM"]},
+        {n:"LadyBug",d:"2025-12",dur:"2 days",t:4,tags:["Unity", "C#", "Gameplay"],bio:"A game jam entry that won the Jury's Choice Award.",v:["https://www.youtube.com/watch?v=B9UFAe060Mc"]}];
 
-        /* One object per project.
-        order    : display position. 1 = shown first (the page opens on it, at the top), 2 = the next one
-        you reach by scrolling down, and so on. Projects without "order" come last, newest first.
-        date     : "YYYY-MM" (shown on the slide, also used to break ties between equal orders)
-        today    : (optional) true to show "Today" instead of the date (timeline + big date).
-        "date" is still required: it is only used for sorting.
-        duration : free text, e.g. "3 weeks"
-        team     : number of people who worked on the project, e.g. 1 (shown as "Solo") or 4 (shown as "4 people").
-        Free text also works, e.g. "4 (2 programmers, 2 artists)". Leave null to hide the line.
-        ongoing  : true if the project is still in production (shows "In progress" next to the date).
-        Leave it out (or false) for a finished project (shows "Completed").
-        role     : (optional) what YOU did on the project, shown under the title. Be precise!
-        tags     : (optional) e.g. ["C++", "Unreal Engine", "Tools"]. They drive the filter bar and the
-        "Skills" list at the top of the page (same spelling everywhere = same skill).
-        video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
-        Leave "" if there is none. YouTube videos load only when clicked (faster page).
-        videos   : (optional) several videos, same format as "video",
-        e.g. ["https://youtu.be/AAAAAAAAAAA", "videos/demo.mp4"].
-        You can use "video", "videos" or both (the single "video" comes first).
-        gifs     : (optional) short looping GIFs, e.g. ["gifs/dash.gif"]. Shown after the videos.
-        photos   : list of images in the repo, e.g. ["images/shot1.jpg", "images/shot2.jpg"].
-        They appear with the videos in a small gallery. Leave [] if there are none.
-        demo     : (optional) link to a playable build (itch.io...), shows a "Play demo" button
-        link     : (optional) repository or project page
-        study    : (optional) case study opened by the "Case study" button:
-        { problem: "...", solution: "...", learned: "..." }  (each one a string, or an array of paragraphs)
-        code     : (optional) snippets shown in the case study:
-        [{ title: "Drift model", note: "Why it works like this", text: `...your code...` }] */
-        const PROJECTS = [
-        { name: "Turbo Drift 2", order: 1, date: "2026-05", today: true, duration: "Undefined", team: null, ongoing: true,
-        role: "Gameplay programming & 3D art pipeline (Blender)",
-        tags: ["Unreal Engine", "C++", "Gameplay", "3D Art"],
-        bio: "A racing game derived from my student project Turbo Drift. As my most ambitious project to date, built in Unreal Engine 5.7, everything was created from scratch—from 3D art pipelines in Blender to core gameplay programming.",
-        video: "https://www.youtube.com/watch?v=13oD5iiuFZU", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "",
-        /* PLACEHOLDER content below: replace it with the real story of the project (or delete study/code) */
-        study: {
-        problem: "[Placeholder] What was the hardest technical problem? Describe what was wrong, in player terms (what did it feel like?) and in technical terms.",
-        solution: ["[Placeholder] How did you solve it? Which approach did you pick, and which ones did you try and drop?", "[Placeholder] Numbers help: frame time, iteration time, lines of code removed..."],
-        learned: "[Placeholder] What was the result, and what would you do differently next time?"
-        },
-        code: [{ title: "Example snippet (placeholder)", note: "Explain in one or two sentences what this code does and why it is written this way.",
-        text: `// Placeholder: paste a short, meaningful snippet from Turbo Drift 2 here.
-        void AVehiclePawn::UpdateGrip(float DeltaTime)
-        {
-        // ...
-        }` }] },
-        { name: "CPU Engine", order: 2, date: "2026-11", duration: "1 month", team: "2",
-        tags: ["C++", "Engine", "Rendering"],
-        bio: "C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multri-threading, blinn-phong lighting, multiple lights, terrain generation.",
-        video: "https://youtu.be/hFcULMIPu58", photos: [], link: "" },
-        { name: "A simple slime", order: 3, date: "2026-10", duration: "3 weeks", team: "2",
-        tags: ["Unity", "C#", "Gameplay"],
-        bio: "A Unity game prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",
-        video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
-        { name: "Fps prototype", order: 4, date: "2026-08", duration: "1 month", team: null,
-        tags: ["Unreal Engine", "Gameplay"],
-        bio: "A compact FPS prototype built in Unreal Engine 4, created to test my ability to scope and execute a project under a strict timeline.",
-        video: "https://www.youtube.com/watch?v=nlRbgm4-v0M", photos: [], link: "" },
-        { name: "Guadeloupe: The Secret of the Three Rivers", order: 5, date: "2026-07", duration: "1 month", team: "4",
-        tags: ["Unreal Engine", "Tools", "Gameplay"],
-        bio: "Internship project at Black Frog Studio. An exploration game centered on Guadeloupe's rich folklore, where players travel across the island to solve its mysteries. Developed custom internal tools for level designers.",
-        video: "https://www.youtube.com/watch?v=zlhlM9s28EE", photos: [], link: "" },
-        { name: "Spline Tools (UE5)", order: 6, date: "2026-07", duration: "2 weeks", team: null,
-        tags: ["Unreal Engine", "C++", "Tools"],
-        bio: "A suite of C++ and Blueprint editor tools for Unreal Engine 5, featuring terrain-spline snapping, curve-based movement, and highly configurable parameters.",
-        videos: ["https://www.youtube.com/watch?v=yAbLEiAEBwk", "https://www.youtube.com/watch?v=c-JQNT7x82A"], photos: [], link: "" },
-        { name: "Dialogue and Cutscene System", order: 7, date: "2026-06", duration: "1 week", team: null,
-        tags: ["Unreal Engine", "Tools", "Gameplay"],
-        bio: "A custom dialogue and cutscene system built for the Guadeloupe project in Unreal Engine using Level Sequences.",
-        videos: ["https://www.youtube.com/watch?v=2vAAXGh2Jo8", "https://www.youtube.com/watch?v=SifTLRT01S0"], photos: [], link: "" },
-        { name: "Turbo Drift", order: 8, date: "2026-04", duration: "1 month", team: "6",
-        tags: ["C++", "Engine", "Gameplay"],
-        bio: "A racing game prototype built on a handmade C++ and Vulkan engine, featuring custom vehicle audio and 3D assets created by the art team.",
-        videos: ["https://www.youtube.com/watch?v=UNN34BJ2Xj8", "https://www.youtube.com/watch?v=o79piqJLBgM"], photos: [], link: "" },
-        { name: "LadyBug", order: 9, date: "2025-12", duration: "2 days", team: "4",
-        tags: ["Unity", "C#", "Gameplay"],
-        bio: "A game jam entry that won the Jury's Choice Award.",
-        video: "https://www.youtube.com/watch?v=B9UFAe060Mc", photos: [], link: "" }
-        ];
+        /* ===== Vertical project wheel (drum), timeline, menu, arrows, drag/swipe, mouse wheel ===== */
+        const $=i=>document.getElementById(i),el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+        const calm=matchMedia("(prefers-reduced-motion:reduce)").matches,ytId=u=>(u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/)||[])[1];
+        const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],when=$("when"),ticks=$("ticks"),track=$("track"),menu=$("menu");
+        const slides=[],tabs=[],tickEls=[],STEP=30,PITCH=56;let pos=0,goal=0,RAD=0,rafW=0,active=-1,spin=0;
+        let projects=P,tagFilter=null;
+        function build(){cancelAnimationFrame(rafW);rafW=0;projects=tagFilter?P.filter(p=>p.tags.includes(tagFilter)):P;track.replaceChildren();menu.replaceChildren();ticks.replaceChildren();slides.length=tabs.length=tickEls.length=0;
+        projects.forEach((p,i)=>{
+        const s=el("article","slide"),items=[...p.v.map((v,n)=>({v,l:p.v.length>1?"Video "+(n+1):"Video"})),...(p.ph||[]).map((src,n)=>({src,l:"Photo "+(n+1)}))];
+        const media=el("div","media"),thumbs=el("div","thumbs"),tb=[],g=el("div");let cur=0;g.append(media);
+        const show=k=>{cur=k;const it=items[k],yt=it.v&&ytId(it.v);let n;
+        if(yt){n=el("button","yt");n.type="button";n.setAttribute("aria-label","Play – "+p.n);const im=el("img");im.src="https://i.ytimg.com/vi/"+yt+"/hqdefault.jpg";im.alt="";n.append(im);
+        n.onclick=()=>{const f=el("iframe");f.src="https://www.youtube-nocookie.com/embed/"+yt+"?autoplay=1";f.title="Demo: "+p.n;f.allowFullscreen=true;f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";media.replaceChildren(f)}}
+        else{n=el("img");n.src=it.src;n.alt=p.n+" – "+it.l}
+        media.replaceChildren(n);tb.forEach((b,j)=>b.setAttribute("aria-current",j===k))};
+        if(!items.length)media.append(el("p","novid","Demo video coming soon"));
+        else{if(items.length>1){items.forEach((it,k)=>{const b=el("button");b.type="button";if(it.v)b.textContent="▶ "+it.l;else{const im=el("img");im.src=it.src;im.alt=it.l;b.append(im)}b.onclick=()=>show(k);thumbs.append(b);tb.push(b)});g.append(thumbs)}
+        s.load=()=>show(0);s.stop=()=>{if(media.querySelector("iframe"))show(cur)}}
+        const txt=el("div","txt"),st=el("p","m");st.innerHTML='<span class="live '+(p.live?"":"done")+'"></span>'+(p.live?"in progress":"completed");
+        txt.append(st,el("h3","",p.n),el("p","",p.bio));
+        const ul=el("ul","tags");p.tags.forEach(t=>ul.append(el("li","",t)));txt.append(ul);
+        const dl=el("dl"),stat=(a,b)=>{const d=el("div");d.append(el("dt","",a));const dd=el("dd");dd.innerHTML=b;d.append(dd);dl.append(d)};
+        stat("// production time",p.dur);if(p.t!=null)stat("// team size",p.t==1?"Solo":"<b>"+"■".repeat(p.t)+"</b>"+p.t+" people");
+        txt.append(dl);s.append(g,txt);track.append(s);slides.push(s);
+        const b=el("button","",p.n);b.type="button";b.onclick=()=>go(i);menu.append(b);tabs.push(b);
+        const dt=new Date(p.d+"-01T12:00:00"),ti=el("i");ti.append(el("span","",p.today?"Today":MON[dt.getMonth()]+" "+dt.getFullYear()));ticks.append(ti);tickEls.push(ti)});pos=goal=0;active=-1;go(0,true);measure()}
+        function update(i){
+        const dir=active<0?0:Math.sign(i-active);active=i;tabs.forEach((t,j)=>t.setAttribute("aria-current",j===i));
+        const t=tabs[i];menu.scrollTo({left:t.offsetLeft-(menu.clientWidth-t.offsetWidth)/2,behavior:calm?"auto":"smooth"});
+        slides.forEach((s,j)=>{if(j!==i){s.querySelectorAll("video").forEach(v=>v.pause());if(s.stop)s.stop()}});
+        const p=projects[i],dt=new Date(p.d+"-01T12:00:00");
+        if(p.today)when.replaceChildren(el("b","","Today"));else when.replaceChildren(el("b","",MON[dt.getMonth()]),el("span","",String(dt.getFullYear())));
+        if(dir&&!calm)spin+=.75*dir}   /* each project change also spins the car */
+        function draw(){
+        slides.forEach((s,i)=>{const d=i-pos,a=Math.abs(d),vis=a<1.7;s.style.visibility=vis?"":"hidden";if(!vis)return;
+        if(s.load){s.load();s.load=null}
+        s.style.transform=`translateZ(${-RAD}px) rotateX(${-d*STEP}deg) translateZ(${RAD}px)`;s.style.opacity=Math.max(0,1-a*.75).toFixed(3);s.inert=a>.5});
+        tickEls.forEach((t,i)=>{const d=i-pos;t.style.transform=`translateY(${d*PITCH}px)`;t.style.opacity=Math.max(0,1-Math.abs(d)*.22).toFixed(3);t.firstChild.style.opacity=Math.min(1,Math.max(0,(Math.abs(d)-.45)*2.2)).toFixed(3)});
+        const n=Math.round(pos);if(n!==active&&n>=0&&n<slides.length)update(n)}
+        function spinW(){pos+=(goal-pos)*(calm?1:.16);if(Math.abs(goal-pos)<.002)pos=goal;draw();rafW=pos===goal?0:requestAnimationFrame(spinW)}
+        function go(i,instant){if(i<0||i>slides.length-1)return false;goal=i;$("prev").disabled=i===0;$("next").disabled=i===slides.length-1;
+        if(instant||calm){pos=i;draw()}else if(!rafW)rafW=requestAnimationFrame(spinW);return true}
+        const measure=()=>{RAD=slides[0].offsetHeight*2;draw()};
+        addEventListener("resize",measure);addEventListener("load",measure);if(document.fonts)document.fonts.ready.then(measure);
+        $("prev").onclick=()=>go(goal-1);$("next").onclick=()=>go(goal+1);
+        track.addEventListener("keydown",e=>{const d=e.key==="ArrowDown"?1:e.key==="ArrowUp"?-1:0;if(d&&go(goal+d))e.preventDefault()});
+        let drag=null;
+        track.addEventListener("pointerdown",e=>{if(e.button||e.target.closest("video,iframe,a,button,.thumbs"))return;drag={y:e.clientY,p:pos,i:goal,t:e.timeStamp,m:false}});
+        track.addEventListener("pointermove",e=>{if(!drag)return;const dy=e.clientY-drag.y;if(!drag.m){if(Math.abs(dy)<6)return;drag.m=true;track.setPointerCapture(e.pointerId);track.classList.add("drag");cancelAnimationFrame(rafW);rafW=0}
+        pos=Math.max(-.3,Math.min(slides.length-.7,drag.p-dy/(slides[0].offsetHeight*.8)));draw()});
+        const endDrag=e=>{if(!drag)return;const d=drag;drag=null;track.classList.remove("drag");if(!d.m)return;
+        const dy=e.clientY-d.y,fast=Math.abs(dy/Math.max(1,e.timeStamp-d.t))>.5,t=Math.max(0,Math.min(slides.length-1,fast?(dy<0?Math.ceil(pos):Math.floor(pos)):Math.round(pos)));
+        if(t===d.i&&Math.abs(dy)>40&&(dy<0?t===slides.length-1:t===0))scrollBy({top:(dy<0?1:-1)*innerHeight*.8,behavior:calm?"auto":"smooth"});go(t)};
+        track.addEventListener("pointerup",endDrag);track.addEventListener("pointercancel",endDrag);
+        (()=>{const stage=document.querySelector(".stage");let lastT=0,lastD=0,owned=0;
+        stage.addEventListener("wheel",e=>{if(e.ctrlKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;const t=e.timeStamp,d=Math.abs(e.deltaY),fresh=t-lastT>90||d>lastD*1.8+2;lastT=t;lastD=d;
+        if(fresh&&d>=2&&go(goal+(e.deltaY>0?1:-1))){owned=t;e.preventDefault();return}
+        if(t-owned<120){owned=t;e.preventDefault()}},{passive:false})})();
+        /* tag filter (project chips) + skills chips in the bio */
+        const tagCount={};P.forEach(p=>p.tags.forEach(x=>tagCount[x]=(tagCount[x]||0)+1));
+        const allTags=Object.keys(tagCount).sort((a,b)=>tagCount[b]-tagCount[a]||a.localeCompare(b));
+        function renderFilters(){const box=$("filters");box.replaceChildren();[null,...allTags].forEach(x=>{const b=el("button","chip",x||"All");b.type="button";b.setAttribute("aria-pressed",x===tagFilter);b.onclick=()=>setFilter(x);box.append(b)})}
+        function setFilter(x){tagFilter=x;renderFilters();build()}
+        (()=>{const box=$("skills");box.append(el("p","m","// skills · click one to see the projects"));allTags.forEach(x=>{const b=el("button","chip",x+" · "+tagCount[x]);b.type="button";b.onclick=()=>{setFilter(x);$("work").scrollIntoView({behavior:calm?"auto":"smooth"})};box.append(b)})})();
+        renderFilters();build();
 
-        /* Devlogs: short technical write-ups (newest first on the page). Leave [] to hide the section.
-        { title, date: "YYYY-MM-DD", project (optional), summary, body: ["paragraph", "paragraph"] } */
-        const DEVLOGS = [
-        { title: "Example devlog (placeholder, replace me)", date: "2026-11-22", project: "Turbo Drift 2",
-        summary: "[Placeholder] One or two sentences: what problem did you tackle and what did you find?",
-        body: ["[Placeholder] First paragraph: the context and the problem.", "[Placeholder] Second paragraph: what you tried, what worked, what you measured."] }
-        ];
-        /* ====== End of the editable area ====== */
+        /* ===== Clock + loader ===== */
+        const clk=document.getElementById("clk"),tick=()=>clk.textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});tick();setInterval(tick,15000);
+        let ld=0;const ldt=document.getElementById("ldt"),li=setInterval(()=>{ld=Math.min(100,ld+4+Math.random()*9|0);ldt.innerHTML="/*****L*****/udwig<br>// loading <b>"+String(ld).padStart(2,"0")+"%</b>";if(ld>=100){clearInterval(li);document.getElementById("ld").classList.add("x")}},60);
 
-        const $ = id => document.getElementById(id);
-        const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
-        const monthFmt = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
-        const monthShort = d => d.toLocaleString("en", { month: "long" }).slice(0, 3);   // first 3 letters only
-        const ytId = u => (u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([\w-]{11})/) || [])[1];
-        const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        /* Profile */
-        document.title = PROFILE.name + " – Portfolio";
-        $("name").textContent = PROFILE.name;
-        $("title").textContent = PROFILE.title;
-        if (PROFILE.photo) {
-        const img = el("img", "photo");
-        img.src = PROFILE.photo; img.alt = "Portrait of " + PROFILE.name;
-        img.onerror = () => img.remove();
-        $("bio").append(img);
-        }
-        PROFILE.bio.forEach(p => $("bio").append(el("p", "", p)));
-        PROFILE.links.forEach(l => {
-        const li = el("li"), a = el("a", "", l.label);
-        a.href = l.url;
-        if (!l.url.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
-        li.append(a); $("links").append(li);
+        /* ===== 3D: Mazda RX-7 (FD3S) built from primitives, rendered then converted to squares ===== */
+        const cv=document.getElementById("gl"),R=new THREE.WebGLRenderer({canvas:cv,antialias:false});
+        const pix=Math.min(devicePixelRatio||1,1.5),CELL=7;
+        const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(28,1,.1,60);
+        scene.add(new THREE.HemisphereLight(0xffffff,0x1a1a1a,.5));
+        const k=new THREE.DirectionalLight(0xffffff,1.1);k.position.set(3,6,5);scene.add(k);
+        const rim=new THREE.DirectionalLight(0xffffff,.85);rim.position.set(-5,2.5,-4);scene.add(rim);
+        const car=new THREE.Group(),pivot=new THREE.Group();pivot.add(car);scene.add(pivot);
+        const PH=(c,s=40)=>new THREE.MeshPhongMaterial({color:c,specular:0x888888,shininess:s}),
+        VC=new THREE.MeshPhongMaterial({color:0xffffff,specular:0xaaaaaa,shininess:70,vertexColors:true,side:THREE.DoubleSide});
+        const white=PH(0xf2f2f2,60),tire=PH(0x141414,8),rimM=PH(0xdcdcdc,90),dark=PH(0x0c0c0c,10),red=new THREE.MeshBasicMaterial({color:0xff1608});
+        const ss=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)};
+        /* smooth curve through [x,y] control points (Catmull-Rom) */
+        const cr=Q=>{Q=[Q[0],...Q,Q[Q.length-1]];return x=>{let i=1;while(i<Q.length-3&&x>Q[i+1][0])i++;const a=Q[i-1][1],b=Q[i][1],c=Q[i+1][1],d=Q[i+2][1],t=Math.min(1,Math.max(0,(x-Q[i][0])/(Q[i+1][0]-Q[i][0])));
+        return .5*(2*b+(c-a)*t+(2*a-5*b+4*c-d)*t*t+(3*b-a-3*c+d)*t*t*t)}};
+        /* loft: superellipse cross-sections along x (bottom yb, top yt, half-width w), rounded ends, taper tp, extra top relief ad(x,u,si), vertex-colour shading cf(si,x,y) */
+        function loft(x0,x1,N,yb,yt,w,n,r,cf,ad,tp){const M=64,pos=[],col=[],ix=[];
+        for(let i=0;i<=N;i++){const x=x0+(x1-x0)*i/N,d=Math.max(0,Math.min(x-x0,x1-x)),c=d<r?Math.sqrt(1-((r-d)/r)**2):1,W=w(x)*c,a=yb(x),b=Math.max(a+.04,yt(x)),yc=(a+b)/2,h=(b-a)/2;
+        for(let j=0;j<M;j++){const t=j/M*6.2832,co=Math.cos(t),si=Math.sin(t),u=Math.abs(co)**(2/n),y=yc+Math.sign(si)*Math.abs(si)**(2/n)*h+(ad&&si>0?ad(x,u,si):0),v=cf(si,x,y);
+        pos.push(x,y,Math.sign(co)*u*W*(1-(tp||0)*Math.max(0,si)));col.push(v,v,v)}}
+        for(let i=0;i<N;i++)for(let j=0;j<M;j++){const a=i*M+j,b=i*M+(j+1)%M,c=a+M,d=b+M;ix.push(a,b,c,b,d,c)}
+        const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));g.setAttribute("color",new THREE.Float32BufferAttribute(col,3));g.setIndex(ix);g.computeVertexNormals();return new THREE.Mesh(g,VC)}
+        const XR=-1.18,XF=1.24; /* FD3S: 4.28 m long, 2.42 m wheelbase, 1.23 m high */
+        const arch=x=>{const d=Math.min(Math.abs(x-XR),Math.abs(x-XF));return d<.41?.24+.47*Math.sqrt(1-(d/.41)**2):.24};
+        /* body: long low hood, raised front-fender bulges (closed pop-ups), wide muscular hips, short tail */
+        car.add(loft(-2.14,2.14,230,arch,
+        cr([[-2.14,.84],[-1.95,.92],[-1.6,.95],[-1.18,.93],[-.6,.88],[0,.85],[.55,.86],[.9,.8],[1.24,.74],[1.7,.62],[2.14,.5]]),
+        cr([[-2.14,.72],[-1.95,.86],[-1.18,.9],[-.5,.83],[.2,.8],[.7,.82],[1.24,.86],[1.8,.78],[2.14,.55]]),2.7,.3,
+        (si,x)=>{let v=.16+.84*ss(-.75,.1,si);if(x>1.98&&si<.3&&si>-.75)v=.1;return v},   /* dark underside + front grille */
+        (x,u,si)=>ss(0,.35,si)*(.07*Math.exp(-(((x-1.22)/.42)**2))*ss(.3,.62,u)*(1-ss(.86,1,u))+.05*Math.exp(-(((x+1.2)/.55)**2))*ss(.35,.7,u)*(1-ss(.9,1,u)))));
+        /* greenhouse: raked windshield, dome roof, fastback hatch; dark glass, light roof and pillars */
+        car.add(loft(-1.9,.62,170,()=>.74,
+        cr([[-1.9,.93],[-1.5,1.04],[-1.1,1.17],[-.6,1.23],[-.2,1.22],[.15,1.12],[.62,.88]]),
+        cr([[-1.9,.5],[-1.5,.66],[-1.0,.73],[-.3,.74],[.3,.73],[.62,.7]]),2.3,.07,
+        (si,x,y)=>((si>.5&&(x>.02||x<-1.38))||(si<.62&&y>.93&&((x<.38&&x>-.48)||(x<-.85&&x>-1.38))))?.1:.93,null,.3));
+        const add=(g,m,x,y,z,sx=1,sy=1,sz=1)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);car.add(o);return o};
+        const box=new THREE.BoxGeometry(1,1,1),cylX=new THREE.CylinderGeometry(1,1,1,24).rotateZ(Math.PI/2);
+        [-1,1].forEach(z=>{
+        add(cylX,red,-2.08,.66,z*.3,.16,.105,.105);add(cylX,red,-2.08,.66,z*.6,.16,.105,.105);   /* four round red tail lights */
+        add(box,white,-1.97,.99,z*.42,.07,.18,.05);add(box,white,-2.0,1.05,z*.76,.38,.15,.035);   /* wing stanchions + end plates */
+        add(box,white,.45,.9,z*.82,.13,.08,.16);                                                /* mirrors */
+        add(cylX,dark,2.06,.33,z*.3,.06,.07,.07);                                               /* fog lights */
+        add(cylX,dark,-2.12,.3,z*.42,.12,.045,.045);                                            /* exhausts */
         });
-        $("copy").textContent = "© " + new Date().getFullYear() + " " + PROFILE.name;
+        add(box,white,-2.0,1.07,0,.34,.045,1.5);                                                 /* rear wing */
+        function wheel(x,z){const g=new THREE.Group(),m=(geo,mat,px=0,pz=0)=>{const o=new THREE.Mesh(geo,mat);o.position.set(px,0,pz);g.add(o)};
+        m(new THREE.CylinderGeometry(.325,.325,.22,40),tire);m(new THREE.CylinderGeometry(.235,.235,.25,40),rimM);m(new THREE.CylinderGeometry(.06,.06,.27,16),tire);
+        for(let q=0;q<5;q++){const a=q*1.2566+.63;m(new THREE.CylinderGeometry(.062,.062,.27,12),tire,Math.cos(a)*.15,Math.sin(a)*.15)}
+        g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g)}
+        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>wheel(x,z)));
+        car.position.y=-.62;
 
-        /* CV link: shown only if the file really exists (always shown when opening index.html straight from disk) */
-        if (PROFILE.cv) {
-        const addCv = () => { const li = el("li"), a = el("a", "", "CV"); a.href = PROFILE.cv; a.download = ""; li.append(a); $("links").append(li); };
-        if (location.protocol === "file:") addCv();
-        else fetch(PROFILE.cv, { method: "HEAD" }).then(r => { if (r.ok) addCv(); }).catch(() => {});
+        /* post-process: scene -> low-res target -> squares grid (car dots + reactive background) */
+        const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
+        const U={tS:{value:rt.texture},uRes:{value:new THREE.Vector2()},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uSc:{value:0},uF:{value:0},uTr:{value:Array.from({length:8},()=>new THREE.Vector2(-999,-999))}};
+        const qs=new THREE.Scene(),qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+        qs.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:"void main(){gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:`precision highp float;uniform sampler2D tS;uniform vec2 uRes,uM;uniform vec2 uTr[8];uniform float uT,uC,uSc,uF;
+        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+        float sq(vec2 f,float r){return step(max(abs(f.x),abs(f.y)),r);}
+        /* cursor influence: head + 7 older positions = a soft wake that fades out */
+        float infl(vec2 p){float v=0.;for(int i=0;i<8;i++){float k=float(i);float d=length(p-uTr[i])/((210.-k*10.)*uC/${CELL}.);v=max(v,(1.-k*.115)*pow(smoothstep(1.,0.,d),1.7));}return v*uF;}
+        /* the cursor stirs the squares like something moving through a fluid: n = influence, v = displacement (px) */
+        void fld(vec2 c,out float n,out vec2 v){
+        n=0.;v=vec2(0.);
+        for(int i=0;i<8;i++){float k=float(i),rr=(210.-k*10.)*uC/${CELL}.;vec2 d=c-uTr[i];float L=length(d),w=(1.-k*.115)*pow(smoothstep(1.,0.,L/rr),1.7);
+        vec2 u=d/(L+1.);n=max(n,w);v+=(u*.85+vec2(-u.y,u.x)*.45)*w*smoothstep(0.,.25*rr,L);}
+        n*=uF;v*=uF;
+        v=v*.27*uC/max(1.,length(v))+vec2(sin(uT*1.3+c.y*.05),cos(uT*1.1+c.x*.05))*.07*uC*n;}
+        /* one background square: slow blink with its own rate and phase, slight highlight under the cursor */
+        vec3 sqCol(vec2 nid,vec2 g,float n){
+        float hr=h(nid),h2=h(nid+3.7);
+        float bl=.5+.5*sin(uT*(.7+.9*h2)+hr*6.2832);
+        float rest=hr>.93?.2:.06+.07*hr;
+        float b=rest*(.15+1.9*pow(bl,2.2))+n*(.2+.1*bl);
+        if(hr>.985)b=max(b,.12+.38*bl*bl);
+        float r=((.5+.12*hr)+n*.1+.05*bl)*.5;
+        return vec3(b)*step(max(abs(g.x),abs(g.y)),r);}
+        void main(){
+        vec2 px=gl_FragCoord.xy,id=floor(px/uC),f=fract(px/uC)-.5,cc=(id+.5)*uC;
+        vec4 s=texture2D(tS,cc/uRes);
+        vec2 sid=vec2(0.,floor(uSc*.02));
+        float nr=infl(px);vec3 col=vec3(0.);
+        if(nr<.004){col=sqCol(id+sid,f,0.);}
+        else{for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 nid=id+vec2(float(i),float(j)),c=(nid+.5)*uC;float n;vec2 v;fld(c,n,v);col=max(col,sqCol(nid+sid,(px-c-v)/uC,n));}}
+        /* car: square dots sized by lighting, red tail lights, outline, particles */
+        vec3 q=s.rgb;float red=q.r-max(q.g,q.b);
+        float l=pow(clamp(dot(q,vec3(.34,.5,.16)),0.,1.),.6)+(h(id)-.5)*.14+nr*.12;
+        if(s.a>.5&&red>.3){col=vec3(1.,.13,.07)*sq(f,.5);}
+        else if(s.a>.5){if(l>.1)col=vec3(.86,.85,.82)*sq(f,mix(.12,.5,clamp(l,0.,1.)));}
+        else{
+        if(s.a>.2)col=vec3(.75)*sq(f,.32);
+        float g=0.;for(int i=-1;i<=1;i+=2){vec4 t=texture2D(tS,(cc+vec2(float(i)*3.,0.)*uC)/uRes);g+=step(.3,t.r-max(t.g,t.b))*t.a;}
+        col=max(col,vec3(.55,.05,.03)*min(g,1.)*sq(f,.34));
+        for(int i=1;i<=2;i++){float d=float(i)*2.+floor(h(id+float(i))*6.);
+        vec4 t=texture2D(tS,(id-vec2(d,d*.3)+.5)*uC/uRes);
+        if(t.a>.5&&h(id*1.7+floor(uT*2.)+float(i))>.955)col=vec3(.8)*sq(f,.11);}
         }
+        if(uF>.3&&id==floor(uM/uC))col=vec3(1.,.42,.17)*sq(f,.4);
+        gl_FragColor=vec4(col,1.);}`})));
 
-        /* Team size: one simplified person icon per team member (free text without a leading number stays text) */
-        const SVG = "http://www.w3.org/2000/svg";
-        const personIcon = () => {
-        const svg = document.createElementNS(SVG, "svg"), head = document.createElementNS(SVG, "circle"), body = document.createElementNS(SVG, "path");
-        svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
-        head.setAttribute("cx", "12"); head.setAttribute("cy", "7.5"); head.setAttribute("r", "4.5");
-        body.setAttribute("d", "M3 22c0-5 4-9 9-9s9 4 9 9z");
-        svg.append(head, body);
-        return svg;
-        };
-        const teamNode = team => {
-        const text = String(team).trim(), m = text.match(/^(\d+)/), count = m ? +m[1] : 0;
-        if (count < 1) return text;
-        const label = /^\d+$/.test(text) ? (count === 1 ? "Solo" : count + " people") : text;
-        const box = el("span", "team");
-        box.setAttribute("role", "img"); box.setAttribute("aria-label", label); box.title = label; box.style.setProperty("--n", count);
-        for (let i = 0; i < count; i++) box.append(personIcon());
-        return box;
-        };
+        let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix/2),Math.ceil(H*pix/2));
+        const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix()}
+        size();addEventListener("resize",size);
 
-        /* Projects: order 1 on top, following orders below it */
-        const ALL = [...PROJECTS].sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date));
-        let projects = ALL, tagFilter = null;
-        const track = $("track"), menu = $("menu");
-        const slides = [], tabs = [];
-        let active = 0;
-
-        /* Small message at the bottom of the screen */
-        let toastTimer = 0;
-        const toast = (msg, ms = 2600) => {
-        const t = $("toast"); t.textContent = msg; t.classList.add("on");
-        clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), ms);
-        };
-
-        /* Easter egg: the coffee button (see "Hobbies" in the bio) */
-        let brewTimer = 0;
-        $("coffee").addEventListener("click", e => {
-        const b = e.currentTarget;
-        b.classList.remove("brew"); void b.offsetWidth; b.classList.add("brew");
-        toast("Brewing… ☕");
-        clearTimeout(brewTimer);
-        brewTimer = setTimeout(() => { b.classList.remove("brew"); toast("Error 418: I'm a teapot. The coffee button is still in prototype.", 3800); }, 1400);
-        });
-
-        /* Case study dialog: problem / solution / result + code snippets */
-        const dlg = $("study");
-        dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
-        $("studyClose").addEventListener("click", () => dlg.close());
-        const paras = (box, t) => [].concat(t || []).forEach(x => box.append(el("p", "", x)));
-        function openStudy(p) {
-        const b = $("studyBody"), st = p.study || {};
-        b.replaceChildren();
-        const h = el("h3", "", p.name); h.id = "studyTitle"; b.append(h);
-        if (p.role) b.append(el("p", "role", p.role));
-        [["The problem", st.problem], ["My solution", st.solution], ["Result & what I would do differently", st.learned]].forEach(([title, t]) => {
-        if (!t) return;
-        b.append(el("h4", "", title)); paras(b, t);
-        });
-        (p.code || []).forEach(c => {
-        b.append(el("h4", "", c.title || "Code"));
-        if (c.note) b.append(el("p", "", c.note));
-        const pre = el("pre"), copy = el("button", "btn small", "Copy");
-        pre.append(el("code", "", c.text));
-        copy.type = "button";
-        copy.addEventListener("click", () => navigator.clipboard?.writeText(c.text).then(() => { copy.textContent = "Copied ✓"; setTimeout(() => copy.textContent = "Copy", 1500); }));
-        b.append(pre, copy);
-        });
-        dlg.showModal(); dlg.scrollTop = 0;
-        }
-
-        /* Tags: filter bar above the projects + "Skills" list in the About section (both built from the projects' tags) */
-        const tagCount = {};
-        ALL.forEach(p => (p.tags || []).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
-        const allTags = Object.keys(tagCount).sort((a, b) => tagCount[b] - tagCount[a] || a.localeCompare(b));
-        function renderFilters() {
-        const box = $("filters");
-        box.replaceChildren();
-        if (allTags.length < 2) return;
-        [null, ...allTags].forEach(t => {
-        const b = el("button", "chip", t || "All");
-        b.type = "button"; b.setAttribute("aria-pressed", t === tagFilter);
-        b.addEventListener("click", () => setFilter(t));
-        box.append(b);
-        });
-        }
-        function renderSkills() {
-        const box = $("skills");
-        if (!allTags.length) { box.hidden = true; return; }
-        allTags.forEach(t => {
-        const b = el("button", "chip", t + " · " + tagCount[t]);
-        b.type = "button"; b.title = "Show the " + tagCount[t] + " project" + (tagCount[t] > 1 ? "s" : "") + " using " + t;
-        b.addEventListener("click", () => { setFilter(t); $("projects").scrollIntoView({ behavior: behavior() }); });
-        box.append(b);
-        });
-        }
-        function setFilter(t) { tagFilter = t; renderFilters(); build(); }
-
-        /* Devlogs */
-        (() => {
-        const list = [...DEVLOGS].sort((a, b) => b.date.localeCompare(a.date));
-        if (!list.length) return;
-        $("devlogs").hidden = false; $("devcue").hidden = false;
-        list.forEach(d => {
-        const a = el("article", "log"), t = el("time", "", new Date(d.date + "T12:00:00").toLocaleDateString("en", { day: "numeric", month: "long", year: "numeric" }) + (d.project ? " · " + d.project : ""));
-        t.dateTime = d.date;
-        a.append(t, el("h3", "", d.title));
-        if (d.summary) a.append(el("p", "", d.summary));
-        if (d.body && d.body.length) {
-        const det = el("details"), wrap = el("div", "log-body");
-        d.body.forEach(x => wrap.append(el("p", "", x)));
-        det.append(el("summary", "", "Read more"), wrap); a.append(det);
-        }
-        $("logs").append(a);
-        });
-        })();
-
-        /* (Re)builds the wheel, the menu and the timeline from the projects that match the current filter */
-        function build() {
-        cancelAnimationFrame(rafW); rafW = 0;
-        projects = tagFilter ? ALL.filter(p => (p.tags || []).includes(tagFilter)) : ALL;
-        track.replaceChildren(); menu.replaceChildren(); ticks.replaceChildren();
-        slides.length = tabs.length = tickEls.length = 0;
-
-        projects.forEach((p, i) => {
-        const s = el("article", "slide");
-        const items = [];
-        const vids = [p.video, ...(p.videos || [])].filter(Boolean);
-        vids.forEach((v, n) => items.push({ video: v, label: vids.length > 1 ? "Video " + (n + 1) : "Video" }));
-        (p.gifs || []).forEach((src, n) => items.push({ src, label: "GIF " + (n + 1), alt: p.name + " – animation " + (n + 1) }));
-        (p.photos || []).forEach((src, n) => items.push({ src, alt: p.name + " – photo " + (n + 1) }));
-        const gallery = el("div", "gallery"), media = el("div", "media"), thumbs = el("div", "thumbs"), thumbBtns = [];
-        let cur = 0;
-        gallery.append(media);
-        const show = k => {
-        cur = k;
-        const it = items[k], yt = it.video && ytId(it.video), title = "Demo: " + p.name + (vids.length > 1 && it.video ? " – " + it.label : "");
-        let node;
-        if (yt) {
-        /* facade: a thumbnail with a play button, the real player is created on click */
-        node = el("button", "yt"); node.type = "button"; node.setAttribute("aria-label", "Play – " + title);
-        const im = el("img"); im.src = "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; im.alt = ""; im.decoding = "async";
-        node.append(im);
-        node.addEventListener("click", () => {
-        const f = el("iframe");
-        f.src = "https://www.youtube-nocookie.com/embed/" + yt + "?autoplay=1"; f.title = title; f.allowFullscreen = true;
-        f.allow = "autoplay; accelerometer; encrypted-media; picture-in-picture; fullscreen";
-        media.replaceChildren(f);
-        });
-        } else if (it.video) {
-        node = el("video"); node.src = it.video; node.controls = true; node.preload = "metadata"; node.playsInline = true;
-        } else {
-        node = el("img"); node.src = it.src; node.alt = it.alt; node.decoding = "async";
-        }
-        media.replaceChildren(node);
-        thumbBtns.forEach((b, j) => b.setAttribute("aria-current", j === k));
-        };
-        if (!items.length) {
-        media.append(el("p", "novid", "Demo video coming soon"));
-        } else {
-        if (items.length > 1) {
-        items.forEach((it, k) => {
-        const b = el("button");
-        if (it.video) b.textContent = "▶ " + it.label;
-        else if (it.label) b.textContent = it.label;
-        else { const im = el("img"); im.src = it.src; im.alt = ""; im.loading = "lazy"; b.append(im); }
-        b.setAttribute("aria-label", it.video ? "Demo " + it.label.toLowerCase() : it.alt);
-        b.addEventListener("click", () => show(k));
-        thumbs.append(b); thumbBtns.push(b);
-        });
-        gallery.append(thumbs);
-        }
-        s.load = () => show(0);   // media are created only when the card gets close to the front
-        s.stop = () => { if (media.querySelector("iframe")) show(cur); };   // leaving the card: a playing YouTube video goes back to its thumbnail
-        }
-        const txt = el("div", "txt");
-        const meta = el("p", "date");
-        const status = el("span", "status", p.ongoing ? "In progress" : "Completed");
-        status.dataset.state = p.ongoing ? "ongoing" : "done";
-        meta.append(status);
-        txt.append(meta, el("h3", "", p.name));
-        if (p.role) txt.append(el("p", "role", p.role));
-        txt.append(el("p", "", p.bio));
-        if (p.tags && p.tags.length) { const ul = el("ul", "tags"); p.tags.forEach(t => ul.append(el("li", "", t))); txt.append(ul); }
-        const dl = el("dl");
-        const stat = (label, value) => { const d = el("div"), dd = el("dd", "", typeof value === "string" ? value : null); if (typeof value !== "string") dd.append(value); d.append(el("dt", "", label), dd); dl.append(d); };
-        stat("Production time", p.duration);
-        if (p.team != null && p.team !== "") stat("Team size", teamNode(p.team));
-        txt.append(dl);
-        const acts = el("div", "actions");
-        const link = (cls, label, url) => { const a = el("a", "btn " + cls, label); a.href = url; a.target = "_blank"; a.rel = "noopener"; acts.append(a); };
-        if (p.demo) link("primary", "▶ Play demo", p.demo);
-        if (p.study || (p.code && p.code.length)) { const b = el("button", "btn", "Case study"); b.type = "button"; b.addEventListener("click", () => openStudy(p)); acts.append(b); }
-        if (p.link) link("", "View project", p.link);
-        if (acts.children.length) txt.append(acts);
-        s.append(gallery, txt); track.append(s); slides.push(s);
-
-        const t = el("button", "", p.name);
-        t.addEventListener("click", () => go(i));
-        menu.append(t); tabs.push(t);
-
-        const ti = el("i"), dt = new Date(p.date + "-01T12:00:00");
-        ti.append(el("span", "", p.today ? "Today" : monthShort(dt) + " " + dt.getFullYear()));
-        ticks.append(ti); tickEls.push(ti);
-        });
-
-        pos = goal = 0; active = -1;
-        update(0, true); go(0, true); measure();
-        }
-
-        /* Wheel: the cards sit on a vertical drum. pos = (fractional) index in front of the viewer, goal = index it settles on */
-        const when = $("when"), ticks = $("ticks");
-        const STEP = 30, PITCH = 56;          // degrees between two cards / px between two timeline ticks
-        let pos = 0, goal = 0, R = 0, rafW = 0;
-        const behavior = instant => (instant || calm) ? "auto" : "smooth";
-        const tickEls = [];   // filled by build()
-
-        function update(i, instant) {
-        active = i;
-        tabs.forEach((t, j) => t.setAttribute("aria-current", j === i));
-        const t = tabs[i];
-        menu.scrollTo({ left: t.offsetLeft - (menu.clientWidth - t.offsetWidth) / 2, behavior: behavior(instant) });
-        slides.forEach((s, j) => { if (j !== i) { s.querySelectorAll("video").forEach(v => v.pause()); if (s.stop) s.stop(); } });
-        const dt = new Date(projects[i].date + "-01T12:00:00");
-        if (projects[i].today) when.replaceChildren(el("span", "m", "Today"));
-        else when.replaceChildren(el("span", "m", monthShort(dt)), el("span", "y", String(dt.getFullYear())));
-        when.dateTime = projects[i].date;
-        }
-
-        function draw() {
-        slides.forEach((s, i) => {
-        const d = i - pos, a = Math.abs(d), vis = a < 1.7;
-        s.style.visibility = vis ? "" : "hidden";
-        if (!vis) return;
-        if (s.load) { s.load(); s.load = null; }
-        s.style.transform = `translateZ(${-R}px) rotateX(${-d * STEP}deg) translateZ(${R}px)`;
-        s.style.opacity = Math.max(0, 1 - a * .75).toFixed(3);
-        s.inert = a > .5;
-        });
-        tickEls.forEach((t, i) => {
-        const d = i - pos;
-        t.style.transform = `translateY(${d * PITCH}px)`;
-        t.style.opacity = Math.max(0, 1 - Math.abs(d) * .22).toFixed(3);
-        t.firstChild.style.opacity = Math.min(1, Math.max(0, (Math.abs(d) - .45) * 2.2)).toFixed(3);   // the centre date is shown big by .when
-        });
-        const n = Math.round(pos);
-        if (n !== active && n >= 0 && n < slides.length) update(n);
-        }
-
-        function tick() {
-        pos += (goal - pos) * (calm ? 1 : .16);
-        if (Math.abs(goal - pos) < .002) pos = goal;
-        draw();
-        rafW = pos === goal ? 0 : requestAnimationFrame(tick);
-        }
-
-        /* Rotates the wheel to project i. Returns false when i does not exist (the caller can then hand over to the page) */
-        function go(i, instant) {
-        if (i < 0 || i > slides.length - 1) return false;
-        goal = i;
-        $("prev").disabled = i === 0;
-        $("next").disabled = i === slides.length - 1;
-        if (instant || calm) { pos = i; draw(); } else if (!rafW) rafW = requestAnimationFrame(tick);
-        return true;
-        }
-
-        const measure = () => { if (!slides.length) return; R = slides[0].offsetHeight * 2; draw(); };   // drum radius: neighbours sit just outside the front card
-        addEventListener("resize", measure); addEventListener("load", measure);
-        if (document.fonts) document.fonts.ready.then(measure);
-
-        $("prev").addEventListener("click", () => go(goal - 1));
-        $("next").addEventListener("click", () => go(goal + 1));
-        track.addEventListener("keydown", e => {
-        const dir = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
-        if (dir && go(goal + dir)) e.preventDefault();   // at either end the key falls through to the page
-        });
-
-        /* Drag / swipe (mouse and touch): the wheel follows the finger, then snaps. A swipe past either end moves to the next page section */
-        let drag = null;
-        track.addEventListener("pointerdown", e => {
-        if (e.button || e.target.closest("video,iframe,a,button,.thumbs")) return;
-        drag = { y: e.clientY, p: pos, i: goal, t: e.timeStamp, moved: false };
-        });
-        track.addEventListener("pointermove", e => {
-        if (!drag) return;
-        const dy = e.clientY - drag.y;
-        if (!drag.moved) {
-        if (Math.abs(dy) < 6) return;
-        drag.moved = true; track.setPointerCapture(e.pointerId); track.classList.add("drag");
-        cancelAnimationFrame(rafW); rafW = 0;
-        }
-        pos = Math.max(-.3, Math.min(slides.length - .7, drag.p - dy / (slides[0].offsetHeight * .8)));
-        draw();
-        });
-        const endDrag = e => {
-        if (!drag) return;
-        const d = drag; drag = null; track.classList.remove("drag");
-        if (!d.moved) return;
-        const dy = e.clientY - d.y, fast = Math.abs(dy / Math.max(1, e.timeStamp - d.t)) > .5;
-        const t = Math.max(0, Math.min(slides.length - 1, fast ? (dy < 0 ? Math.ceil(pos) : Math.floor(pos)) : Math.round(pos)));
-        if (t === d.i && Math.abs(dy) > 40 && (dy < 0 ? t === slides.length - 1 : t === 0)) scrollBy({ top: (dy < 0 ? 1 : -1) * innerHeight * .8, behavior: calm ? "auto" : "smooth" });   // swipe past either end: hand over to the page
-        go(t);
-        };
-        track.addEventListener("pointerup", endDrag);
-        track.addEventListener("pointercancel", endDrag);
-
-        /* Open on the newest project */
-        renderFilters(); renderSkills(); build();
-
-        /* Mouse wheel over the projects: turns the project wheel. At either end (or anywhere else on the page)
-        the wheel is left alone, so the site keeps its normal native scrolling. */
-        (() => {
-        const stage = document.querySelector(".stage");
-        let lastT = 0, lastD = 0, owned = 0;
-        stage.addEventListener("wheel", e => {
-        if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;   // pinch-zoom and horizontal gestures stay native
-        const t = e.timeStamp, d = Math.abs(e.deltaY);
-        const fresh = t - lastT > 90 || d > lastD * 1.8 + 2;                // a new gesture, or a clear new push during a trackpad's inertia tail
-        lastT = t; lastD = d;
-        if (fresh && d >= 2 && go(goal + (e.deltaY > 0 ? 1 : -1))) { owned = t; e.preventDefault(); return; }
-        if (t - owned < 120) { owned = t; e.preventDefault(); }             // inertia tail of a gesture the project wheel took: do not leak it to the page
-        }, { passive: false });
-        })();
-
-        /* Diamond pattern on the whole background. Only the diamonds near the mouse light up and emit light */
-        (() => {
-        const CELL = 16;              // half-diagonal of the lattice step: smaller = finer pattern
-        const RADIUS = 230;           // vertical range of the light around the mouse (px)
-        const STRETCH = 1.5;          // horizontal stretch of that area (1 = circle, 1.5 = 50% wider than tall)
-        const RX = RADIUS * STRETCH;  // horizontal range of the light (px)
-        const BASE = 0.26;            // diamond size at rest (1 = touching neighbours)
-        const MAX = 0.9;              // diamond size right under the mouse: they grow smoothly from BASE to MAX
-        const BASE_RIM = "rgba(255,255,255,.05)";   // resting outline (the diamonds are outlines only, no interior)
-        const RIM = "240,160,115";    // luminous outline of lit diamonds
-        const LIGHT = "205,88,26";    // light cast on the background by lit diamonds
-        const LIGHT_DIV = 8;          // the light is drawn at 1/8 resolution, blurred, then upscaled
-        const STEPS = 16;             // brightness levels while a diamond lights up (more = smoother fade)
-        const MAX_FPS = 60;           // frame cap of the animation (0 = follow the screen refresh rate)
-        const FRINGE = 110;           // px around the lit diamonds reached by their light: only this area is redrawn
-        const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
-        const baseCv = $("gridBase"), bctx = baseCv.getContext("2d");
-        const cv = $("gridFx"), ctx = cv.getContext("2d");
-        const lc = document.createElement("canvas"), lctx = lc.getContext("2d");
-        const lb = document.createElement("canvas"), lbctx = lb.getContext("2d");   // blurred copy of lc
-
-        /* Colour strings built once instead of every frame */
-        const LIGHT_STYLE = Array.from({ length: 256 }, (_, q) => "rgba(" + LIGHT + "," + (.38 * (q / 255) * (q / 255)).toFixed(3) + ")");
-        const RIM_STYLE = Array.from({ length: STEPS }, (_, b) => "rgba(" + RIM + "," + (.62 * (b + 1) / STEPS).toFixed(3) + ")");
-        const GLOW_ALPHA = [.3, .55, .8];
-        /* Falloff table: replaces a sqrt and a pow per diamond and per frame (t = squared elliptical distance / RADIUS²) */
-        const LUT_N = 4096, INV_R2 = 1 / (RADIUS * RADIUS), KX = INV_R2 / (STRETCH * STRETCH);
-        const FALLOFF = Float32Array.from({ length: LUT_N + 1 }, (_, i) => Math.pow(1 - Math.sqrt(i / LUT_N), 1.3));
-        const BG = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#0d0d0f";
-        const MASK_R = BASE * CELL + 3;   // covers the resting outline of a diamond while it is lit
-
-        let W = 0, H = 0, dpr = 1, cols = 0, rows = 0;
-        let lit = new Float32Array(0), pts = new Float32Array(0), act = new Uint32Array(0), nxt = new Uint32Array(0);
-        let actN = 0, n = 0, nN = 0, prev = null;
-        let lvR = new Uint8Array(0), ordR = new Uint32Array(0), rad = new Float32Array(0);
-        const sR = new Int32Array(STEPS + 1), pR = new Int32Array(STEPS);
-        const boxA = new Int32Array(4), boxB = new Int32Array(4);
-        let flip = false;
-        let mx = 0, my = 0, tx = 0, ty = 0, inside = false, running = false, last = 0;
-        let grow = 1, shrink = 1, changed = false, minX = 0, maxX = 0, minY = 0, maxY = 0;
-
-        const diamond = (path, x, y, r) => { path.moveTo(x, y - r); path.lineTo(x + r, y); path.lineTo(x, y + r); path.lineTo(x - r, y); path.closePath(); };
-        const fit = (c, x) => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); x.setTransform(dpr, 0, 0, dpr, 0, 0); };
-
-        /* Resting pattern: drawn once per size, outlines only, barely lighter than the background */
-        function drawBase() {
-        const body = new Path2D(), r = BASE * CELL, OFF = 4000;
-        for (let j = 0; j < rows; j++) for (let i = j & 1; i < cols; i += 2) diamond(body, i * CELL, j * CELL, r);
-        bctx.clearRect(0, 0, W, H);
-        bctx.lineWidth = .75;
-        bctx.save();
-        bctx.translate(-OFF, 0);
-        bctx.shadowColor = "rgba(0,0,0,.4)"; bctx.shadowBlur = 4 * dpr; bctx.shadowOffsetX = (OFF + 1) * dpr; bctx.shadowOffsetY = 2 * dpr;
-        bctx.strokeStyle = "#000"; bctx.stroke(body);
-        bctx.restore();
-        bctx.strokeStyle = BASE_RIM; bctx.stroke(body);
-        }
-
-        function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        W = innerWidth; H = innerHeight;
-        cols = Math.ceil(W / CELL) + 2; rows = Math.ceil(H / CELL) + 2;
-        fit(baseCv, bctx); drawBase();
-        if (!fine) return;
-        fit(cv, ctx);
-        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-        lc.width = lb.width = Math.ceil(W / LIGHT_DIV); lc.height = lb.height = Math.ceil(H / LIGHT_DIV);
-        lit = new Float32Array(cols * rows);
-        pts = new Float32Array(cols * rows * 3);
-        act = new Uint32Array(cols * rows); nxt = new Uint32Array(cols * rows);
-        lvR = new Uint8Array(cols * rows); ordR = new Uint32Array(cols * rows); rad = new Float32Array(cols * rows);
-        actN = 0; prev = null;
-        }
-
-        /* The animation only runs while something changes: it stops once the diamonds have settled */
-        const start = () => { if (!running) { running = true; last = 0; requestAnimationFrame(frame); } };
-        let rt;
-        addEventListener("resize", () => {
-        clearTimeout(rt);
-        rt = setTimeout(() => { resize(); if (fine && inside) start(); }, 120);
-        });
-        resize();
-        if (!fine) return;
-
-        /* Updates one diamond's light level and records it if it is visible */
-        function upd(k, cx, cy, target) {
-        const o = lit[k];
-        let l = o + (target - o) * (target > o ? grow : shrink);
-        if (l < .01) l = 0;
-        lit[k] = l;
-        const dl = l - o;
-        if (dl > 2e-4 || dl < -2e-4) changed = true;
-        if (l > 0) {
-        nxt[nN++] = k; pts[n++] = cx; pts[n++] = cy; pts[n++] = l;
-        if (cx < minX) minX = cx; if (cx > maxX) maxX = cx; if (cy < minY) minY = cy; if (cy > maxY) maxY = cy;
-        }
-        }
-
-        function frame(now) {
-        if (MAX_FPS && last && now - last < 1000 / MAX_FPS - 4) { requestAnimationFrame(frame); return; }
-        const dt = last ? Math.min((now - last) / 16.67, 4) : 1;
-        last = now;
-        const follow = calm ? 1 : 1 - Math.pow(1 - .4, dt);
-        mx += (tx - mx) * follow; my += (ty - my) * follow;
-        grow = calm ? 1 : 1 - Math.pow(1 - .35, dt); shrink = calm ? 1 : 1 - Math.pow(1 - .07, dt);
-        changed = Math.abs(tx - mx) > .5 || Math.abs(ty - my) > .5;
-        n = 0; nN = 0; minX = minY = Infinity; maxX = maxY = -Infinity;
-
-        /* 1. light level of the diamonds: only those near the mouse and those still fading are visited */
-        let i0 = 0, i1 = -1, j0 = 0, j1 = -1;
-        if (inside) {
-        i0 = Math.max(0, Math.floor((mx - RX) / CELL)); i1 = Math.min(cols - 1, Math.ceil((mx + RX) / CELL));
-        j0 = Math.max(0, Math.floor((my - RADIUS) / CELL)); j1 = Math.min(rows - 1, Math.ceil((my + RADIUS) / CELL));
-        for (let j = j0; j <= j1; j++) {
-        const cy = j * CELL, dy = cy - my, dyT = dy * dy * INV_R2;
-        for (let i = i0 + ((i0 ^ j) & 1); i <= i1; i += 2) {
-        const cx = i * CELL, dx = cx - mx, t = dx * dx * KX + dyT, k = j * cols + i;
-        const target = t < 1 ? FALLOFF[(t * LUT_N + .5) | 0] : 0;
-        if (target === 0 && lit[k] === 0) continue;   // nothing to light, nothing to fade
-        upd(k, cx, cy, target);
-        }
-        }
-        }
-        for (let a = 0; a < actN; a++) {
-        const k = act[a], j = (k / cols) | 0, i = k - j * cols;
-        if (inside && i >= i0 && i <= i1 && j >= j0 && j <= j1) continue;
-        upd(k, i * CELL, j * CELL, 0);
-        }
-        const swap = act; act = nxt; nxt = swap; actN = nN;
-
-        /* Area to redraw (in light-canvas pixels): where diamonds are now, plus where they were */
-        const M = FRINGE;
-        let cur = null;
-        if (n) {
-        cur = flip ? boxB : boxA; flip = !flip;
-        cur[0] = Math.max(0, Math.floor((minX - M) / LIGHT_DIV)); cur[1] = Math.max(0, Math.floor((minY - M) / LIGHT_DIV));
-        cur[2] = Math.min(lc.width, Math.ceil((maxX + M) / LIGHT_DIV)); cur[3] = Math.min(lc.height, Math.ceil((maxY + M) / LIGHT_DIV));
-        }
-        const ub = cur || prev;
-        if (ub) {
-        const ux0 = cur && prev ? Math.min(cur[0], prev[0]) : ub[0], uy0 = cur && prev ? Math.min(cur[1], prev[1]) : ub[1];
-        const ux1 = cur && prev ? Math.max(cur[2], prev[2]) : ub[2], uy1 = cur && prev ? Math.max(cur[3], prev[3]) : ub[3];
-        lctx.clearRect(ux0, uy0, ux1 - ux0, uy1 - uy0);
-        lbctx.clearRect(ux0, uy0, ux1 - ux0, uy1 - uy0);
-        ctx.clearRect(ux0 * LIGHT_DIV, uy0 * LIGHT_DIV, (ux1 - ux0) * LIGHT_DIV, (uy1 - uy0) * LIGHT_DIV);
-        }
-        prev = cur;
-
-        if (n) {
-        const cnt = n / 3;
-
-        /* 2. group the lit diamonds by brightness level (counting sort: no allocation) */
-        sR.fill(0);
-        for (let k = 0, p = 2; k < cnt; k++, p += 3) {
-        const l = pts[p], b = Math.min(STEPS - 1, (Math.min(1, l * 1.4) * STEPS) | 0);
-        lvR[k] = b; sR[b + 1]++;
-        rad[k] = (BASE + (MAX - BASE) * l) * CELL;
-        }
-        for (let b = 0; b < STEPS; b++) sR[b + 1] += sR[b];
-        pR.set(sR.subarray(0, STEPS));
-        for (let k = 0; k < cnt; k++) ordR[pR[lvR[k]]++] = k;
-
-        /* 3. a lit diamond is the resting one growing: hide the resting outline underneath */
-        ctx.fillStyle = BG; ctx.beginPath();
-        for (let k = 0, p = 0; k < cnt; k++, p += 3) diamond(ctx, pts[p], pts[p + 1], MASK_R);
-        ctx.fill();
-
-        /* 4. light cast on the background: diamonds drawn sharp at low resolution, then copied once with a single blur */
-        const LK = CELL * 1.5 / LIGHT_DIV;
-        for (let k = 0, p = 0; k < cnt; k++, p += 3) {
-        const l = pts[p + 2];
-        if (l < .05) continue;
-        lctx.fillStyle = LIGHT_STYLE[(l * 255 + .5) | 0];
-        lctx.beginPath(); diamond(lctx, pts[p] / LIGHT_DIV, pts[p + 1] / LIGHT_DIV, (BASE + (MAX - BASE) * l) * LK);
-        lctx.fill();
-        }
-        const cw = cur[2] - cur[0], ch = cur[3] - cur[1];
-        lbctx.shadowColor = "rgba(" + LIGHT + ",.9)"; lbctx.shadowBlur = 5;
-        lbctx.drawImage(lc, cur[0], cur[1], cw, ch, cur[0], cur[1], cw, ch);
-        ctx.drawImage(lb, cur[0], cur[1], cw, ch, cur[0] * LIGHT_DIV, cur[1] * LIGHT_DIV, cw * LIGHT_DIV, ch * LIGHT_DIV);
-
-        /* 5. very light drop shadow of the outlines (drawn off-screen so only the shadow shows) */
-        ctx.lineWidth = 1.25; ctx.lineJoin = "miter";
-        const OFF = 4000;
-        ctx.save();
-        ctx.translate(-OFF, 0);
-        ctx.shadowColor = "rgba(0,0,0,.3)"; ctx.shadowBlur = 5 * dpr; ctx.shadowOffsetX = (OFF + 1) * dpr; ctx.shadowOffsetY = 2.5 * dpr;
-        ctx.strokeStyle = "#000"; ctx.beginPath();
-        for (let k = 0, p = 0; k < cnt; k++, p += 3) diamond(ctx, pts[p], pts[p + 1], rad[k]);
-        ctx.stroke();
-        ctx.restore();
-
-        /* 6. luminous outlines only (no interior), brighter levels last */
-        for (let b = 0; b < STEPS; b++) {
-        const s0 = sR[b], s1 = sR[b + 1];
-        if (s0 === s1) continue;
-        ctx.beginPath();
-        for (let a = s0; a < s1; a++) { const k = ordR[a], p = k * 3; diamond(ctx, pts[p], pts[p + 1], rad[k]); }
-        ctx.strokeStyle = RIM_STYLE[b]; ctx.stroke();
-        }
-        ctx.save();
-        ctx.strokeStyle = "rgba(" + RIM + ",.8)"; ctx.shadowColor = "rgba(215,115,65,.6)"; ctx.shadowBlur = 4 * dpr;
-        for (let g = 0; g < 3; g++) {
-        ctx.beginPath(); let any = false;
-        for (let k = 0, p = 2; k < cnt; k++, p += 3) {
-        const l = pts[p];
-        if (l <= .25 || (l > .75 ? 2 : l > .5 ? 1 : 0) !== g) continue;
-        diamond(ctx, pts[p - 2], pts[p - 1], rad[k]); any = true;
-        }
-        if (any) { ctx.globalAlpha = GLOW_ALPHA[g]; ctx.stroke(); }
-        }
-        ctx.restore();
-        }
-
-        if (changed || (!inside && n)) requestAnimationFrame(frame);
-        else { running = false; last = 0; }
-        }
-
-        addEventListener("pointermove", e => {
-        if (e.pointerType !== "mouse") return;
-        tx = e.clientX; ty = e.clientY;
-        if (!inside) { inside = true; if (!running) { mx = tx; my = ty; } }
-        start();
-        });
-        document.documentElement.addEventListener("pointerleave", () => { inside = false; if (prev) start(); });
-        })();
+        /* input + scroll-driven motion */
+        const hist=[];let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0;
+        addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}});
+        document.documentElement.addEventListener("pointerleave",()=>{tx=ty=-999});
+        const secs=[...document.querySelectorAll("section")],rotE=document.getElementById("rot"),secE=document.getElementById("sec");
+        function frame(t){
+        const sy=scrollY,max=Math.max(1,document.documentElement.scrollHeight-H),p=sy/max,a=W/H;
+        const mid=H/2;let best=1e9;secs.forEach((e,i)=>{const r=e.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-mid);if(d<best){best=d;idx=i}});
+        const side=a>1.25&&idx==1,wk=a>1.25&&idx==2;
+        px+=((side?Math.min(3.4,a*1.55):wk?Math.min(4.6,a*2.1):0)-px)*.06;sc+=((idx==0?1.12:idx==3?.95:idx==2?.8:.92)-sc)*.06;
+        const ty2=p*Math.PI*8+.6+spin,mxn=tx<0?0:tx/W-.5,myn=ty<0?0:ty/H-.5;
+        yaw+=(ty2+mxn*.5-yaw)*.07;pitch+=(.1+myn*.18-pitch)*.06;
+        pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=Math.sin(t*.0012)*.04;
+        if(tx>=0){mx+=(tx-mx)*.3;my+=(ty-my)*.3}
+        U.uF.value+=((tx>=0&&mx>=0?1:0)-U.uF.value)*.07;
+        U.uM.value.set(mx*pix,(H-my)*pix);hist.push([mx*pix,(H-my)*pix]);if(hist.length>26)hist.shift();
+        for(let i=0;i<8;i++){const q=hist[Math.max(0,hist.length-1-i*3)];U.uTr.value[i].set(q[0],q[1])}
+        U.uT.value=t/1000;U.uSc.value=sy;
+        R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(scene,cam);
+        R.setRenderTarget(null);R.render(qs,qc);
+        rotE.textContent=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0");secE.textContent="0"+(idx+1);
+        requestAnimationFrame(frame)}
+        requestAnimationFrame(frame);
     </script>
 </body>
 </html>
