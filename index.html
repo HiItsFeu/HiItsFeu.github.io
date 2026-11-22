@@ -9,7 +9,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0d0f'/%3E%3Crect x='9' y='9' width='14' height='14' fill='%23ff6a2b'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0d0d0f;
@@ -47,8 +47,8 @@
         }
 
         .m {
-            font: 500 .72rem/1.5 "JetBrains Mono",ui-monospace,monospace;
-            letter-spacing: .05em;
+            font: 500 .86rem/1.5 "Bricolage Grotesque",system-ui,sans-serif;
+            letter-spacing: .01em;
             color: var(--mut)
         }
 
@@ -320,7 +320,7 @@
         }
 
             .ticks i span {
-                font: 700 .74rem "JetBrains Mono",monospace;
+                font: 600 .8rem "Bricolage Grotesque",system-ui,sans-serif;
                 font-style: normal;
                 position: absolute;
                 right: calc(100% + .7rem);
@@ -362,7 +362,7 @@
             .when span {
                 display: block;
                 margin-top: .35rem;
-                font: 500 .95rem "JetBrains Mono",monospace;
+                font: 600 1rem "Bricolage Grotesque",system-ui,sans-serif;
                 color: var(--acc)
             }
 
@@ -495,7 +495,7 @@
                 border: 1px solid var(--line);
                 border-bottom: 3px solid #4a4a52;
                 color: var(--mut);
-                font: 500 .72rem "JetBrains Mono",monospace;
+                font: 500 .8rem "Bricolage Grotesque",system-ui,sans-serif;
                 padding: .35rem .6rem;
                 cursor: pointer;
                 height: 2rem
@@ -535,14 +535,9 @@
         }
 
             .tags li {
-                font: 500 .7rem "JetBrains Mono",monospace;
+                font: 500 .78rem "Bricolage Grotesque",system-ui,sans-serif;
                 color: var(--mut)
             }
-
-                .tags li::before {
-                    content: "# ";
-                    color: var(--acc)
-                }
 
         .txt dl {
             display: grid;
@@ -551,7 +546,7 @@
         }
 
         .txt dt {
-            font: 500 .68rem "JetBrains Mono",monospace;
+            font: 500 .8rem "Bricolage Grotesque",system-ui,sans-serif;
             color: var(--mut)
         }
 
@@ -648,22 +643,52 @@
                 scroll-behavior: auto
             }
         }
+
+        .eye {
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            font-size: .74rem
+        }
+
+        nav .logo {
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -.01em
+        }
+
+        #ld {
+            text-align: center
+        }
+
+            #ld .m {
+                font-size: 1rem;
+                line-height: 1.9
+            }
+
+        .tags {
+            gap: .4rem
+        }
+
+            .tags li {
+                border: 1px solid var(--line);
+                padding: .1rem .55rem
+            }
     </style>
 </head>
 <body>
-    <div id="ld"><div class="m" id="ldt">/*****L*****/udwig<br>// loading <b>00%</b></div></div>
+    <div id="ld"><div class="m" id="ldt">Ludwig Gurget<br>Loading <b>00%</b></div></div>
     <canvas id="gl" aria-hidden="true"></canvas>
     <nav class="m">
-        <a href="#top">/*<b>L</b>*/udwig</a>
-        <div class="r"><a href="#about">01 about</a><a href="#work">02 work</a><a href="#contact">03 contact</a><span class="hide">// local <b id="clk">--:--</b></span></div>
+        <a href="#top" class="logo">Ludwig Gurget</a>
+        <div class="r"><a href="#about">About</a><a href="#work">Work</a><a href="#contact">Contact</a><span class="hide">Local time <b id="clk">--:--</b></span></div>
     </nav>
-    <div class="hud m"><span>fig. 01 · mazda rx-7 (fd3s)</span><br><span>rot <b id="rot">000</b>° · <b id="sec">01</b> / 04</span></div>
-    <div class="hud r2 m">// scroll to rotate<br>// move the mouse, squares react</div>
+    <div class="hud m"><span>Mazda RX-7 (FD3S)</span><br><span>Rotation <b id="rot">000</b>° · <b id="sec">01</b> / 04</span></div>
+    <div class="hud r2 m">Scroll to rotate the car<br>Move the mouse to send ripples through the squares</div>
 
     <main>
         <section id="top">
             <div class="wrap">
-                <p class="m">// gameplay programmer · c++ / c# · unity &amp; unreal 5</p>
+                <p class="m eye">Gameplay programmer · C++ / C# · Unity &amp; Unreal 5</p>
                 <h1>Ludwig<br>Gurget</h1>
                 <p class="sub">I design and program gameplay systems, editor tools and interactive experiences.</p>
             </div>
@@ -672,7 +697,7 @@
         <section id="about">
             <div class="wrap">
                 <div class="col glass bio">
-                    <p class="m">// about</p>
+                    <p class="m eye">About</p>
                     <h2>Small details,<br><i>big difference.</i></h2>
                     <p>23 y/o Gameplay Programmer (3rd-year student) specializing in C++ and C#.</p>
                     <p>I love well-crafted systems: an animation that reacts to the player, a tool that saves the team an hour, a prototype that holds together. And if a button could make you a coffee, I'd build it in a heartbeat.</p>
@@ -685,8 +710,8 @@
 
         <section id="work">
             <div class="wrap">
-                <p class="m">// selected work · scroll, drag or use the arrows to turn the wheel</p>
-                <h2>Projects<i>.md</i></h2>
+                <p class="m eye">Selected work · scroll, drag or use the arrows to browse</p>
+                <h2>Projects</h2>
                 <div class="filters" id="filters" role="group" aria-label="Filter projects by tag"></div>
                 <nav class="menu" id="menu" aria-label="Project list"></nav>
                 <div class="stage">
@@ -701,10 +726,10 @@
 
         <section id="contact">
             <div class="wrap">
-                <p class="m">// your turn</p>
+                <p class="m eye">Your turn</p>
                 <h2 style="text-shadow:0 0 20px #000">What are we building?</h2>
-                <a class="big" href="mailto:l.gurget@gmail.com">l.gurget@gmail.com</a>
-                <p class="m" style="margin-top:2rem">$ start-project <b>_</b> &nbsp;// © 2026 Ludwig Gurget</p>
+                <a class="big" href="mailto:l.gurget@gmail.com">l.gurget17@gmail.com</a>
+                <p class="m" style="margin-top:2rem">© 2026 Ludwig Gurget</p>
             </div>
         </section>
     </main>
@@ -745,7 +770,7 @@
         txt.append(st,el("h3","",p.n),el("p","",p.bio));
         const ul=el("ul","tags");p.tags.forEach(t=>ul.append(el("li","",t)));txt.append(ul);
         const dl=el("dl"),stat=(a,b)=>{const d=el("div");d.append(el("dt","",a));const dd=el("dd");dd.innerHTML=b;d.append(dd);dl.append(d)};
-        stat("// production time",p.dur);if(p.t!=null)stat("// team size",p.t==1?"Solo":"<b>"+"■".repeat(p.t)+"</b>"+p.t+" people");
+        stat("Production time",p.dur);if(p.t!=null)stat("Team size",p.t==1?"Solo":"<b>"+"■".repeat(p.t)+"</b>"+p.t+" people");
         txt.append(dl);s.append(g,txt);track.append(s);slides.push(s);
         const b=el("button","",p.n);b.type="button";b.onclick=()=>go(i);menu.append(b);tabs.push(b);
         const dt=new Date(p.d+"-01T12:00:00"),ti=el("i");ti.append(el("span","",p.today?"Today":MON[dt.getMonth()]+" "+dt.getFullYear()));ticks.append(ti);tickEls.push(ti)});pos=goal=0;active=-1;go(0,true);measure()}
@@ -786,16 +811,16 @@
         const allTags=Object.keys(tagCount).sort((a,b)=>tagCount[b]-tagCount[a]||a.localeCompare(b));
         function renderFilters(){const box=$("filters");box.replaceChildren();[null,...allTags].forEach(x=>{const b=el("button","chip",x||"All");b.type="button";b.setAttribute("aria-pressed",x===tagFilter);b.onclick=()=>setFilter(x);box.append(b)})}
         function setFilter(x){tagFilter=x;renderFilters();build()}
-        (()=>{const box=$("skills");box.append(el("p","m","// skills · click one to see the projects"));allTags.forEach(x=>{const b=el("button","chip",x+" · "+tagCount[x]);b.type="button";b.onclick=()=>{setFilter(x);$("work").scrollIntoView({behavior:calm?"auto":"smooth"})};box.append(b)})})();
+        (()=>{const box=$("skills");box.append(el("p","m eye","Skills · click one to see the related projects"));allTags.forEach(x=>{const b=el("button","chip",x+" · "+tagCount[x]);b.type="button";b.onclick=()=>{setFilter(x);$("work").scrollIntoView({behavior:calm?"auto":"smooth"})};box.append(b)})})();
         renderFilters();build();
 
         /* ===== Clock + loader ===== */
         const clk=document.getElementById("clk"),tick=()=>clk.textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});tick();setInterval(tick,15000);
-        let ld=0;const ldt=document.getElementById("ldt"),li=setInterval(()=>{ld=Math.min(100,ld+4+Math.random()*9|0);ldt.innerHTML="/*****L*****/udwig<br>// loading <b>"+String(ld).padStart(2,"0")+"%</b>";if(ld>=100){clearInterval(li);document.getElementById("ld").classList.add("x")}},60);
+        let ld=0;const ldt=document.getElementById("ldt"),li=setInterval(()=>{ld=Math.min(100,ld+4+Math.random()*9|0);ldt.innerHTML="Ludwig Gurget<br>Loading <b>"+String(ld).padStart(2,"0")+"%</b>";if(ld>=100){clearInterval(li);document.getElementById("ld").classList.add("x")}},60);
 
         /* ===== 3D: Mazda RX-7 (FD3S) built from primitives, rendered then converted to squares ===== */
         const cv=document.getElementById("gl"),R=new THREE.WebGLRenderer({canvas:cv,antialias:false});
-        const pix=Math.min(devicePixelRatio||1,1.5),CELL=7;
+        const pix=Math.min(devicePixelRatio||1,1.5),CELL=7,BG=CELL*2; /* CELL = car dots, BG = background squares (2x, same grid origin) */
         const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(28,1,.1,60);
         scene.add(new THREE.HemisphereLight(0xffffff,0x1a1a1a,.5));
         const k=new THREE.DirectionalLight(0xffffff,1.1);k.position.set(3,6,5);scene.add(k);
@@ -845,41 +870,56 @@
         [XR,XF].forEach(x=>[-.74,.74].forEach(z=>wheel(x,z)));
         car.position.y=-.62;
 
-        /* post-process: scene -> low-res target -> squares grid (car dots + reactive background) */
+        /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
         const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
-        const U={tS:{value:rt.texture},uRes:{value:new THREE.Vector2()},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uSc:{value:0},uF:{value:0},uTr:{value:Array.from({length:8},()=>new THREE.Vector2(-999,-999))}};
-        const qs=new THREE.Scene(),qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-        qs.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:"void main(){gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:`precision highp float;uniform sampler2D tS;uniform vec2 uRes,uM;uniform vec2 uTr[8];uniform float uT,uC,uSc,uF;
+        const wt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter,depthBuffer:false}); /* ripple map, one texel per background square: rg = push, b = crest light, a = trough */
+        const NW=16,WAVE={life:1.8,speed:170,len:60,push:.3}; /* life (s) · speed (css px/s) · wavelength (css px) · push = max shove, in squares */
+        const waves=Array.from({length:NW},()=>new THREE.Vector4(0,0,-999,0)); /* one slot per ripple: x, y (px), birth time (s), strength */
+        const U={tS:{value:rt.texture},tW:{value:wt.texture},uRes:{value:new THREE.Vector2()},uG:{value:new THREE.Vector2(1,1)},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uB:{value:BG*pix},uS:{value:pix},uSc:{value:0},uF:{value:0},uW:{value:waves}};
+        const G=n=>n.toFixed(2),qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1),
+        quad=fs=>{const s=new THREE.Scene();s.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:"void main(){gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:fs})));return s};
+
+        /* pass 1 (one pixel per background square): every ripple is a wavelet travelling outward; squares are shoved along the radius as it passes */
+        const waveFS=`precision highp float;uniform vec4 uW[${NW}];uniform float uT,uB,uS;
+        void main(){
+        vec2 c=(floor(gl_FragCoord.xy)+.5)*uB,v=vec2(0.);float lit=0.,tr=0.;
+        for(int i=0;i<${NW};i++){
+        vec4 w=uW[i];float age=uT-w.z;
+        if(age<0.||age>${G(WAVE.life)})continue;
+        vec2 d=c-w.xy;float L=length(d),r=age*${G(WAVE.speed)}*uS,s=(L-r)/(${G(WAVE.len)}*uS);
+        float env=exp(-s*s*(s>0.?9.:1.6));            /* sharp front, decaying train of rings behind it */
+        float k=1.-age/${G(WAVE.life)},y=cos(6.2832*s)*env*w.w*k*k*inversesqrt(1.+r/(200.*uS));
+        v+=d/max(L,1.)*y;lit+=max(y,0.);tr+=max(-y,0.);}
+        v*=${G(WAVE.push)};float m=length(v);if(m>.6)v*=.6/m;
+        gl_FragColor=vec4(v/1.2+.5,min(lit,1.),min(tr,1.));}`;
+
+        /* pass 2: the squares grid */
+        const mainFS=`precision highp float;uniform sampler2D tS,tW;uniform vec2 uRes,uM,uG;uniform float uT,uC,uB,uSc,uF;
         float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
         float sq(vec2 f,float r){return step(max(abs(f.x),abs(f.y)),r);}
-        /* cursor influence: head + 7 older positions = a soft wake that fades out */
-        float infl(vec2 p){float v=0.;for(int i=0;i<8;i++){float k=float(i);float d=length(p-uTr[i])/((210.-k*10.)*uC/${CELL}.);v=max(v,(1.-k*.115)*pow(smoothstep(1.,0.,d),1.7));}return v*uF;}
-        /* the cursor stirs the squares like something moving through a fluid: n = influence, v = displacement (px) */
-        void fld(vec2 c,out float n,out vec2 v){
-        n=0.;v=vec2(0.);
-        for(int i=0;i<8;i++){float k=float(i),rr=(210.-k*10.)*uC/${CELL}.;vec2 d=c-uTr[i];float L=length(d),w=(1.-k*.115)*pow(smoothstep(1.,0.,L/rr),1.7);
-        vec2 u=d/(L+1.);n=max(n,w);v+=(u*.85+vec2(-u.y,u.x)*.45)*w*smoothstep(0.,.25*rr,L);}
-        n*=uF;v*=uF;
-        v=v*.27*uC/max(1.,length(v))+vec2(sin(uT*1.3+c.y*.05),cos(uT*1.1+c.x*.05))*.07*uC*n;}
-        /* one background square: slow blink with its own rate and phase, slight highlight under the cursor */
-        vec3 sqCol(vec2 nid,vec2 g,float n){
+        /* one background square: breathes slowly between black and light grey. l = wave crest passing through it (adds a faint grey), t = wave trough (dims it a little) */
+        vec3 bgSq(vec2 nid,vec2 g,float l,float t){
         float hr=h(nid),h2=h(nid+3.7);
-        float bl=.5+.5*sin(uT*(.7+.9*h2)+hr*6.2832);
+        float bl=.5+.5*sin(uT*(.22+.25*h2)+hr*6.2832);
         float rest=hr>.93?.2:.06+.07*hr;
-        float b=rest*(.15+1.9*pow(bl,2.2))+n*(.2+.1*bl);
+        float b=rest*(.15+1.9*pow(bl,2.2));
         if(hr>.985)b=max(b,.12+.38*bl*bl);
-        float r=((.5+.12*hr)+n*.1+.05*bl)*.5;
-        return vec3(b)*step(max(abs(g.x),abs(g.y)),r);}
+        b*=1.-.4*t;
+        float r=((.5+.12*hr)+.05*bl)*.5+l*.05;
+        vec3 c=vec3(b)+vec3(.23,.23,.25)*l;
+        return c*sq(g,r);}
         void main(){
         vec2 px=gl_FragCoord.xy,id=floor(px/uC),f=fract(px/uC)-.5,cc=(id+.5)*uC;
         vec4 s=texture2D(tS,cc/uRes);
-        vec2 sid=vec2(0.,floor(uSc*.02));
-        float nr=infl(px);vec3 col=vec3(0.);
-        if(nr<.004){col=sqCol(id+sid,f,0.);}
-        else{for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 nid=id+vec2(float(i),float(j)),c=(nid+.5)*uC;float n;vec2 v;fld(c,n,v);col=max(col,sqCol(nid+sid,(px-c-v)/uC,n));}}
+        vec2 bid=floor(px/uB),sid=vec2(0.,floor(uSc*.01));
+        vec3 col=vec3(0.);
+        for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){
+        vec2 nid=bid+vec2(float(i),float(j));vec4 w=texture2D(tW,(nid+.5)/uG);
+        col=max(col,bgSq(nid+sid,(px-(nid+.5)*uB)/uB-(w.xy-.5)*1.2,w.z,w.w));}
         /* car: square dots sized by lighting, red tail lights, outline, particles */
-        vec3 q=s.rgb;float red=q.r-max(q.g,q.b);
-        float l=pow(clamp(dot(q,vec3(.34,.5,.16)),0.,1.),.6)+(h(id)-.5)*.14+nr*.12;
+        vec3 q=s.rgb;float red=q.r-max(q.g,q.b),nr=texture2D(tW,cc/(uB*uG)).z;
+        float l=pow(clamp(dot(q,vec3(.34,.5,.16)),0.,1.),.6)+(h(id)-.5)*.14+nr*.04;
+        if(s.a>.5)col*=.35;
         if(s.a>.5&&red>.3){col=vec3(1.,.13,.07)*sq(f,.5);}
         else if(s.a>.5){if(l>.1)col=vec3(.86,.85,.82)*sq(f,mix(.12,.5,clamp(l,0.,1.)));}
         else{
@@ -891,14 +931,21 @@
         if(t.a>.5&&h(id*1.7+floor(uT*2.)+float(i))>.955)col=vec3(.8)*sq(f,.11);}
         }
         if(uF>.3&&id==floor(uM/uC))col=vec3(1.,.42,.17)*sq(f,.4);
-        gl_FragColor=vec4(col,1.);}`})));
+        gl_FragColor=vec4(col,1.);}`;
+        const qs=quad(mainFS),ws=quad(waveFS);
 
-        let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix/2),Math.ceil(H*pix/2));
+        let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix/2),Math.ceil(H*pix/2));const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
         const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix()}
         size();addEventListener("resize",size);
 
         /* input + scroll-driven motion */
-        const hist=[];let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0;
+        let lx=-999,ly=-999,lt=0,wi=0;
+        /* the mouse sends ripples: each time it has travelled a bit, a ring leaves its position; the faster the move, the stronger the ring */
+        function ripples(t){if(tx<0||mx<0){lx=-999;return}
+        if(lx<0){lx=mx;ly=my;lt=t;return}
+        const d=Math.hypot(mx-lx,my-ly);
+        if(!calm&&d>46&&t-lt>150){waves[wi].set(mx*pix,(H-my)*pix,t/1000,Math.min(1,.4+d/170));wi=(wi+1)%NW;lx=mx;ly=my;lt=t}}
+        let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0;
         addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}});
         document.documentElement.addEventListener("pointerleave",()=>{tx=ty=-999});
         const secs=[...document.querySelectorAll("section")],rotE=document.getElementById("rot"),secE=document.getElementById("sec");
@@ -912,10 +959,11 @@
         pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=Math.sin(t*.0012)*.04;
         if(tx>=0){mx+=(tx-mx)*.3;my+=(ty-my)*.3}
         U.uF.value+=((tx>=0&&mx>=0?1:0)-U.uF.value)*.07;
-        U.uM.value.set(mx*pix,(H-my)*pix);hist.push([mx*pix,(H-my)*pix]);if(hist.length>26)hist.shift();
-        for(let i=0;i<8;i++){const q=hist[Math.max(0,hist.length-1-i*3)];U.uTr.value[i].set(q[0],q[1])}
+        U.uM.value.set(mx*pix,(H-my)*pix);ripples(t);
+
         U.uT.value=t/1000;U.uSc.value=sy;
         R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(scene,cam);
+        R.setRenderTarget(wt);R.render(ws,qc);
         R.setRenderTarget(null);R.render(qs,qc);
         rotE.textContent=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0");secE.textContent="0"+(idx+1);
         requestAnimationFrame(frame)}
