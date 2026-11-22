@@ -715,28 +715,35 @@
         }
 
         /* ===== Filter chips (project filter + skills) ===== */
+        /* Same look as the project-name buttons (.menu button) */
         .chip {
+            background: var(--glass);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
+            border: 1px solid var(--glass-line);
+            border-bottom: 3px solid #4a4a52;
+            border-radius: 0;
+            color: var(--mut);
             font: inherit;
             font-size: .85rem;
-            color: var(--mut);
-            background: transparent;
-            border: 1px solid var(--line);
-            border-radius: 0;
-            padding: .2rem .7rem;
+            padding: .3rem .7rem;
             cursor: pointer;
-            transition: color .2s ease, border-color .2s ease
+            white-space: nowrap;
+            transition: background-color .25s ease, color .25s ease, border-color .25s ease
         }
 
         @media (hover:hover) {
             .chip:hover {
-                color: var(--fg);
+                background-color: rgba(78,78,86,.5);
                 border-color: var(--acc)
             }
         }
 
         .chip[aria-pressed=true] {
             color: var(--fg);
-            border-color: var(--acc)
+            font-weight: 700;
+            border-color: rgba(255,106,43,.55);
+            border-bottom-color: var(--acc)
         }
 
         .filters {
@@ -877,6 +884,12 @@
         }
 
         /* ===== Devlogs ===== */
+        /* Everything that is not inside a .page sits above the diamond canvases too (they are fixed, z-index 0) */
+        .devlogs, footer {
+            position: relative;
+            z-index: 1
+        }
+
         .devlogs {
             max-width: 1100px;
             margin: 0 auto;
@@ -1146,7 +1159,7 @@
         bio: "A racing game prototype built on a handmade C++ and Vulkan engine, featuring custom vehicle audio and 3D assets created by the art team.",
         videos: ["https://www.youtube.com/watch?v=UNN34BJ2Xj8", "https://www.youtube.com/watch?v=o79piqJLBgM"], photos: [], link: "" },
         { name: "LadyBug", order: 9, date: "2025-12", duration: "2 days", team: "4",
-        tags: ["Unity","C#", "Gameplay"],
+        tags: ["Unity", "C#", "Gameplay"],
         bio: "A game jam entry that won the Jury's Choice Award.",
         video: "https://www.youtube.com/watch?v=B9UFAe060Mc", photos: [], link: "" }
         ];
