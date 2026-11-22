@@ -3,7 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Portfolio</title>
+    <title>Ludwig Gurget – Gameplay Programmer Portfolio</title>
+    <meta name="description" content="Ludwig Gurget, gameplay programmer specializing in C++ and C#. Games, editor tools and prototypes in Unity and Unreal Engine 5.">
+    <meta name="theme-color" content="#0d0d0f">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Ludwig Gurget – Gameplay Programmer">
+    <meta property="og:description" content="Games, editor tools and prototypes in Unity and Unreal Engine 5.">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Link preview image: once the site is online, add
+         <meta property="og:image" content="https://YOUR-SITE/Pictures/preview.jpg">  (absolute URL, about 1200x630) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0d0f'/%3E%3Cpath d='M16 4l12 12-12 12L4 16z' fill='none' stroke='%23ff3d2e' stroke-width='3'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://i.ytimg.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -639,6 +649,346 @@
                     margin: 0 0 0 .4em
                 }
         }
+
+
+        /* ===== Roles, tags, action buttons ===== */
+        .role {
+            color: var(--hot);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: -.45rem
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            padding: 0;
+            list-style: none
+        }
+
+            .tags li {
+                font-size: .8rem;
+                color: var(--mut);
+                border: 1px solid var(--line);
+                padding: .05rem .5rem
+            }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6rem
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--glass);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
+            border: 1px solid var(--glass-line);
+            border-bottom: 3px solid #4a4a52;
+            border-radius: 0;
+            color: var(--fg);
+            font: inherit;
+            font-size: .95rem;
+            padding: .45rem .9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color .25s ease, border-color .25s ease
+        }
+
+            .btn.primary {
+                border-bottom-color: var(--acc)
+            }
+
+            .btn.small {
+                font-size: .85rem;
+                padding: .3rem .7rem;
+                justify-self: start
+            }
+
+        @media (hover:hover) {
+            .btn:hover {
+                background-color: rgba(78,78,86,.5);
+                border-color: var(--acc)
+            }
+        }
+
+        /* ===== Filter chips (project filter + skills) ===== */
+        .chip {
+            font: inherit;
+            font-size: .85rem;
+            color: var(--mut);
+            background: transparent;
+            border: 1px solid var(--line);
+            border-radius: 0;
+            padding: .2rem .7rem;
+            cursor: pointer;
+            transition: color .2s ease, border-color .2s ease
+        }
+
+        @media (hover:hover) {
+            .chip:hover {
+                color: var(--fg);
+                border-color: var(--acc)
+            }
+        }
+
+        .chip[aria-pressed=true] {
+            color: var(--fg);
+            border-color: var(--acc)
+        }
+
+        .filters {
+            max-width: 1100px;
+            margin: .9rem auto 0;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem
+        }
+
+            .filters:empty {
+                display: none
+            }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-top: 1.5rem
+        }
+
+        .skills-label {
+            width: 100%;
+            color: var(--mut);
+            font-size: .85rem
+        }
+
+        /* ===== YouTube facade: the video loads only when clicked ===== */
+        .yt {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            border: 0;
+            background: #000;
+            cursor: pointer
+        }
+
+            .yt img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                opacity: .85;
+                transition: opacity .25s ease
+            }
+
+            .yt::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 4.2rem;
+                height: 3rem;
+                transform: translate(-50%,-50%);
+                background: var(--acc);
+                box-shadow: 0 0 24px rgba(255,61,46,.5)
+            }
+
+            .yt::before {
+                content: "";
+                position: absolute;
+                z-index: 1;
+                left: 50%;
+                top: 50%;
+                transform: translate(-40%,-50%);
+                border-style: solid;
+                border-width: .7rem 0 .7rem 1.1rem;
+                border-color: transparent transparent transparent #fff
+            }
+
+        @media (hover:hover) {
+            .yt:hover img {
+                opacity: 1
+            }
+        }
+
+        /* ===== Case study dialog ===== */
+        body:has(dialog[open]) {
+            overflow: hidden
+        }
+
+        dialog {
+            width: min(780px, calc(100% - 2rem));
+            max-height: calc(100svh - 2rem);
+            margin: auto;
+            padding: 0;
+            overflow: auto;
+            background: #141417;
+            color: var(--fg);
+            border: 1px solid var(--glass-line);
+            border-bottom: 3px solid var(--acc);
+            border-radius: 0
+        }
+
+            dialog::backdrop {
+                background: rgba(0,0,0,.65);
+                -webkit-backdrop-filter: blur(4px);
+                backdrop-filter: blur(4px)
+            }
+
+        .sheet {
+            padding: 1.5rem 1.5rem 1.75rem;
+            display: grid;
+            gap: .6rem
+        }
+
+            .sheet h3 {
+                font-size: 1.9rem;
+                line-height: 1.1;
+                font-weight: 800;
+                letter-spacing: -.02em;
+                padding-right: 6rem
+            }
+
+            .sheet h4 {
+                margin-top: .9rem;
+                color: var(--hot);
+                font-size: .85rem;
+                text-transform: uppercase;
+                letter-spacing: .08em
+            }
+
+            .sheet .btn.close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem
+            }
+
+        pre {
+            background: #0a0a0c;
+            border: 1px solid var(--line);
+            padding: 1rem;
+            overflow: auto;
+            font: .85rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            tab-size: 4
+        }
+
+        /* ===== Devlogs ===== */
+        .devlogs {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 1rem
+        }
+
+        .logs {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.25rem
+        }
+
+        .log {
+            background: var(--glass);
+            -webkit-backdrop-filter: var(--glass-fx);
+            backdrop-filter: var(--glass-fx);
+            border: 1px solid var(--glass-line);
+            padding: 1.1rem 1.25rem
+        }
+
+            .log time {
+                color: var(--mut);
+                font-size: .9rem
+            }
+
+            .log h3 {
+                font-size: 1.4rem;
+                font-weight: 800;
+                letter-spacing: -.02em;
+                line-height: 1.15;
+                margin: .2rem 0 .4rem
+            }
+
+            .log summary {
+                cursor: pointer;
+                color: var(--acc);
+                margin-top: .6rem
+            }
+
+        .log-body p {
+            margin-top: .7rem;
+            max-width: 70ch
+        }
+
+        /* ===== Easter egg + toast ===== */
+        .coffee {
+            background: none;
+            border: 0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            filter: grayscale(1);
+            opacity: .55;
+            transition: opacity .2s ease, filter .2s ease
+        }
+
+            .coffee:hover, .coffee.brew {
+                filter: none;
+                opacity: 1
+            }
+
+            .coffee.brew {
+                animation: shake .45s
+            }
+
+        @keyframes shake {
+            20% {
+                transform: translateX(-3px) rotate(-8deg)
+            }
+
+            40% {
+                transform: translateX(3px) rotate(8deg)
+            }
+
+            60% {
+                transform: translateX(-2px) rotate(-5deg)
+            }
+
+            80% {
+                transform: translateX(2px) rotate(5deg)
+            }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 1.5rem;
+            z-index: 10;
+            max-width: calc(100% - 2rem);
+            transform: translate(-50%,1rem);
+            opacity: 0;
+            pointer-events: none;
+            background: #1d1d21;
+            border: 1px solid var(--glass-line);
+            border-bottom: 3px solid var(--acc);
+            padding: .6rem 1rem;
+            transition: opacity .3s ease, transform .3s ease
+        }
+
+            .toast.on {
+                opacity: 1;
+                transform: translate(-50%,0)
+            }
+
+        @media (prefers-reduced-motion:reduce) {
+            .coffee.brew {
+                animation: none
+            }
+
+            .toast, .btn, .chip {
+                transition: none
+            }
+        }
     </style>
 </head>
 <body>
@@ -649,6 +999,7 @@
                 <h1 id="name"></h1>
                 <p class="title" id="title"></p>
                 <ul class="links" id="links"></ul>
+                <div class="skills" id="skills"><p class="skills-label">Skills – click one to see the projects</p></div>
             </div>
             <div class="bio" id="bio"></div>
         </header>
@@ -660,6 +1011,7 @@
             <div class="projects-head">
                 <h2 class="section">Projects</h2>
             </div>
+            <div class="filters" id="filters" role="group" aria-label="Filter projects by tag"></div>
             <nav class="menu" id="menu" aria-label="Project list"></nav>
             <div class="stage">
                 <div class="timeline" aria-hidden="true">
@@ -676,8 +1028,23 @@
                 </div>
             </div>
         </div>
-        <footer><span id="copy"></span><a href="#about">↑ About</a></footer>
+        <a class="cue" href="#devlogs" id="devcue" hidden>Devlogs ↓</a>
     </main>
+
+    <section class="devlogs" id="devlogs" hidden aria-labelledby="devlogsTitle">
+        <h2 class="section" id="devlogsTitle">Devlogs</h2>
+        <div class="logs" id="logs"></div>
+    </section>
+
+    <footer><span id="copy"></span><button class="coffee" id="coffee" type="button" aria-label="Make coffee">☕</button><a href="#about">↑ About</a></footer>
+
+    <dialog id="study" aria-labelledby="studyTitle">
+        <div class="sheet">
+            <button class="btn small close" id="studyClose" type="button">Close ✕</button>
+            <div id="studyBody" style="display:contents"></div>
+        </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <canvas class="grid-base" id="gridBase" aria-hidden="true"></canvas>
     <canvas class="grid-fx" id="gridFx" aria-hidden="true"></canvas>
@@ -690,6 +1057,8 @@
         // Portrait shown next to your bio. Put the image in the repo next to index.html
         // (default file name: photo.jpg). If the file is missing, no photo is shown.
         photo: "photo.jpg",
+        // CV file next to index.html. The "CV" link only appears if the file exists (leave "" to hide it).
+        cv: "cv.pdf",
         bio: [
         "I design and program gameplay systems, editor tools and interactive experiences in Unity and Unreal Engine 5.",
         "I love small details that make a huge difference and well-crafted systems like an animation that reacts to the player, a tool that saves the team an hour, a prototype that holds together. And if a button could make you a coffee, I'd build it in a heartbeat",
@@ -703,52 +1072,90 @@
         };
 
         /* One object per project.
-        order    : display position. 1 = shown first (the page opens on it, on the right), 2 = the next one
-        you reach by scrolling right, and so on. Projects without "order" come last, newest first.
+        order    : display position. 1 = shown first (the page opens on it, at the top), 2 = the next one
+        you reach by scrolling down, and so on. Projects without "order" come last, newest first.
         date     : "YYYY-MM" (shown on the slide, also used to break ties between equal orders)
+        today    : (optional) true to show "Today" instead of the date (timeline + big date).
+        "date" is still required: it is only used for sorting.
         duration : free text, e.g. "3 weeks"
         team     : number of people who worked on the project, e.g. 1 (shown as "Solo") or 4 (shown as "4 people").
         Free text also works, e.g. "4 (2 programmers, 2 artists)". Leave null to hide the line.
-        today    : (optional) true to show "Today" instead of the date (timeline + big date). "date" is still
-        required: it is only used for sorting.
         ongoing  : true if the project is still in production (shows "In progress" next to the date).
         Leave it out (or false) for a finished project (shows "Completed").
+        role     : (optional) what YOU did on the project, shown under the title. Be precise!
+        tags     : (optional) e.g. ["C++", "Unreal Engine", "Tools"]. They drive the filter bar and the
+        "Skills" list at the top of the page (same spelling everywhere = same skill).
         video    : a YouTube link (youtube.com or youtu.be) OR a file in the repo, e.g. "videos/demo.mp4".
-        Leave "" if there is none.
+        Leave "" if there is none. YouTube videos load only when clicked (faster page).
         videos   : (optional) several videos, same format as "video",
         e.g. ["https://youtu.be/AAAAAAAAAAA", "videos/demo.mp4"].
         You can use "video", "videos" or both (the single "video" comes first).
+        gifs     : (optional) short looping GIFs, e.g. ["gifs/dash.gif"]. Shown after the videos.
         photos   : list of images in the repo, e.g. ["images/shot1.jpg", "images/shot2.jpg"].
-        They appear with the videos in a small gallery (videos first). Leave [] if there are none.
-        link     : (optional) repository or project page */
+        They appear with the videos in a small gallery. Leave [] if there are none.
+        demo     : (optional) link to a playable build (itch.io...), shows a "Play demo" button
+        link     : (optional) repository or project page
+        study    : (optional) case study opened by the "Case study" button:
+        { problem: "...", solution: "...", learned: "..." }  (each one a string, or an array of paragraphs)
+        code     : (optional) snippets shown in the case study:
+        [{ title: "Drift model", note: "Why it works like this", text: `...your code...` }] */
         const PROJECTS = [
         { name: "Turbo Drift 2", order: 1, date: "2026-05", today: true, duration: "Undefined", team: null, ongoing: true,
+        role: "Gameplay programming & 3D art pipeline (Blender)",
+        tags: ["Unreal Engine", "C++", "Gameplay", "3D Art"],
         bio: "A racing game derived from my student project Turbo Drift. As my most ambitious project to date, built in Unreal Engine 5.7, everything was created from scratch—from 3D art pipelines in Blender to core gameplay programming.",
-        video: "https://www.youtube.com/watch?v=13oD5iiuFZU", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "" },
+        video: "https://www.youtube.com/watch?v=13oD5iiuFZU", photos: ["Pictures/Test4.png" , "Pictures/SideView.png" , "Pictures/OrthoView.png" , "Pictures/TopView.png"], link: "",
+        /* PLACEHOLDER content below: replace it with the real story of the project (or delete study/code) */
+        study: {
+        problem: "[Placeholder] What was the hardest technical problem? Describe what was wrong, in player terms (what did it feel like?) and in technical terms.",
+        solution: ["[Placeholder] How did you solve it? Which approach did you pick, and which ones did you try and drop?", "[Placeholder] Numbers help: frame time, iteration time, lines of code removed..."],
+        learned: "[Placeholder] What was the result, and what would you do differently next time?"
+        },
+        code: [{ title: "Example snippet (placeholder)", note: "Explain in one or two sentences what this code does and why it is written this way.",
+        text: `// Placeholder: paste a short, meaningful snippet from Turbo Drift 2 here.
+        void AVehiclePawn::UpdateGrip(float DeltaTime)
+        {
+        // ...
+        }` }] },
         { name: "CPU Engine", order: 2, date: "2026-11", duration: "1 month", team: "2",
+        tags: ["C++", "Engine", "Rendering"],
         bio: "C++ software engine running entirely on the CPU using SDL3. Framebuffer management, custom rasterizer, multri-threading, blinn-phong lighting, multiple lights, terrain generation.",
         video: "https://youtu.be/hFcULMIPu58", photos: [], link: "" },
         { name: "A simple slime", order: 3, date: "2026-10", duration: "3 weeks", team: "2",
+        tags: ["Unity", "C#", "Gameplay"],
         bio: "A Unity game prototype focused on game feel and core gameplay mechanics, featuring a custom-built character controller.",
         video: "https://www.youtube.com/watch?v=g6VkB29s6fE", photos: [], link: "" },
         { name: "Fps prototype", order: 4, date: "2026-08", duration: "1 month", team: null,
+        tags: ["Unreal Engine", "Gameplay"],
         bio: "A compact FPS prototype built in Unreal Engine 4, created to test my ability to scope and execute a project under a strict timeline.",
         video: "https://www.youtube.com/watch?v=nlRbgm4-v0M", photos: [], link: "" },
         { name: "Guadeloupe: The Secret of the Three Rivers", order: 5, date: "2026-07", duration: "1 month", team: "4",
+        tags: ["Unreal Engine", "Tools", "Gameplay"],
         bio: "Internship project at Black Frog Studio. An exploration game centered on Guadeloupe's rich folklore, where players travel across the island to solve its mysteries. Developed custom internal tools for level designers.",
         video: "https://www.youtube.com/watch?v=zlhlM9s28EE", photos: [], link: "" },
         { name: "Spline Tools (UE5)", order: 6, date: "2026-07", duration: "2 weeks", team: null,
+        tags: ["Unreal Engine", "C++", "Tools"],
         bio: "A suite of C++ and Blueprint editor tools for Unreal Engine 5, featuring terrain-spline snapping, curve-based movement, and highly configurable parameters.",
         videos: ["https://www.youtube.com/watch?v=yAbLEiAEBwk", "https://www.youtube.com/watch?v=c-JQNT7x82A"], photos: [], link: "" },
         { name: "Dialogue and Cutscene System", order: 7, date: "2026-06", duration: "1 week", team: null,
+        tags: ["Unreal Engine", "Tools", "Gameplay"],
         bio: "A custom dialogue and cutscene system built for the Guadeloupe project in Unreal Engine using Level Sequences.",
         videos: ["https://www.youtube.com/watch?v=2vAAXGh2Jo8", "https://www.youtube.com/watch?v=SifTLRT01S0"], photos: [], link: "" },
         { name: "Turbo Drift", order: 8, date: "2026-04", duration: "1 month", team: "6",
+        tags: ["C++", "Engine", "Gameplay"],
         bio: "A racing game prototype built on a handmade C++ and Vulkan engine, featuring custom vehicle audio and 3D assets created by the art team.",
         videos: ["https://www.youtube.com/watch?v=UNN34BJ2Xj8", "https://www.youtube.com/watch?v=o79piqJLBgM"], photos: [], link: "" },
         { name: "LadyBug", order: 9, date: "2025-12", duration: "2 days", team: "4",
         bio: "A game jam entry that won the Jury's Choice Award.",
         video: "https://www.youtube.com/watch?v=B9UFAe060Mc", photos: [], link: "" }
+        ];
+
+        /* Devlogs: short technical write-ups (newest first on the page). Leave [] to hide the section.
+        { title, date: "YYYY-MM-DD", project (optional), summary, body: ["paragraph", "paragraph"] } */
+        const DEVLOGS = [
+        { title: "Example devlog (placeholder, replace me)", date: "2026-11-22", project: "Turbo Drift 2",
+        summary: "[Placeholder] One or two sentences: what problem did you tackle and what did you find?",
+        body: ["[Placeholder] First paragraph: the context and the problem.", "[Placeholder] Second paragraph: what you tried, what worked, what you measured."] }
         ];
         /* ====== End of the editable area ====== */
 
@@ -778,6 +1185,13 @@
         });
         $("copy").textContent = "© " + new Date().getFullYear() + " " + PROFILE.name;
 
+        /* CV link: shown only if the file really exists (always shown when opening index.html straight from disk) */
+        if (PROFILE.cv) {
+        const addCv = () => { const li = el("li"), a = el("a", "", "CV"); a.href = PROFILE.cv; a.download = ""; li.append(a); $("links").append(li); };
+        if (location.protocol === "file:") addCv();
+        else fetch(PROFILE.cv, { method: "HEAD" }).then(r => { if (r.ok) addCv(); }).catch(() => {});
+        }
+
         /* Team size: one simplified person icon per team member (free text without a leading number stays text) */
         const SVG = "http://www.w3.org/2000/svg";
         const personIcon = () => {
@@ -799,33 +1213,137 @@
         };
 
         /* Projects: order 1 on top, following orders below it */
-        const projects = [...PROJECTS]
-        .sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date))
-        ;
+        const ALL = [...PROJECTS].sort((a, b) => ((a.order ?? Infinity) - (b.order ?? Infinity)) || b.date.localeCompare(a.date));
+        let projects = ALL, tagFilter = null;
         const track = $("track"), menu = $("menu");
         const slides = [], tabs = [];
         let active = 0;
+
+        /* Small message at the bottom of the screen */
+        let toastTimer = 0;
+        const toast = (msg, ms = 2600) => {
+        const t = $("toast"); t.textContent = msg; t.classList.add("on");
+        clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), ms);
+        };
+
+        /* Easter egg: the coffee button (see "Hobbies" in the bio) */
+        let brewTimer = 0;
+        $("coffee").addEventListener("click", e => {
+        const b = e.currentTarget;
+        b.classList.remove("brew"); void b.offsetWidth; b.classList.add("brew");
+        toast("Brewing… ☕");
+        clearTimeout(brewTimer);
+        brewTimer = setTimeout(() => { b.classList.remove("brew"); toast("Error 418: I'm a teapot. The coffee button is still in prototype.", 3800); }, 1400);
+        });
+
+        /* Case study dialog: problem / solution / result + code snippets */
+        const dlg = $("study");
+        dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+        $("studyClose").addEventListener("click", () => dlg.close());
+        const paras = (box, t) => [].concat(t || []).forEach(x => box.append(el("p", "", x)));
+        function openStudy(p) {
+        const b = $("studyBody"), st = p.study || {};
+        b.replaceChildren();
+        const h = el("h3", "", p.name); h.id = "studyTitle"; b.append(h);
+        if (p.role) b.append(el("p", "role", p.role));
+        [["The problem", st.problem], ["My solution", st.solution], ["Result & what I would do differently", st.learned]].forEach(([title, t]) => {
+        if (!t) return;
+        b.append(el("h4", "", title)); paras(b, t);
+        });
+        (p.code || []).forEach(c => {
+        b.append(el("h4", "", c.title || "Code"));
+        if (c.note) b.append(el("p", "", c.note));
+        const pre = el("pre"), copy = el("button", "btn small", "Copy");
+        pre.append(el("code", "", c.text));
+        copy.type = "button";
+        copy.addEventListener("click", () => navigator.clipboard?.writeText(c.text).then(() => { copy.textContent = "Copied ✓"; setTimeout(() => copy.textContent = "Copy", 1500); }));
+        b.append(pre, copy);
+        });
+        dlg.showModal(); dlg.scrollTop = 0;
+        }
+
+        /* Tags: filter bar above the projects + "Skills" list in the About section (both built from the projects' tags) */
+        const tagCount = {};
+        ALL.forEach(p => (p.tags || []).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+        const allTags = Object.keys(tagCount).sort((a, b) => tagCount[b] - tagCount[a] || a.localeCompare(b));
+        function renderFilters() {
+        const box = $("filters");
+        box.replaceChildren();
+        if (allTags.length < 2) return;
+        [null, ...allTags].forEach(t => {
+        const b = el("button", "chip", t || "All");
+        b.type = "button"; b.setAttribute("aria-pressed", t === tagFilter);
+        b.addEventListener("click", () => setFilter(t));
+        box.append(b);
+        });
+        }
+        function renderSkills() {
+        const box = $("skills");
+        if (!allTags.length) { box.hidden = true; return; }
+        allTags.forEach(t => {
+        const b = el("button", "chip", t + " · " + tagCount[t]);
+        b.type = "button"; b.title = "Show the " + tagCount[t] + " project" + (tagCount[t] > 1 ? "s" : "") + " using " + t;
+        b.addEventListener("click", () => { setFilter(t); $("projects").scrollIntoView({ behavior: behavior() }); });
+        box.append(b);
+        });
+        }
+        function setFilter(t) { tagFilter = t; renderFilters(); build(); }
+
+        /* Devlogs */
+        (() => {
+        const list = [...DEVLOGS].sort((a, b) => b.date.localeCompare(a.date));
+        if (!list.length) return;
+        $("devlogs").hidden = false; $("devcue").hidden = false;
+        list.forEach(d => {
+        const a = el("article", "log"), t = el("time", "", new Date(d.date + "T12:00:00").toLocaleDateString("en", { day: "numeric", month: "long", year: "numeric" }) + (d.project ? " · " + d.project : ""));
+        t.dateTime = d.date;
+        a.append(t, el("h3", "", d.title));
+        if (d.summary) a.append(el("p", "", d.summary));
+        if (d.body && d.body.length) {
+        const det = el("details"), wrap = el("div", "log-body");
+        d.body.forEach(x => wrap.append(el("p", "", x)));
+        det.append(el("summary", "", "Read more"), wrap); a.append(det);
+        }
+        $("logs").append(a);
+        });
+        })();
+
+        /* (Re)builds the wheel, the menu and the timeline from the projects that match the current filter */
+        function build() {
+        cancelAnimationFrame(rafW); rafW = 0;
+        projects = tagFilter ? ALL.filter(p => (p.tags || []).includes(tagFilter)) : ALL;
+        track.replaceChildren(); menu.replaceChildren(); ticks.replaceChildren();
+        slides.length = tabs.length = tickEls.length = 0;
 
         projects.forEach((p, i) => {
         const s = el("article", "slide");
         const items = [];
         const vids = [p.video, ...(p.videos || [])].filter(Boolean);
         vids.forEach((v, n) => items.push({ video: v, label: vids.length > 1 ? "Video " + (n + 1) : "Video" }));
+        (p.gifs || []).forEach((src, n) => items.push({ src, label: "GIF " + (n + 1), alt: p.name + " – animation " + (n + 1) }));
         (p.photos || []).forEach((src, n) => items.push({ src, alt: p.name + " – photo " + (n + 1) }));
         const gallery = el("div", "gallery"), media = el("div", "media"), thumbs = el("div", "thumbs"), thumbBtns = [];
+        let cur = 0;
         gallery.append(media);
         const show = k => {
-        const it = items[k], yt = it.video && ytId(it.video);
+        cur = k;
+        const it = items[k], yt = it.video && ytId(it.video), title = "Demo: " + p.name + (vids.length > 1 && it.video ? " – " + it.label : "");
         let node;
         if (yt) {
-        node = el("iframe");
-        node.src = "https://www.youtube-nocookie.com/embed/" + yt;
-        node.title = "Demo: " + p.name + (vids.length > 1 ? " – " + it.label : ""); node.loading = "lazy"; node.allowFullscreen = true;
-        node.allow = "accelerometer; encrypted-media; picture-in-picture; fullscreen";
+        /* facade: a thumbnail with a play button, the real player is created on click */
+        node = el("button", "yt"); node.type = "button"; node.setAttribute("aria-label", "Play – " + title);
+        const im = el("img"); im.src = "https://i.ytimg.com/vi/" + yt + "/hqdefault.jpg"; im.alt = ""; im.decoding = "async";
+        node.append(im);
+        node.addEventListener("click", () => {
+        const f = el("iframe");
+        f.src = "https://www.youtube-nocookie.com/embed/" + yt + "?autoplay=1"; f.title = title; f.allowFullscreen = true;
+        f.allow = "autoplay; accelerometer; encrypted-media; picture-in-picture; fullscreen";
+        media.replaceChildren(f);
+        });
         } else if (it.video) {
         node = el("video"); node.src = it.video; node.controls = true; node.preload = "metadata"; node.playsInline = true;
         } else {
-        node = el("img"); node.src = it.src; node.alt = it.alt;
+        node = el("img"); node.src = it.src; node.alt = it.alt; node.decoding = "async";
         }
         media.replaceChildren(node);
         thumbBtns.forEach((b, j) => b.setAttribute("aria-current", j === k));
@@ -837,6 +1355,7 @@
         items.forEach((it, k) => {
         const b = el("button");
         if (it.video) b.textContent = "▶ " + it.label;
+        else if (it.label) b.textContent = it.label;
         else { const im = el("img"); im.src = it.src; im.alt = ""; im.loading = "lazy"; b.append(im); }
         b.setAttribute("aria-label", it.video ? "Demo " + it.label.toLowerCase() : it.alt);
         b.addEventListener("click", () => show(k));
@@ -845,40 +1364,56 @@
         gallery.append(thumbs);
         }
         s.load = () => show(0);   // media are created only when the card gets close to the front
+        s.stop = () => { if (media.querySelector("iframe")) show(cur); };   // leaving the card: a playing YouTube video goes back to its thumbnail
         }
         const txt = el("div", "txt");
         const meta = el("p", "date");
         const status = el("span", "status", p.ongoing ? "In progress" : "Completed");
         status.dataset.state = p.ongoing ? "ongoing" : "done";
         meta.append(status);
-        txt.append(meta, el("h3", "", p.name), el("p", "", p.bio));
+        txt.append(meta, el("h3", "", p.name));
+        if (p.role) txt.append(el("p", "role", p.role));
+        txt.append(el("p", "", p.bio));
+        if (p.tags && p.tags.length) { const ul = el("ul", "tags"); p.tags.forEach(t => ul.append(el("li", "", t))); txt.append(ul); }
         const dl = el("dl");
         const stat = (label, value) => { const d = el("div"), dd = el("dd", "", typeof value === "string" ? value : null); if (typeof value !== "string") dd.append(value); d.append(el("dt", "", label), dd); dl.append(d); };
         stat("Production time", p.duration);
         if (p.team != null && p.team !== "") stat("Team size", teamNode(p.team));
         txt.append(dl);
-        if (p.link) { const a = el("a", "", "View project"); a.href = p.link; a.target = "_blank"; a.rel = "noopener"; txt.append(a); }
+        const acts = el("div", "actions");
+        const link = (cls, label, url) => { const a = el("a", "btn " + cls, label); a.href = url; a.target = "_blank"; a.rel = "noopener"; acts.append(a); };
+        if (p.demo) link("primary", "▶ Play demo", p.demo);
+        if (p.study || (p.code && p.code.length)) { const b = el("button", "btn", "Case study"); b.type = "button"; b.addEventListener("click", () => openStudy(p)); acts.append(b); }
+        if (p.link) link("", "View project", p.link);
+        if (acts.children.length) txt.append(acts);
         s.append(gallery, txt); track.append(s); slides.push(s);
 
         const t = el("button", "", p.name);
         t.addEventListener("click", () => go(i));
         menu.append(t); tabs.push(t);
+
+        const ti = el("i"), dt = new Date(p.date + "-01T12:00:00");
+        ti.append(el("span", "", p.today ? "Today" : monthShort(dt) + " " + dt.getFullYear()));
+        ticks.append(ti); tickEls.push(ti);
         });
+
+        pos = goal = 0; active = -1;
+        update(0, true); go(0, true); measure();
+        }
 
         /* Wheel: the cards sit on a vertical drum. pos = (fractional) index in front of the viewer, goal = index it settles on */
         const when = $("when"), ticks = $("ticks");
         const STEP = 30, PITCH = 56;          // degrees between two cards / px between two timeline ticks
         let pos = 0, goal = 0, R = 0, rafW = 0;
         const behavior = instant => (instant || calm) ? "auto" : "smooth";
-        projects.forEach(p => { const i = el("i"), dt = new Date(p.date + "-01T12:00:00"); i.append(el("span", "", p.today ? "Today" : monthShort(dt) + " " + dt.getFullYear())); ticks.append(i); });
-        const tickEls = [...ticks.children];
+        const tickEls = [];   // filled by build()
 
         function update(i, instant) {
         active = i;
         tabs.forEach((t, j) => t.setAttribute("aria-current", j === i));
         const t = tabs[i];
         menu.scrollTo({ left: t.offsetLeft - (menu.clientWidth - t.offsetWidth) / 2, behavior: behavior(instant) });
-        slides.forEach((s, j) => { if (j !== i) s.querySelectorAll("video").forEach(v => v.pause()); });
+        slides.forEach((s, j) => { if (j !== i) { s.querySelectorAll("video").forEach(v => v.pause()); if (s.stop) s.stop(); } });
         const dt = new Date(projects[i].date + "-01T12:00:00");
         if (projects[i].today) when.replaceChildren(el("span", "m", "Today"));
         else when.replaceChildren(el("span", "m", monthShort(dt)), el("span", "y", String(dt.getFullYear())));
@@ -922,7 +1457,7 @@
         return true;
         }
 
-        const measure = () => { R = slides[0].offsetHeight * 2; draw(); };   // drum radius: neighbours sit just outside the front card
+        const measure = () => { if (!slides.length) return; R = slides[0].offsetHeight * 2; draw(); };   // drum radius: neighbours sit just outside the front card
         addEventListener("resize", measure); addEventListener("load", measure);
         if (document.fonts) document.fonts.ready.then(measure);
 
@@ -963,9 +1498,7 @@
         track.addEventListener("pointercancel", endDrag);
 
         /* Open on the newest project */
-        update(0, true);
-        go(0, true);
-        measure();
+        renderFilters(); renderSkills(); build();
 
         /* Mouse wheel over the projects: turns the project wheel. At either end (or anywhere else on the page)
         the wheel is left alone, so the site keeps its normal native scrolling. */
