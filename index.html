@@ -712,6 +712,68 @@
         .txt h3 {
             color: var(--acc)
         }
+
+        /* on-screen key under the car (hold to burn rubber); only visible while the page is at the very top */
+        .burn {
+            position: fixed;
+            left: 50%;
+            top: 0;
+            z-index: 4;
+            transform: translate3d(-50%,72vh,0);
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+            background: none;
+            border: 0;
+            padding: .4rem;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+            transition: opacity .35s;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent
+        }
+
+            .burn.off {
+                opacity: 0;
+                pointer-events: none
+            }
+
+            .burn kbd {
+                font: 700 1.05rem "Bricolage Grotesque",system-ui,sans-serif;
+                min-width: 3rem;
+                text-align: center;
+                padding: .5rem 1.1rem;
+                background: rgba(13,13,15,.82);
+                border: 1px solid rgba(255,255,255,.09);
+                border-bottom: 4px solid #4a4a52;
+                transition: color .15s,border-color .15s,transform .08s
+            }
+
+            .burn .m {
+                text-shadow: 0 0 12px #000
+            }
+
+            .burn:hover kbd {
+                border-color: var(--acc)
+            }
+
+            .burn.down kbd {
+                transform: translateY(3px);
+                border-bottom-width: 1px;
+                margin-bottom: 3px;
+                color: var(--acc);
+                border-color: var(--acc)
+            }
+
+        /* perf: no live backdrop blur on the many small controls over the animated canvas (big panels keep it) */
+        .chip, .menu button, .arrows button {
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            background: rgba(13,13,15,.82)
+        }
     </style>
 </head>
 <body>
@@ -723,6 +785,7 @@
     </nav>
     <div class="hud m"><span>""</span><br><span>Rotation <b id="rot">000</b>° · <b id="sec">01</b> / 04</span></div>
     <div class="hud r2 m">Scroll to rotate the car<br>Move the mouse to send ripples through the squares</div>
+    <button type="button" class="burn" id="burn" aria-label="Hold to spin the wheels forward and make the tyres smoke (key B)"><kbd>B</kbd><span class="m">Hold to burn rubber</span></button>
 
     <main>
         <section id="top">
@@ -859,7 +922,7 @@
 
         /* ===== 3D: Mazda RX-7 (FD3S) built from primitives, rendered then converted to squares ===== */
         const cv=document.getElementById("gl"),R=new THREE.WebGLRenderer({canvas:cv,antialias:false});
-        const pix=Math.min(devicePixelRatio||1,1.5),CELL=3,BG=14; /* CELL = fine stipple dots of the car, BG = large background squares */
+        let pix=Math.min(devicePixelRatio||1,1.5);const CELL=3,BG=14; /* CELL = fine stipple dots of the car, BG = large background squares */
         const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(28,1,.1,60);
         scene.add(new THREE.HemisphereLight(0xffffff,0x333333,.5));
         const k=new THREE.DirectionalLight(0xffffff,1.0);k.position.set(-5,6,4);scene.add(k);
@@ -915,8 +978,8 @@
         m(new THREE.CylinderGeometry(.325,.325,.22,40),tire);m(new THREE.CylinderGeometry(.235,.235,.25,40),rimM);m(new THREE.CylinderGeometry(.06,.06,.27,16),tire);
         for(let q=0;q<5;q++){const a=q*1.2566+.63;m(new THREE.CylinderGeometry(.062,.062,.27,12),tire,Math.cos(a)*.15,Math.sin(a)*.15)}
         g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g);return g}
-        const rw=[]; /* rear wheels: spun while the car turns */
-        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);if(x===XR)rw.push(g)}));
+        const rw=[],fw=[]; /* rear wheels spin while the car turns; the front ones only when the key is held */
+        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);(x===XR?rw:fw).push(g)}));
         car.position.y=-.62;
 
         /* tyre smoke: puffs of dithered points left in space behind the rear tyres. They fade by dissolving (noise discard), then the squares pass turns them into dots */
@@ -937,11 +1000,11 @@
         smoke.frustumCulled=false;const smokeG=new THREE.Group();smokeG.add(smoke);scene.add(smokeG);
 
         /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
-        const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
+        const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter}); /* perf: the scene is only ever sampled once per stipple cell, so it is rendered at one texel per cell */
         const wt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter,depthBuffer:false}); /* ripple map, one texel per background square: rg = push, b = crest light, a = trough */
         const NW=16,WAVE={life:1.8,speed:170,len:60,push:.3}; /* life (s) · speed (css px/s) · wavelength (css px) · push = max shove, in squares */
         const waves=Array.from({length:NW},()=>new THREE.Vector4(0,0,-999,0)); /* one slot per ripple: x, y (px), birth time (s), strength */
-        const U={tS:{value:rt.texture},tW:{value:wt.texture},uRes:{value:new THREE.Vector2()},uG:{value:new THREE.Vector2(1,1)},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uB:{value:BG*pix},uS:{value:pix},uSc:{value:0},uF:{value:0},uW:{value:waves}};
+        const U={tS:{value:rt.texture},tW:{value:wt.texture},uRes:{value:new THREE.Vector2()},uCg:{value:new THREE.Vector2(1,1)},uBox:{value:new THREE.Vector4(0,0,1e5,1e5)},uWa:{value:1},uG:{value:new THREE.Vector2(1,1)},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uB:{value:BG*pix},uS:{value:pix},uSc:{value:0},uF:{value:0},uW:{value:waves}};
         const G=n=>n.toFixed(2),qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1),
         quad=fs=>{const s=new THREE.Scene();s.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:"void main(){gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:fs})));return s};
 
@@ -960,7 +1023,7 @@
         gl_FragColor=vec4(v/1.2+.5,min(lit,1.),min(tr,1.));}`;
 
         /* pass 2: the squares grid */
-        const mainFS=`precision highp float;uniform sampler2D tS,tW;uniform vec2 uRes,uM,uG;uniform float uT,uC,uB,uSc,uF;
+        const mainFS=`precision highp float;uniform sampler2D tS,tW;uniform vec2 uRes,uM,uG,uCg;uniform vec4 uBox;uniform float uWa;uniform float uT,uC,uB,uSc,uF;
         float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
         float sq(vec2 f,float r){return step(max(abs(f.x),abs(f.y)),r);}
         /* one background square: breathes slowly between black and light grey. l = wave crest passing through it (adds a faint grey), t = wave trough (dims it a little) */
@@ -976,10 +1039,10 @@
         return c*sq(g,r);}
         void main(){
         vec2 px=gl_FragCoord.xy,id=floor(px/uC),f=fract(px/uC)-.5,cc=(id+.5)*uC;
-        vec4 s=texture2D(tS,cc/uRes);
+        vec4 s=texture2D(tS,(id+.5)/uCg);
         vec2 bid=floor(px/uB),sid=vec2(0.,floor(uSc*.01));
         vec3 col=vec3(0.);
-        for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){
+        for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){if(uWa<.5&&(i!=0||j!=0))continue;
         vec2 nid=bid+vec2(float(i),float(j));vec4 w=texture2D(tW,(nid+.5)/uG);
         col=max(col,bgSq(nid+sid,(px-(nid+.5)*uB)/uB-(w.xy-.5)*1.2,w.z,w.w));}
         /* car: fine stipple. Light = density of small light-grey dots (noise dither), shadow side dissolves into drifting particles */
@@ -990,10 +1053,10 @@
         if(red>.3)col=max(col,vec3(1.,.13,.07)*dt);
         else if(dens>thr)col=max(col,vec3(.8,.79,.76)*(.86+.14*h(id+2.))*dt);
         }else{
-        for(int k=0;k<6;k++){float fk=float(k);
+        if(px.x>uBox.x&&px.x<uBox.z&&px.y>uBox.y&&px.y<uBox.w)for(int k=0;k<6;k++){float fk=float(k);
         float d=3.+fract(h(id+fk*9.1)+uT*.1)*48.;
         vec2 so=id-vec2(d,d*.25*(h(id+fk*3.3)-.5));
-        vec4 t=texture2D(tS,(so+.5)*uC/uRes);
+        vec4 t=texture2D(tS,(so+.5)/uCg);
         float p=pow(1.-(d-3.)/48.,2.)*.3,rd=t.r-max(t.g,t.b);
         if(t.a>.5&&rd<.3&&dot(t.rgb,vec3(.34,.5,.16))>.2&&h(id*1.7+fk*5.3)<p)col=max(col,vec3(.72)*sq(f,.32));}
         }
@@ -1002,10 +1065,11 @@
         gl_FragColor=vec4(col,1.);}`;
         const qs=quad(mainFS),ws=quad(waveFS);
 
-        let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix),Math.ceil(H*pix));const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
+        let W,H;function size(){W=innerWidth;H=innerHeight;pix=Math.min(devicePixelRatio||1,1.5,Math.max(.8,Math.sqrt(2.6e6/(W*H)))); /* pixel budget on very large screens */
+        U.uC.value=CELL*pix;U.uB.value=BG*pix;U.uS.value=pix;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);const cw=Math.ceil(W/CELL),ch=Math.ceil(H/CELL);rt.setSize(cw,ch);U.uCg.value.set(cw,ch);const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
         const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix();
-        SU.uK.value=H*pix/(2*Math.tan(14*Math.PI/180));{const gl=R.getContext();SU.uMax.value=Math.min(160,gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1])}}
-        size();addEventListener("resize",size);
+        cam.updateMatrixWorld();SU.uK.value=ch/(2*Math.tan(14*Math.PI/180));{const gl=R.getContext();SU.uMax.value=Math.min(160,gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1])}}
+        size();let rzq=0;addEventListener("resize",()=>{if(!rzq)rzq=requestAnimationFrame(()=>{rzq=0;if(innerWidth!==W||innerHeight!==H)size()})});
 
         /* input + scroll-driven motion */
         let lx=-999,ly=-999,lt=0,wi=0;
@@ -1013,61 +1077,86 @@
         function ripples(t){if(tx<0||mx<0){lx=-999;return}
         if(lx<0){lx=mx;ly=my;lt=t;return}
         const d=Math.hypot(mx-lx,my-ly);
-        if(!calm&&d>46&&t-lt>150){waves[wi].set(mx*pix,(H-my)*pix,t/1000,Math.min(1,.4+d/170));wi=(wi+1)%NW;lx=mx;ly=my;lt=t}}
-        let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0;
-        addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}});
+        if(!calm&&d>46&&t-lt>150){waves[wi].set(mx*pix,(H-my)*pix,t/1000,Math.min(1,.4+d/170));wi=(wi+1)%NW;lastWaveT=t/1000;lx=mx;ly=my;lt=t}}
+        let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0,lastAct=0,lastSy=-1,lastRend=0,atTop=true,lastBy=-1,lastRot="",lastSec="",lastWaveT=-999,wClean=false;
+        addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}lastAct=performance.now()},{passive:true});
         document.documentElement.addEventListener("pointerleave",()=>{tx=ty=-999});
         const secs=[...document.querySelectorAll("section")],rotE=document.getElementById("rot"),secE=document.getElementById("sec");
+        /* perf: section centres + page height are measured on resize only, not every frame */
+        let sMid=[],sMax=1;const cacheSecs=()=>{sMid=secs.map(e=>{const r=e.getBoundingClientRect();return r.top+scrollY+r.height/2});sMax=Math.max(1,document.documentElement.scrollHeight-H)};
+        new ResizeObserver(cacheSecs).observe(document.querySelector("main"));addEventListener("load",cacheSecs);
+        /* on-screen key under the car: hold it (or hold B) to spin the wheels forward and burn rubber. Visible only while scrolled to the very top */
+        const bk=document.getElementById("burn");
+        const press=v=>{if(v&&!atTop)return;hold=v?1:0;bk.classList.toggle("down",!!hold);if(hold)lastAct=performance.now()};
+        bk.addEventListener("pointerdown",e=>{if(e.button)return;e.preventDefault();bk.setPointerCapture(e.pointerId);press(1)});
+        ["pointerup","pointercancel","lostpointercapture"].forEach(n=>bk.addEventListener(n,()=>press(0)));
+        addEventListener("keydown",e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key||"").toLowerCase()!=="b"||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;press(1)});
+        addEventListener("keyup",e=>{if((e.key||"").toLowerCase()==="b")press(0)});
+        addEventListener("blur",()=>press(0));
+        const onScroll=()=>{const top=scrollY<=2;if(top===atTop)return;atTop=top;bk.classList.toggle("off",!top);bk.disabled=!top;if(!top)press(0)};
+        addEventListener("scroll",onScroll,{passive:true});atTop=true;onScroll();
         /* tail-light trails: ribbons left in space behind the four round lights while the car turns. Flat red material, no lighting, no fade: the ribbon only tapers, so it stays pure red */
         const TN=56,TL=[[-2.14,.04,-.6],[-2.14,.04,-.3],[-2.14,.04,.3],[-2.14,.04,.6]],trailG=new THREE.Group(),trailM=new THREE.MeshBasicMaterial({color:0xff1608,side:THREE.DoubleSide}),yAx=new THREE.Vector3(0,1,0),vT=new THREE.Vector3(),vV=new THREE.Vector3(),vS=new THREE.Vector3(),
         hist=TL.map(()=>[]),ribs=TL.map(()=>{const g=new THREE.BufferGeometry(),ix=[];g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(TN*6),3).setUsage(THREE.DynamicDrawUsage));
         for(let i=0;i<TN-1;i++){const a=i*2;ix.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(ix);const m=new THREE.Mesh(g,trailM);m.frustumCulled=false;m.visible=false;trailG.add(m);return m});
         scene.add(trailG);let pyaw=.6,lamp=0,lampUntil=performance.now()+4500;
-        /* turning = drifting: rear wheels spin up and the tyres smoke, proportional to how fast the car is rotating */
-        let burn=0,wsp=0,sT=performance.now(),sI=0;const sAcc=[0,0],rnd=Math.random;
+        /* turning = drifting: the rear wheels spin up and the tyres smoke in proportion to how fast the car rotates. hold = the on-screen key: all four wheels spin forward and the smoke is at full strength */
+        let burn=0,wsp=0,fsp=0,hb=0,hold=0,sT=performance.now(),sI=0,liveN=0;const sAcc=[0,0],rnd=Math.random,vCam=new THREE.Vector3(),vBtn=new THREE.Vector3(),vBt2=new THREE.Vector3();
         function updSmoke(dy){
         const now=performance.now(),dt=Math.min(.05,(now-sT)/1000);sT=now;
-        burn+=((calm?0:ss(.002,.03,dy))-burn)*.12;if(burn<.002)burn=0;
-        wsp+=burn*24*dt;rw.forEach(w=>w.rotation.y=-wsp);   /* spin around the axle (local Y of the wheel group) */
+        burn+=(Math.max(calm?0:ss(.002,.03,dy),hold)-burn)*.12;if(burn<.002)burn=0;
+        hb+=(hold-hb)*.12;if(hb<.002)hb=0;
+        if(burn){wsp+=burn*24*dt;rw.forEach(w=>w.rotation.y=-wsp)}   /* spin around the axle (local Y of the wheel group) */
+        if(hb){fsp+=hb*24*dt;fw.forEach(w=>w.rotation.y=-fsp)}
+        const emit=burn>=.06;
+        if(!emit&&!liveN){smoke.visible=false;return}   /* nothing to simulate or draw */
+        smoke.visible=true;
         smokeG.position.copy(pivot.position);smokeG.scale.copy(pivot.scale);smokeG.rotation.set(pitch,0,0);
         const c=Math.cos(yaw),s=Math.sin(yaw);
-        rw.forEach((w,j)=>{if(burn<.06)return;sAcc[j]+=burn*85*dt;
+        if(emit)rw.forEach((w,j)=>{sAcc[j]+=burn*85*dt;
         while(sAcc[j]>=1){sAcc[j]--;const i=sI;sI=(sI+1)%SN;const sg=Math.sign(w.position.z),
         x0=w.position.x+(rnd()-.5)*.45,z0=w.position.z+(rnd()-.5)*.2,vx=(rnd()-.5)*.5,vz=sg*(.15+rnd()*.35);
         sP[i*3]=x0*c+z0*s;sP[i*3+1]=-.57+rnd()*.06;sP[i*3+2]=-x0*s+z0*c;
         sV[i*3]=vx*c+vz*s;sV[i*3+1]=.3+rnd()*.4;sV[i*3+2]=-vx*s+vz*c;
         sL[i]=1.1+rnd()*.9;sS0[i]=.14+rnd()*.08;sA[i]=0}});
-        for(let i=0;i<SN;i++){if(sA[i]>=1){sS[i]=0;continue}
+        liveN=0;
+        for(let i=0;i<SN;i++){if(sA[i]>=1)continue;
         sA[i]+=dt/sL[i];if(sA[i]>=1){sA[i]=1;sS[i]=0;continue}
         const k=1-1.4*dt;sV[i*3]*=k;sV[i*3+2]*=k;sV[i*3+1]*=1-.8*dt;
-        sP[i*3]+=sV[i*3]*dt;sP[i*3+1]+=sV[i*3+1]*dt;sP[i*3+2]+=sV[i*3+2]*dt;sS[i]=sS0[i]*(1+sA[i]*2.6)}
+        sP[i*3]+=sV[i*3]*dt;sP[i*3+1]+=sV[i*3+1]*dt;sP[i*3+2]+=sV[i*3+2]*dt;sS[i]=sS0[i]*(1+sA[i]*2.6);liveN++}
         sGeo.attributes.position.needsUpdate=sGeo.attributes.aA.needsUpdate=sGeo.attributes.aS.needsUpdate=true}
         function updTrails(){const dy=Math.abs(yaw-pyaw),mv=!calm&&dy>.0015;pyaw=yaw;updSmoke(dy);
         if(mv)lampUntil=performance.now()+1400;const lt=calm||performance.now()<lampUntil?1:0;lamp=calm?lt:lamp+(lt-lamp)*.09;{const o=ss(0,1,lamp);lamps.forEach(g=>g.rotation.z=-(1-o)*(Math.PI/2+.2));ramps.forEach(r=>r.scale.y=Math.max(.001,o))}
-        trailG.position.copy(pivot.position);trailG.scale.copy(pivot.scale);trailG.rotation.set(pitch,0,0);trailG.updateMatrixWorld(true);const cl=trailG.worldToLocal(cam.position.clone());
+        if(!mv&&!hist[0].length)return;   /* nothing left to draw */
+        trailG.position.copy(pivot.position);trailG.scale.copy(pivot.scale);trailG.rotation.set(pitch,0,0);trailG.updateMatrixWorld(true);const cl=trailG.worldToLocal(vCam.copy(cam.position));
         TL.forEach((l,j)=>{const h=hist[j];if(mv){h.push(new THREE.Vector3(l[0],l[1],l[2]).applyAxisAngle(yAx,yaw));if(h.length>TN)h.shift()}else if(h.length)h.splice(0,2);
         const n=h.length,rb=ribs[j],A=rb.geometry.attributes.position.array;rb.visible=n>1;if(n<2)return;
         for(let i=0;i<n;i++){const Q=h[i];vT.subVectors(h[Math.min(n-1,i+1)],h[Math.max(0,i-1)]);vV.subVectors(cl,Q);vS.crossVectors(vT,vV);if(vS.lengthSq()<1e-12)vS.set(0,1,0);vS.normalize();
         const w=.085*(.25+.75*i/(n-1));A[i*6]=Q.x+vS.x*w;A[i*6+1]=Q.y+vS.y*w;A[i*6+2]=Q.z+vS.z*w;A[i*6+3]=Q.x-vS.x*w;A[i*6+4]=Q.y-vS.y*w;A[i*6+5]=Q.z-vS.z*w}
         rb.geometry.attributes.position.needsUpdate=true;rb.geometry.setDrawRange(0,(n-1)*6)})}
-        function frame(t){
-        const sy=scrollY,max=Math.max(1,document.documentElement.scrollHeight-H),p=sy/max,a=W/H;
-        const mid=H/2;let best=1e9;secs.forEach((e,i)=>{const r=e.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-mid);if(d<best){best=d;idx=i}});
+        function frame(t){requestAnimationFrame(frame);
+        const sy=scrollY;if(sy!==lastSy){lastSy=sy;lastAct=t}
+        /* perf: when nothing is moving (no scroll, mouse, spin, smoke, ripples) only the slow background breathing is left, so draw at ~30 fps */
+        if(hold||burn||liveN||t/1000-lastWaveT<WAVE.life+.2||performance.now()<lampUntil+1500)lastAct=t;
+        if(t-lastAct>1200&&t-lastRend<28)return;lastRend=t;
+        const p=sy/sMax,a=W/H;
+        {const mid=sy+H/2;let best=1e9;sMid.forEach((m,i)=>{const d=Math.abs(m-mid);if(d<best){best=d;idx=i}})}
         const side=a>1.25&&idx==1,wk=a>1.25&&idx==2;
         px+=((side?Math.min(3.4,a*1.55):wk?Math.min(4.6,a*2.1):0)-px)*.06;sc+=((idx==0?1.12:idx==3?.95:idx==2?.8:.92)-sc)*.06;
         const ty2=p*Math.PI*8+.6+spin,mxn=tx<0?0:tx/W-.5,myn=ty<0?0:ty/H-.5;
-        yaw+=(ty2+mxn*.5-yaw)*.07;pitch+=(.1+myn*.18-pitch)*.06;
+        const yd=ty2+mxn*.5-yaw;if(Math.abs(yd)>.004)lastAct=t;yaw+=yd*.07;pitch+=(.1+myn*.18-pitch)*.06;
         pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=0;updTrails();
+        if(atTop){vBtn.set(px,-.66*sc,0).project(cam);const by=((1-vBtn.y)/2+.045)*H+18;if(Math.abs(by-lastBy)>.4){lastBy=by;bk.style.transform="translate3d(-50%,"+by.toFixed(1)+"px,0)"}}   /* key sits just under the car */
+        {const c1=vBtn.set(px,.2,0).project(cam),c2=vBt2.set(px+3.3*sc,.2,0).project(cam),k=W*pix*.5,cx=(c1.x+1)*k,cy=(c1.y+1)*H*pix*.5,r=(c2.x-c1.x)*k,ex=52*CELL*pix,ey=9*CELL*pix;U.uBox.value.set(cx-r,cy-r-ey,cx+r+ex,cy+r+ey)}   /* region where car pixels / drifting dots can appear */
         if(tx>=0){mx+=(tx-mx)*.3;my+=(ty-my)*.3}
         U.uF.value+=((tx>=0&&mx>=0?1:0)-U.uF.value)*.07;
         U.uM.value.set(mx*pix,(H-my)*pix);ripples(t);
 
         U.uT.value=t/1000;U.uSc.value=sy;
         R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(scene,cam);
-        R.setRenderTarget(wt);R.render(ws,qc);
+        {const recent=t/1000-lastWaveT<WAVE.life+.1;if(!wClean||recent){R.setRenderTarget(wt);R.render(ws,qc);wClean=!recent}U.uWa.value=wClean?0:1}   /* ripple map only while ripples exist */
         R.setRenderTarget(null);R.render(qs,qc);
-        rotE.textContent=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0");secE.textContent="0"+(idx+1);
-        requestAnimationFrame(frame)}
+        {const rs=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0"),ss2="0"+(idx+1);if(rs!==lastRot){lastRot=rs;rotE.textContent=rs}if(ss2!==lastSec){lastSec=ss2;secE.textContent=ss2}}}
         requestAnimationFrame(frame);
     </script>
 </body>
