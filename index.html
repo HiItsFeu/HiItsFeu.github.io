@@ -1000,7 +1000,7 @@
         smoke.frustumCulled=false;const smokeG=new THREE.Group();smokeG.add(smoke);scene.add(smokeG);
 
         /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
-        const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter}); /* perf: the scene is only ever sampled once per stipple cell, so it is rendered at one texel per cell */
+        const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
         const wt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter,depthBuffer:false}); /* ripple map, one texel per background square: rg = push, b = crest light, a = trough */
         const NW=16,WAVE={life:1.8,speed:170,len:60,push:.3}; /* life (s) · speed (css px/s) · wavelength (css px) · push = max shove, in squares */
         const waves=Array.from({length:NW},()=>new THREE.Vector4(0,0,-999,0)); /* one slot per ripple: x, y (px), birth time (s), strength */
@@ -1039,7 +1039,7 @@
         return c*sq(g,r);}
         void main(){
         vec2 px=gl_FragCoord.xy,id=floor(px/uC),f=fract(px/uC)-.5,cc=(id+.5)*uC;
-        vec4 s=texture2D(tS,(id+.5)/uCg);
+        vec4 s=texture2D(tS,cc/uRes);
         vec2 bid=floor(px/uB),sid=vec2(0.,floor(uSc*.01));
         vec3 col=vec3(0.);
         for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){if(uWa<.5&&(i!=0||j!=0))continue;
@@ -1056,7 +1056,7 @@
         if(px.x>uBox.x&&px.x<uBox.z&&px.y>uBox.y&&px.y<uBox.w)for(int k=0;k<6;k++){float fk=float(k);
         float d=3.+fract(h(id+fk*9.1)+uT*.1)*48.;
         vec2 so=id-vec2(d,d*.25*(h(id+fk*3.3)-.5));
-        vec4 t=texture2D(tS,(so+.5)/uCg);
+        vec4 t=texture2D(tS,(so+.5)*uC/uRes);
         float p=pow(1.-(d-3.)/48.,2.)*.3,rd=t.r-max(t.g,t.b);
         if(t.a>.5&&rd<.3&&dot(t.rgb,vec3(.34,.5,.16))>.2&&h(id*1.7+fk*5.3)<p)col=max(col,vec3(.72)*sq(f,.32));}
         }
@@ -1065,10 +1065,9 @@
         gl_FragColor=vec4(col,1.);}`;
         const qs=quad(mainFS),ws=quad(waveFS);
 
-        let W,H;function size(){W=innerWidth;H=innerHeight;pix=Math.min(devicePixelRatio||1,1.5,Math.max(.8,Math.sqrt(2.6e6/(W*H)))); /* pixel budget on very large screens */
-        U.uC.value=CELL*pix;U.uB.value=BG*pix;U.uS.value=pix;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);const cw=Math.ceil(W/CELL),ch=Math.ceil(H/CELL);rt.setSize(cw,ch);U.uCg.value.set(cw,ch);const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
+        let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix),Math.ceil(H*pix));const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
         const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix();
-        cam.updateMatrixWorld();SU.uK.value=ch/(2*Math.tan(14*Math.PI/180));{const gl=R.getContext();SU.uMax.value=Math.min(160,gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1])}}
+        cam.updateMatrixWorld();SU.uK.value=H*pix/(2*Math.tan(14*Math.PI/180));{const gl=R.getContext();SU.uMax.value=Math.min(160,gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1])}}
         size();let rzq=0;addEventListener("resize",()=>{if(!rzq)rzq=requestAnimationFrame(()=>{rzq=0;if(innerWidth!==W||innerHeight!==H)size()})});
 
         /* input + scroll-driven motion */
@@ -1087,13 +1086,13 @@
         new ResizeObserver(cacheSecs).observe(document.querySelector("main"));addEventListener("load",cacheSecs);
         /* on-screen key under the car: hold it (or hold B) to spin the wheels forward and burn rubber. Visible only while scrolled to the very top */
         const bk=document.getElementById("burn");
-        const press=v=>{if(v&&!atTop)return;hold=v?1:0;bk.classList.toggle("down",!!hold);if(hold)lastAct=performance.now()};
-        bk.addEventListener("pointerdown",e=>{if(e.button)return;e.preventDefault();bk.setPointerCapture(e.pointerId);press(1)});
-        ["pointerup","pointercancel","lostpointercapture"].forEach(n=>bk.addEventListener(n,()=>press(0)));
-        addEventListener("keydown",e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key||"").toLowerCase()!=="b"||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;press(1)});
-        addEventListener("keyup",e=>{if((e.key||"").toLowerCase()==="b")press(0)});
-        addEventListener("blur",()=>press(0));
-        const onScroll=()=>{const top=scrollY<=2;if(top===atTop)return;atTop=top;bk.classList.toggle("off",!top);bk.disabled=!top;if(!top)press(0)};
+        let kh=0,ph=0;const press=(src,v)=>{if(src)kh=v;else ph=v;hold=kh||ph?1:0;bk.classList.toggle("down",!!hold);if(hold)lastAct=performance.now()};   /* src 1 = keyboard (works at any scroll position), 0 = on-screen key */
+        bk.addEventListener("pointerdown",e=>{if(e.button)return;e.preventDefault();bk.setPointerCapture(e.pointerId);press(0,1)});
+        ["pointerup","pointercancel","lostpointercapture"].forEach(n=>bk.addEventListener(n,()=>press(0,0)));
+        addEventListener("keydown",e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key||"").toLowerCase()!=="b"||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;press(1,1)});
+        addEventListener("keyup",e=>{if((e.key||"").toLowerCase()==="b")press(1,0)});
+        addEventListener("blur",()=>{press(1,0);press(0,0)});
+        const onScroll=()=>{const top=scrollY<=2;if(top===atTop)return;atTop=top;bk.classList.toggle("off",!top);bk.disabled=!top;if(!top)press(0,0)};
         addEventListener("scroll",onScroll,{passive:true});atTop=true;onScroll();
         /* tail-light trails: ribbons left in space behind the four round lights while the car turns. Flat red material, no lighting, no fade: the ribbon only tapers, so it stays pure red */
         const TN=56,TL=[[-2.14,.04,-.6],[-2.14,.04,-.3],[-2.14,.04,.3],[-2.14,.04,.6]],trailG=new THREE.Group(),trailM=new THREE.MeshBasicMaterial({color:0xff1608,side:THREE.DoubleSide}),yAx=new THREE.Vector3(0,1,0),vT=new THREE.Vector3(),vV=new THREE.Vector3(),vS=new THREE.Vector3(),
@@ -1145,7 +1144,7 @@
         const yd=ty2+mxn*.5-yaw;if(Math.abs(yd)>.004)lastAct=t;yaw+=yd*.07;pitch+=(.1+myn*.18-pitch)*.06;
         pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=0;updTrails();
         if(atTop){vBtn.set(px,-.66*sc,0).project(cam);const by=((1-vBtn.y)/2+.045)*H+18;if(Math.abs(by-lastBy)>.4){lastBy=by;bk.style.transform="translate3d(-50%,"+by.toFixed(1)+"px,0)"}}   /* key sits just under the car */
-        {const c1=vBtn.set(px,.2,0).project(cam),c2=vBt2.set(px+3.3*sc,.2,0).project(cam),k=W*pix*.5,cx=(c1.x+1)*k,cy=(c1.y+1)*H*pix*.5,r=(c2.x-c1.x)*k,ex=52*CELL*pix,ey=9*CELL*pix;U.uBox.value.set(cx-r,cy-r-ey,cx+r+ex,cy+r+ey)}   /* region where car pixels / drifting dots can appear */
+        {const c1=vBtn.set(px,.2,0).project(cam),c2=vBt2.set(px+3.6*sc,.2,0).project(cam),k=W*pix*.5,cx=(c1.x+1)*k,cy=(c1.y+1)*H*pix*.5,r=(c2.x-c1.x)*k,ex=52*CELL*pix,ey=9*CELL*pix;U.uBox.value.set(cx-r,cy-r-ey,cx+r+ex,cy+r+ey)}   /* region where car pixels / drifting dots can appear */
         if(tx>=0){mx+=(tx-mx)*.3;my+=(ty-my)*.3}
         U.uF.value+=((tx>=0&&mx>=0?1:0)-U.uF.value)*.07;
         U.uM.value.set(mx*pix,(H-my)*pix);ripples(t);
