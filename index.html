@@ -914,9 +914,27 @@
         function wheel(x,z){const g=new THREE.Group(),m=(geo,mat,px=0,pz=0)=>{const o=new THREE.Mesh(geo,mat);o.position.set(px,0,pz);g.add(o)};
         m(new THREE.CylinderGeometry(.325,.325,.22,40),tire);m(new THREE.CylinderGeometry(.235,.235,.25,40),rimM);m(new THREE.CylinderGeometry(.06,.06,.27,16),tire);
         for(let q=0;q<5;q++){const a=q*1.2566+.63;m(new THREE.CylinderGeometry(.062,.062,.27,12),tire,Math.cos(a)*.15,Math.sin(a)*.15)}
-        g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g)}
-        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>wheel(x,z)));
+        g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g);return g}
+        const rw=[]; /* rear wheels: spun while the car turns */
+        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);if(x===XR)rw.push(g)}));
         car.position.y=-.62;
+
+        /* tyre smoke: puffs of dithered points left in space behind the rear tyres. They fade by dissolving (noise discard), then the squares pass turns them into dots */
+        const SN=420,sP=new Float32Array(SN*3),sA=new Float32Array(SN).fill(1),sS=new Float32Array(SN),sV=new Float32Array(SN*3),sL=new Float32Array(SN),sS0=new Float32Array(SN);
+        const sGeo=new THREE.BufferGeometry(),DYN=THREE.DynamicDrawUsage;
+        sGeo.setAttribute("position",new THREE.BufferAttribute(sP,3).setUsage(DYN));sGeo.setAttribute("aA",new THREE.BufferAttribute(sA,1).setUsage(DYN));sGeo.setAttribute("aS",new THREE.BufferAttribute(sS,1).setUsage(DYN));
+        const SU={uK:{value:1},uMax:{value:64}};
+        const smoke=new THREE.Points(sGeo,new THREE.ShaderMaterial({uniforms:SU,
+        vertexShader:`attribute float aA;attribute float aS;uniform float uK,uMax;varying float vA;
+        void main(){vA=aA;if(aS<=0.){gl_Position=vec4(2.,2.,2.,1.);gl_PointSize=0.;return;}
+        vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(aS*uK/-mv.z,uMax);gl_Position=projectionMatrix*mv;}`,
+        fragmentShader:`varying float vA;
+        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+        void main(){vec2 c=gl_PointCoord-.5;float d=length(c)*2.;if(d>1.)discard;
+        float a=(1.-d*d)*smoothstep(0.,.06,vA)*pow(1.-vA,1.3)*.9;
+        if(h(gl_FragCoord.xy)>a)discard;
+        gl_FragColor=vec4(vec3(.62+.3*(1.-vA)),1.);}`}));
+        smoke.frustumCulled=false;const smokeG=new THREE.Group();smokeG.add(smoke);scene.add(smokeG);
 
         /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
         const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
@@ -985,7 +1003,8 @@
         const qs=quad(mainFS),ws=quad(waveFS);
 
         let W,H;function size(){W=innerWidth;H=innerHeight;R.setPixelRatio(1);R.setSize(W*pix,H*pix,false);U.uRes.value.set(W*pix,H*pix);rt.setSize(Math.ceil(W*pix),Math.ceil(H*pix));const cols=Math.ceil(W/BG),rows=Math.ceil(H/BG);U.uG.value.set(cols,rows);wt.setSize(cols,rows);
-        const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix()}
+        const a=W/H;cam.aspect=a;cam.position.set(0,.5,Math.max(12,13/a));cam.lookAt(0,.2,0);cam.updateProjectionMatrix();
+        SU.uK.value=H*pix/(2*Math.tan(14*Math.PI/180));{const gl=R.getContext();SU.uMax.value=Math.min(160,gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1])}}
         size();addEventListener("resize",size);
 
         /* input + scroll-driven motion */
@@ -1004,7 +1023,26 @@
         hist=TL.map(()=>[]),ribs=TL.map(()=>{const g=new THREE.BufferGeometry(),ix=[];g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(TN*6),3).setUsage(THREE.DynamicDrawUsage));
         for(let i=0;i<TN-1;i++){const a=i*2;ix.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(ix);const m=new THREE.Mesh(g,trailM);m.frustumCulled=false;m.visible=false;trailG.add(m);return m});
         scene.add(trailG);let pyaw=.6,lamp=0,lampUntil=performance.now()+4500;
-        function updTrails(){const mv=!calm&&Math.abs(yaw-pyaw)>.0015;pyaw=yaw;
+        /* turning = drifting: rear wheels spin up and the tyres smoke, proportional to how fast the car is rotating */
+        let burn=0,wsp=0,sT=performance.now(),sI=0;const sAcc=[0,0],rnd=Math.random;
+        function updSmoke(dy){
+        const now=performance.now(),dt=Math.min(.05,(now-sT)/1000);sT=now;
+        burn+=((calm?0:ss(.002,.03,dy))-burn)*.12;if(burn<.002)burn=0;
+        wsp+=burn*24*dt;rw.forEach(w=>w.rotation.y=-wsp);   /* spin around the axle (local Y of the wheel group) */
+        smokeG.position.copy(pivot.position);smokeG.scale.copy(pivot.scale);smokeG.rotation.set(pitch,0,0);
+        const c=Math.cos(yaw),s=Math.sin(yaw);
+        rw.forEach((w,j)=>{if(burn<.06)return;sAcc[j]+=burn*85*dt;
+        while(sAcc[j]>=1){sAcc[j]--;const i=sI;sI=(sI+1)%SN;const sg=Math.sign(w.position.z),
+        x0=w.position.x+(rnd()-.5)*.45,z0=w.position.z+(rnd()-.5)*.2,vx=(rnd()-.5)*.5,vz=sg*(.15+rnd()*.35);
+        sP[i*3]=x0*c+z0*s;sP[i*3+1]=-.57+rnd()*.06;sP[i*3+2]=-x0*s+z0*c;
+        sV[i*3]=vx*c+vz*s;sV[i*3+1]=.3+rnd()*.4;sV[i*3+2]=-vx*s+vz*c;
+        sL[i]=1.1+rnd()*.9;sS0[i]=.14+rnd()*.08;sA[i]=0}});
+        for(let i=0;i<SN;i++){if(sA[i]>=1){sS[i]=0;continue}
+        sA[i]+=dt/sL[i];if(sA[i]>=1){sA[i]=1;sS[i]=0;continue}
+        const k=1-1.4*dt;sV[i*3]*=k;sV[i*3+2]*=k;sV[i*3+1]*=1-.8*dt;
+        sP[i*3]+=sV[i*3]*dt;sP[i*3+1]+=sV[i*3+1]*dt;sP[i*3+2]+=sV[i*3+2]*dt;sS[i]=sS0[i]*(1+sA[i]*2.6)}
+        sGeo.attributes.position.needsUpdate=sGeo.attributes.aA.needsUpdate=sGeo.attributes.aS.needsUpdate=true}
+        function updTrails(){const dy=Math.abs(yaw-pyaw),mv=!calm&&dy>.0015;pyaw=yaw;updSmoke(dy);
         if(mv)lampUntil=performance.now()+1400;const lt=calm||performance.now()<lampUntil?1:0;lamp=calm?lt:lamp+(lt-lamp)*.09;{const o=ss(0,1,lamp);lamps.forEach(g=>g.rotation.z=-(1-o)*(Math.PI/2+.2));ramps.forEach(r=>r.scale.y=Math.max(.001,o))}
         trailG.position.copy(pivot.position);trailG.scale.copy(pivot.scale);trailG.rotation.set(pitch,0,0);trailG.updateMatrixWorld(true);const cl=trailG.worldToLocal(cam.position.clone());
         TL.forEach((l,j)=>{const h=hist[j];if(mv){h.push(new THREE.Vector3(l[0],l[1],l[2]).applyAxisAngle(yAx,yaw));if(h.length>TN)h.shift()}else if(h.length)h.splice(0,2);
