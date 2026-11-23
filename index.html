@@ -978,8 +978,8 @@
         m(new THREE.CylinderGeometry(.325,.325,.22,40),tire);m(new THREE.CylinderGeometry(.235,.235,.25,40),rimM);m(new THREE.CylinderGeometry(.06,.06,.27,16),tire);
         for(let q=0;q<5;q++){const a=q*1.2566+.63;m(new THREE.CylinderGeometry(.062,.062,.27,12),tire,Math.cos(a)*.15,Math.sin(a)*.15)}
         g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g);return g}
-        const rw=[],fw=[]; /* rear wheels spin while the car turns; the front ones only when the key is held */
-        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);(x===XR?rw:fw).push(g)}));
+        const rw=[]; /* rear wheels: spun while the car turns or the key is held */
+        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);if(x===XR)rw.push(g)}));
         car.position.y=-.62;
 
         /* tyre smoke: puffs of dithered points left in space behind the rear tyres. They fade by dissolving (noise discard), then the squares pass turns them into dots */
@@ -1100,14 +1100,12 @@
         hist=TL.map(()=>[]),ribs=TL.map(()=>{const g=new THREE.BufferGeometry(),ix=[];g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(TN*6),3).setUsage(THREE.DynamicDrawUsage));
         for(let i=0;i<TN-1;i++){const a=i*2;ix.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(ix);const m=new THREE.Mesh(g,trailM);m.frustumCulled=false;m.visible=false;trailG.add(m);return m});
         scene.add(trailG);let pyaw=.6,lamp=0,lampUntil=performance.now()+4500;
-        /* turning = drifting: the rear wheels spin up and the tyres smoke in proportion to how fast the car rotates. hold = the on-screen key: all four wheels spin forward and the smoke is at full strength */
-        let burn=0,wsp=0,fsp=0,hb=0,hold=0,sT=performance.now(),sI=0,liveN=0;const sAcc=[0,0],rnd=Math.random,vCam=new THREE.Vector3(),vBtn=new THREE.Vector3(),vBt2=new THREE.Vector3();
+        /* turning = drifting: the rear wheels spin up and the tyres smoke in proportion to how fast the car rotates. hold = the on-screen key: the rear wheels spin forward and the smoke is at full strength */
+        let burn=0,wsp=0,hold=0,sT=performance.now(),sI=0,liveN=0;const sAcc=[0,0],rnd=Math.random,vCam=new THREE.Vector3(),vBtn=new THREE.Vector3(),vBt2=new THREE.Vector3();
         function updSmoke(dy){
         const now=performance.now(),dt=Math.min(.05,(now-sT)/1000);sT=now;
         burn+=(Math.max(calm?0:ss(.002,.03,dy),hold)-burn)*.12;if(burn<.002)burn=0;
-        hb+=(hold-hb)*.12;if(hb<.002)hb=0;
         if(burn){wsp+=burn*24*dt;rw.forEach(w=>w.rotation.y=-wsp)}   /* spin around the axle (local Y of the wheel group) */
-        if(hb){fsp+=hb*24*dt;fw.forEach(w=>w.rotation.y=-fsp)}
         const emit=burn>=.06;
         if(!emit&&!liveN){smoke.visible=false;return}   /* nothing to simulate or draw */
         smoke.visible=true;
