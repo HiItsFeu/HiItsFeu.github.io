@@ -977,9 +977,9 @@
         function wheel(x,z){const g=new THREE.Group(),m=(geo,mat,px=0,pz=0)=>{const o=new THREE.Mesh(geo,mat);o.position.set(px,0,pz);g.add(o)};
         m(new THREE.CylinderGeometry(.325,.325,.22,40),tire);m(new THREE.CylinderGeometry(.235,.235,.25,40),rimM);m(new THREE.CylinderGeometry(.06,.06,.27,16),tire);
         for(let q=0;q<5;q++){const a=q*1.2566+.63;m(new THREE.CylinderGeometry(.062,.062,.27,12),tire,Math.cos(a)*.15,Math.sin(a)*.15)}
-        g.rotation.x=Math.PI/2;g.position.set(x,.325,z);car.add(g);return g}
-        const rw=[]; /* rear wheels: spun while the car turns or the key is held */
-        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);if(x===XR)rw.push(g)}));
+        g.rotation.x=Math.PI/2;const st=new THREE.Group();st.position.set(x,.325,z);st.add(g);car.add(st);g.userData.st=st;return g}   /* st = steering pivot (vertical axis); g spins around the axle */
+        const rw=[],fw=[]; /* rear wheels spin; front wheel pivots steer */
+        [XR,XF].forEach(x=>[-.74,.74].forEach(z=>{const g=wheel(x,z);if(x===XR)rw.push(g);else fw.push(g.userData.st)}));
         car.position.y=-.62;
 
         /* tyre smoke: puffs of dithered points left in space behind the rear tyres. They fade by dissolving (noise discard), then the squares pass turns them into dots */
@@ -1077,7 +1077,7 @@
         if(lx<0){lx=mx;ly=my;lt=t;return}
         const d=Math.hypot(mx-lx,my-ly);
         if(!calm&&d>46&&t-lt>150){waves[wi].set(mx*pix,(H-my)*pix,t/1000,Math.min(1,.4+d/170));wi=(wi+1)%NW;lastWaveT=t/1000;lx=mx;ly=my;lt=t}}
-        let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0,lastAct=0,lastSy=-1,lastRend=0,atTop=true,lastBy=-1,lastRot="",lastSec="",lastWaveT=-999,wClean=false;
+        let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0,lastAct=0,lastSy=-1,lastRend=0,atTop=true,lastBy=-1,lastRot="",lastSec="",lastWaveT=-999,wClean=false,spR=0,lastT=0;
         addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}lastAct=performance.now()},{passive:true});
         document.documentElement.addEventListener("pointerleave",()=>{tx=ty=-999});
         const secs=[...document.querySelectorAll("section")],rotE=document.getElementById("rot"),secE=document.getElementById("sec");
@@ -1100,19 +1100,21 @@
         for(let i=0;i<TN-1;i++){const a=i*2;ix.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(ix);const m=new THREE.Mesh(g,trailM);m.frustumCulled=false;m.visible=false;trailG.add(m);return m});
         scene.add(trailG);let pyaw=.6,lamp=0,lampUntil=performance.now()+4500;
         /* turning = drifting: the rear wheels spin up and the tyres smoke in proportion to how fast the car rotates. hold = the on-screen key: the rear wheels spin forward and the smoke is at full strength */
-        let burn=0,wsp=0,hold=0,sT=performance.now(),sI=0,liveN=0;const sAcc=[0,0],rnd=Math.random,vCam=new THREE.Vector3(),vBtn=new THREE.Vector3(),vBt2=new THREE.Vector3();
-        function updSmoke(dy){
+        let burn=0,wsp=0,steer=0,hold=0,sT=performance.now(),sI=0,liveN=0;const sAcc=[0,0],rnd=Math.random,vCam=new THREE.Vector3(),vBtn=new THREE.Vector3(),vBt2=new THREE.Vector3();
+        function updSmoke(dy,dys){
         const now=performance.now(),dt=Math.min(.05,(now-sT)/1000);sT=now;
         burn+=(Math.max(calm?0:ss(.002,.03,dy),hold)-burn)*.12;if(burn<.002)burn=0;
         if(burn){wsp+=burn*24*dt;rw.forEach(w=>w.rotation.y=-wsp)}   /* spin around the axle (local Y of the wheel group) */
+        /* front wheels steer 50° towards the direction the car is rotating, and straighten again once it stops */
+        {const tg=(calm&&!hold)||Math.abs(dys)<.0025?0:Math.sign(dys)*.8727;steer+=(tg-steer)*(1-Math.exp(-dt*3.5));if(Math.abs(steer)<.002)steer=0;fw.forEach(w=>w.rotation.y=steer)}
         const emit=burn>=.06;
         if(!emit&&!liveN){smoke.visible=false;return}   /* nothing to simulate or draw */
         smoke.visible=true;
         smokeG.position.copy(pivot.position);smokeG.scale.copy(pivot.scale);smokeG.rotation.set(pitch,0,0);
         const c=Math.cos(yaw),s=Math.sin(yaw);
         if(emit)rw.forEach((w,j)=>{sAcc[j]+=burn*85*dt;
-        while(sAcc[j]>=1){sAcc[j]--;const i=sI;sI=(sI+1)%SN;const sg=Math.sign(w.position.z),
-        x0=w.position.x+(rnd()-.5)*.45,z0=w.position.z+(rnd()-.5)*.2,vx=(rnd()-.5)*.5,vz=sg*(.15+rnd()*.35);
+        while(sAcc[j]>=1){sAcc[j]--;const i=sI;sI=(sI+1)%SN;const sg=Math.sign(w.userData.st.position.z),
+        x0=w.userData.st.position.x+(rnd()-.5)*.45,z0=w.userData.st.position.z+(rnd()-.5)*.2,vx=(rnd()-.5)*.5,vz=sg*(.15+rnd()*.35);
         sP[i*3]=x0*c+z0*s;sP[i*3+1]=-.57+rnd()*.06;sP[i*3+2]=-x0*s+z0*c;
         sV[i*3]=vx*c+vz*s;sV[i*3+1]=.3+rnd()*.4;sV[i*3+2]=-vx*s+vz*c;
         sL[i]=1.1+rnd()*.9;sS0[i]=.14+rnd()*.08;sA[i]=0}});
@@ -1120,9 +1122,11 @@
         for(let i=0;i<SN;i++){if(sA[i]>=1)continue;
         sA[i]+=dt/sL[i];if(sA[i]>=1){sA[i]=1;sS[i]=0;continue}
         const k=1-1.4*dt;sV[i*3]*=k;sV[i*3+2]*=k;sV[i*3+1]*=1-.8*dt;
-        sP[i*3]+=sV[i*3]*dt;sP[i*3+1]+=sV[i*3+1]*dt;sP[i*3+2]+=sV[i*3+2]*dt;sS[i]=sS0[i]*(1+sA[i]*2.6);liveN++}
+        sP[i*3]+=sV[i*3]*dt;sP[i*3+1]+=sV[i*3+1]*dt;sP[i*3+2]+=sV[i*3+2]*dt;sS[i]=sS0[i]*(1+sA[i]*2.6);
+        if(spR){const an=dys*spR*(.95-.5*sA[i]),ca=Math.cos(an),sn=Math.sin(an),x=sP[i*3],z=sP[i*3+2];sP[i*3]=x*ca+z*sn;sP[i*3+2]=-x*sn+z*ca}   /* while B spins the car, the smoke is carried round with it (young puffs follow most) */
+        liveN++}
         sGeo.attributes.position.needsUpdate=sGeo.attributes.aA.needsUpdate=sGeo.attributes.aS.needsUpdate=true}
-        function updTrails(){const dy=Math.abs(yaw-pyaw),mv=!calm&&dy>.0015;pyaw=yaw;updSmoke(dy);
+        function updTrails(){const dys=yaw-pyaw,dy=Math.abs(dys),mv=!calm&&dy>.0015;pyaw=yaw;updSmoke(dy,dys);
         if(mv)lampUntil=performance.now()+1400;const lt=calm||performance.now()<lampUntil?1:0;lamp=calm?lt:lamp+(lt-lamp)*.09;{const o=ss(0,1,lamp);lamps.forEach(g=>g.rotation.z=-(1-o)*(Math.PI/2+.2));ramps.forEach(r=>r.scale.y=Math.max(.001,o))}
         if(!mv&&!hist[0].length)return;   /* nothing left to draw */
         trailG.position.copy(pivot.position);trailG.scale.copy(pivot.scale);trailG.rotation.set(pitch,0,0);trailG.updateMatrixWorld(true);const cl=trailG.worldToLocal(vCam.copy(cam.position));
@@ -1134,12 +1138,14 @@
         function frame(t){requestAnimationFrame(frame);
         const sy=scrollY;if(sy!==lastSy){lastSy=sy;lastAct=t}
         /* perf: when nothing is moving (no scroll, mouse, spin, smoke, ripples) only the slow background breathing is left, so draw at ~30 fps */
-        if(hold||burn||liveN||t/1000-lastWaveT<WAVE.life+.2||performance.now()<lampUntil+1500)lastAct=t;
+        if(hold||burn||liveN||steer||t/1000-lastWaveT<WAVE.life+.2||performance.now()<lampUntil+1500)lastAct=t;
         if(t-lastAct>1200&&t-lastRend<28)return;lastRend=t;
         const p=sy/sMax,a=W/H;
         {const mid=sy+H/2;let best=1e9;sMid.forEach((m,i)=>{const d=Math.abs(m-mid);if(d<best){best=d;idx=i}})}
         const side=a>1.25&&idx==1,wk=a>1.25&&idx==2;
         px+=((side?Math.min(3.4,a*1.55):wk?Math.min(4.6,a*2.1):0)-px)*.06;sc+=((idx==0?1.12:idx==3?.95:idx==2?.8:.92)-sc)*.06;
+        /* holding B also spins the car around (eased in/out), drifting-donut style */
+        const fdt=Math.min(.05,(t-lastT)/1000);lastT=t;spR+=(hold-spR)*.08;if(spR<.002)spR=0;spin+=spR*2.8*fdt;
         const ty2=p*Math.PI*8+.6+spin,mxn=tx<0?0:tx/W-.5,myn=ty<0?0:ty/H-.5;
         const yd=ty2+mxn*.5-yaw;if(Math.abs(yd)>.004)lastAct=t;yaw+=yd*.07;pitch+=(.1+myn*.18-pitch)*.06;
         pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=0;updTrails();
