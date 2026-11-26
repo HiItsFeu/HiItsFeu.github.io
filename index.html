@@ -986,7 +986,7 @@
         /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
         const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
         const wt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter,depthBuffer:false}); /* ripple map, one texel per background square: rg = push, b = crest light, a = trough */
-        const MAG={r:600,push:.8,dt:.06,tau:.9,n:32}; /* r = reach of the magnet (css px) · push = max shove, in squares · the field is averaged over the last n cursor positions (one per dt seconds, weights fade with time constant tau); the strongest one wins, so squares are pushed away instantly and drift back slowly */
+        const MAG={r:600,push:.95,dt:.06,tau:.9,n:32}; /* r = reach of the magnet (css px) · push = max shove, in squares · the field is averaged over the last n cursor positions (one per dt seconds, weights fade with time constant tau); the strongest one wins, so squares are pushed away instantly and drift back slowly */
         MAG.follow=.9; /* how much squares are dragged along the cursor's direction of travel (relative to the radial push) */
         const mHist=Array.from({length:MAG.n},()=>new THREE.Vector2(-9999,-9999)),mVel=Array.from({length:MAG.n},()=>new THREE.Vector2(0,0));let mHT=0,mInit=false;
         const NW=16,WAVE={life:1.8,speed:170,len:60,push:.3}; /* life (s) · speed (css px/s) · wavelength (css px) · push = max shove, in squares */
