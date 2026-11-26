@@ -784,7 +784,7 @@
         <div class="r"><a href="#about">About</a><a href="#work">Work</a><a href="#contact">Contact</a><span class="hide">Local time <b id="clk">--:--</b></span></div>
     </nav>
     <div class="hud m"><span>""</span><br><span>Rotation <b id="rot">000</b>° · <b id="sec">01</b> / 04</span></div>
-    <div class="hud r2 m">Scroll to rotate the car<br>Move the mouse to send ripples through the squares</div>
+    <div class="hud r2 m">Scroll to rotate the car<br>Move the mouse: it repels the squares like a magnet</div>
     <button type="button" class="burn" id="burn" aria-label="Hold to spin the wheels forward and make the tyres smoke (key B)"><kbd>B</kbd><span class="m">Hold to burn rubber</span></button>
 
     <main>
@@ -986,25 +986,23 @@
         /* post-process: scene -> low-res target -> squares grid. Car = fine dots, background = larger squares that ripples push around and light up */
         const rt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
         const wt=new THREE.WebGLRenderTarget(8,8,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter,depthBuffer:false}); /* ripple map, one texel per background square: rg = push, b = crest light, a = trough */
+        const MAG={r:600,push:.8,dt:.06,tau:.9,n:32}; /* r = reach of the magnet (css px) · push = max shove, in squares · the field is averaged over the last n cursor positions (one per dt seconds, weights fade with time constant tau); the strongest one wins, so squares are pushed away instantly and drift back slowly */
+        MAG.follow=.9; /* how much squares are dragged along the cursor's direction of travel (relative to the radial push) */
+        const mHist=Array.from({length:MAG.n},()=>new THREE.Vector2(-9999,-9999)),mVel=Array.from({length:MAG.n},()=>new THREE.Vector2(0,0));let mHT=0,mInit=false;
         const NW=16,WAVE={life:1.8,speed:170,len:60,push:.3}; /* life (s) · speed (css px/s) · wavelength (css px) · push = max shove, in squares */
         const waves=Array.from({length:NW},()=>new THREE.Vector4(0,0,-999,0)); /* one slot per ripple: x, y (px), birth time (s), strength */
-        const U={tS:{value:rt.texture},tW:{value:wt.texture},uRes:{value:new THREE.Vector2()},uCg:{value:new THREE.Vector2(1,1)},uBox:{value:new THREE.Vector4(0,0,1e5,1e5)},uWa:{value:1},uG:{value:new THREE.Vector2(1,1)},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uB:{value:BG*pix},uS:{value:pix},uSc:{value:0},uF:{value:0},uGl:{value:1},uW:{value:waves}};
+        const U={tS:{value:rt.texture},tW:{value:wt.texture},uRes:{value:new THREE.Vector2()},uCg:{value:new THREE.Vector2(1,1)},uBox:{value:new THREE.Vector4(0,0,1e5,1e5)},uWa:{value:1},uG:{value:new THREE.Vector2(1,1)},uM:{value:new THREE.Vector2(-999,-999)},uT:{value:0},uC:{value:CELL*pix},uB:{value:BG*pix},uS:{value:pix},uSc:{value:0},uF:{value:0},uP:{value:0},uH:{value:mHist},uV:{value:mVel},uGl:{value:1},uW:{value:waves}};
         const G=n=>n.toFixed(2),qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1),
         quad=fs=>{const s=new THREE.Scene();s.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:"void main(){gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:fs})));return s};
 
-        /* pass 1 (one pixel per background square): every ripple is a wavelet travelling outward; squares are shoved along the radius as it passes */
-        const waveFS=`precision highp float;uniform vec4 uW[${NW}];uniform float uT,uB,uS;
+        /* pass 1 (one pixel per background square): the mouse is a magnet that repels the squares. Push points away from the cursor, its strength falls off smoothly with the distance (quadratic, zero beyond MAG.r) */
+        const waveFS=`precision highp float;uniform vec2 uH[${MAG.n}],uV[${MAG.n}];uniform float uB,uS,uP;
         void main(){
-        vec2 c=(floor(gl_FragCoord.xy)+.5)*uB,v=vec2(0.);float lit=0.,tr=0.;
-        for(int i=0;i<${NW};i++){
-        vec4 w=uW[i];float age=uT-w.z;
-        if(age<0.||age>${G(WAVE.life)})continue;
-        vec2 d=c-w.xy;float L=length(d),r=age*${G(WAVE.speed)}*uS,s=(L-r)/(${G(WAVE.len)}*uS);
-        float env=exp(-s*s*(s>0.?9.:1.6));            /* sharp front, decaying train of rings behind it */
-        float k=1.-age/${G(WAVE.life)},y=cos(6.2832*s)*env*w.w*k*k*inversesqrt(1.+r/(200.*uS));
-        v+=d/max(L,1.)*y;lit+=max(y,0.);tr+=max(-y,0.);}
-        v*=${G(WAVE.push)};float m=length(v);if(m>.6)v*=.6/m;
-        gl_FragColor=vec4(v/1.2+.5,min(lit,1.),min(tr,1.));}`;
+        vec2 c=(floor(gl_FragCoord.xy)+.5)*uB,best=vec2(0.);float bl=0.;
+        for(int i=0;i<${MAG.n};i++){float w=exp(-float(i)*${(MAG.dt/MAG.tau).toFixed(4)})*(1.-float(i)/${MAG.n}.);vec2 d=c-uH[i];float L=length(d),k=clamp(1.-L/(${G(MAG.r)}*uS),0.,1.);
+        k=k*k*k;   /* falloff: 100% at the centre, dropping fast to 0% at the rim */
+        vec2 p=(d/max(L,1.)+uV[i]*${G(MAG.follow)})*k*w;float m=dot(p,p);if(m>bl){bl=m;best=p;}}   /* strongest of the cursor's recent positions: full push the instant the cursor is near, slow fade once it has gone */
+        gl_FragColor=vec4(clamp(best*${G(MAG.push)}*uP,-1.,1.)/2.+.5,0.,0.);}`;
 
         /* pass 2: the squares grid */
         const mainFS=`precision highp float;uniform sampler2D tS,tW;uniform vec2 uRes,uM,uG,uCg;uniform vec4 uBox;uniform float uWa;uniform float uT,uC,uB,uSc,uF,uGl;
@@ -1028,7 +1026,7 @@
         vec3 col=vec3(0.);
         for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){if(uWa<.5&&(i!=0||j!=0))continue;
         vec2 nid=bid+vec2(float(i),float(j));vec4 w=texture2D(tW,(nid+.5)/uG);
-        col=max(col,bgSq(nid+sid,(px-(nid+.5)*uB)/uB-(w.xy-.5)*1.2,w.z,w.w));}
+        col=max(col,bgSq(nid+sid,(px-(nid+.5)*uB)/uB-(w.xy-.5)*2.,w.z,w.w));}
         /* car: fine stipple. Light = density of small light-grey dots (noise dither), shadow side dissolves into drifting particles */
         vec3 q=s.rgb;float red=q.r-max(q.g,q.b),nr=texture2D(tW,cc/(uB*uG)).z;
         float dens=pow(clamp(dot(q,vec3(.34,.5,.16)),0.,1.),1.15)*1.2+nr*.04,thr=h(id*1.37+7.1),dt=sq(f,.4);
@@ -1065,11 +1063,6 @@
 
         /* input + scroll-driven motion */
         let lx=-999,ly=-999,lt=0,wi=0;
-        /* the mouse sends ripples: each time it has travelled a bit, a ring leaves its position; the faster the move, the stronger the ring */
-        function ripples(t){if(tx<0||mx<0){lx=-999;return}
-        if(lx<0){lx=mx;ly=my;lt=t;return}
-        const d=Math.hypot(mx-lx,my-ly);
-        if(!calm&&d>46&&t-lt>150){waves[wi].set(mx*pix,(H-my)*pix,t/1000,Math.min(1,.4+d/170));wi=(wi+1)%NW;lastWaveT=t/1000;lx=mx;ly=my;lt=t}}
         let mx=-999,my=-999,tx=-999,ty=-999,yaw=.6,pitch=.12,px=0,sc=1,idx=0,lastAct=0,lastSy=-1,lastRend=0,atTop=true,lastBy=-1,lastRot="",lastSec="",lastWaveT=-999,wClean=false,spR=0,lastT=0;
         addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;if(mx<0){mx=tx;my=ty}lastAct=performance.now()},{passive:true});
         document.documentElement.addEventListener("pointerleave",()=>{tx=ty=-999});
@@ -1098,8 +1091,8 @@
         const now=performance.now(),dt=Math.min(.05,(now-sT)/1000);sT=now;
         burn+=(Math.max(calm?0:ss(.002,.03,dy),hold)-burn)*.12;if(burn<.002)burn=0;
         if(burn){wsp+=burn*24*dt;rw.forEach(w=>w.rotation.z=-wsp)}   /* spin around the axle (local Z of the wheel group) */
-        /* front wheels steer 50° towards the direction the car is rotating, and straighten again once it stops */
-        {const tg=(calm&&!hold)||Math.abs(dys)<.0025?0:Math.sign(dys)*.8727;steer+=(tg-steer)*(1-Math.exp(-dt*3.5));if(Math.abs(steer)<.002)steer=0;fw.forEach(w=>w.rotation.y=steer)}
+        /* front wheels steer 55° towards the direction the car is rotating, and straighten again once it stops */
+        {const tg=(calm&&!hold)||Math.abs(dys)<.0025?0:Math.sign(dys)*.9599;steer+=(tg-steer)*(1-Math.exp(-dt*3.5));if(Math.abs(steer)<.002)steer=0;fw.forEach(w=>w.rotation.y=steer)}
         const emit=burn>=.06;
         if(!emit&&!liveN){smoke.visible=false;return}   /* nothing to simulate or draw */
         smoke.visible=true;
@@ -1144,13 +1137,18 @@
         pivot.rotation.y=yaw;pivot.rotation.x=pitch;pivot.position.x=px;pivot.scale.setScalar(sc);pivot.position.y=0;updTrails();
         if(atTop){vBtn.set(px,-.66*sc,0).project(cam);const by=((1-vBtn.y)/2+.045)*H+18;if(Math.abs(by-lastBy)>.4){lastBy=by;bk.style.transform="translate3d(-50%,"+by.toFixed(1)+"px,0)"}}   /* key sits just under the car */
         {const c1=vBtn.set(px,.2,0).project(cam),c2=vBt2.set(px+3.6*sc,.2,0).project(cam),k=W*pix*.5,cx=(c1.x+1)*k,cy=(c1.y+1)*H*pix*.5,r=(c2.x-c1.x)*k,ex=52*CELL*pix,ey=9*CELL*pix;U.uBox.value.set(cx-r,cy-r-ey,cx+r+ex,cy+r+ey)}   /* region where car pixels / drifting dots can appear */
-        if(tx>=0){mx+=(tx-mx)*.3;my+=(ty-my)*.3}
+        if(tx>=0){mx+=(tx-mx)*.15;my+=(ty-my)*.15}
         U.uF.value+=((tx>=0&&mx>=0?1:0)-U.uF.value)*.07;
-        U.uM.value.set(mx*pix,(H-my)*pix);ripples(t);
+        U.uM.value.set(mx*pix,(H-my)*pix);
+        if(mx>=0){const mxp=mx*pix,myp=(H-my)*pix;if(!mInit){mInit=true;mHist.forEach(v=>v.set(mxp,myp))}
+        const shift=t-mHT>MAG.dt*1000;
+        if(shift){mHT=t;const dx=mxp-mHist[0].x,dy=myp-mHist[0].y,l=Math.hypot(dx,dy),sp=Math.min(1,l/(40*pix)),nx=l>.5?dx/l*sp:0,ny=l>.5?dy/l*sp:0,pv=mVel[0];   /* direction of travel, magnitude 0..1 with speed */
+        for(let i=MAG.n-1;i>0;i--){mHist[i].copy(mHist[i-1]);mVel[i].copy(mVel[i-1])}mHist[0].set(mxp,myp);mVel[0].set(pv.x*.5+nx*.5,pv.y*.5+ny*.5)}else mHist[0].set(mxp,myp)}
+        {const on=tx>=0&&mx>=0;U.uP.value+=((on?1:0)-U.uP.value)*(on?.12:.012)}
 
         U.uT.value=t/1000;U.uSc.value=sy;U.uGl.value=1+.8*Math.min(1,burn*2);
         R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(scene,cam);
-        {const recent=t/1000-lastWaveT<WAVE.life+.1;if(!wClean||recent){R.setRenderTarget(wt);R.render(ws,qc);wClean=!recent}U.uWa.value=wClean?0:1}   /* ripple map only while ripples exist */
+        {const act=!calm&&U.uP.value>.004;if(act||!wClean){R.setRenderTarget(wt);R.render(ws,qc);wClean=!act}U.uWa.value=wClean?0:1}   /* magnet map only while the cursor is (or just was) over the page */
         R.setRenderTarget(null);R.render(qs,qc);
         {const rs=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0"),ss2="0"+(idx+1);if(rs!==lastRot){lastRot=rs;rotE.textContent=rs}if(ss2!==lastSec){lastSec=ss2;secE.textContent=ss2}}}
         requestAnimationFrame(frame);
