@@ -1121,7 +1121,8 @@
         for(let i=0;i<n;i++){const Q=h[i];vT.subVectors(h[Math.min(n-1,i+1)],h[Math.max(0,i-1)]);vV.subVectors(cl,Q);vS.crossVectors(vT,vV);if(vS.lengthSq()<1e-12)vS.set(0,1,0);vS.normalize();
         const w=.085*(.25+.75*i/(n-1));A[i*6]=Q.x+vS.x*w;A[i*6+1]=Q.y+vS.y*w;A[i*6+2]=Q.z+vS.z*w;A[i*6+3]=Q.x-vS.x*w;A[i*6+4]=Q.y-vS.y*w;A[i*6+5]=Q.z-vS.z*w}
         rb.geometry.attributes.position.needsUpdate=true;rb.geometry.setDrawRange(0,(n-1)*6)})}
-        function frame(t){requestAnimationFrame(frame);
+        let shk=0,bkS=0;const camBase=new THREE.Vector3(),camQ=new THREE.Quaternion();
+        function frame(t){requestAnimationFrame(frame);camBase.copy(cam.position);camQ.copy(cam.quaternion);
         const sy=scrollY;if(sy!==lastSy){lastSy=sy;lastAct=t}
         /* perf: when nothing is moving (no scroll, mouse, spin, smoke, ripples) only the slow background breathing is left, so draw at ~30 fps */
         if(hold||burn||liveN||steer||t/1000-lastWaveT<WAVE.life+.2||performance.now()<lampUntil+1500)lastAct=t;
@@ -1147,7 +1148,16 @@
         {const on=tx>=0&&mx>=0;U.uP.value+=((on?1:0)-U.uP.value)*(on?.12:.012)}
 
         U.uT.value=t/1000;U.uSc.value=sy;U.uGl.value=1+.8*Math.min(1,burn*2);
+        /* camera shake while drifting: amplitude follows 'burn' (tyre smoke / spin intensity), eased in/out, off with reduced motion */
+        shk+=((calm?0:Math.min(1,burn*1.4))-shk)*.15;if(shk<.003)shk=0;
+        let shaken=false;
+        if(shk){const tt=t*.001,A=shk*shk*.5+shk*.5;shaken=true;cam.position.copy(camBase);cam.quaternion.copy(camQ);
+        cam.position.x+=A*.005*(Math.sin(tt*71)+.6*Math.sin(tt*113+1.3));cam.position.y+=A*.0045*(Math.sin(tt*83+2.1)+.6*Math.sin(tt*127));
+        cam.rotateZ(A*.0006*Math.sin(tt*59+.7));cam.updateMatrixWorld(true);
+        bk.style.translate=(A*2.2*(Math.sin(tt*71)+.6*Math.sin(tt*113+1.3))).toFixed(2)+"px "+(A*2*(Math.sin(tt*83+2.1)+.6*Math.sin(tt*127))).toFixed(2)+"px";bkS=1}
+        else if(bkS){bk.style.translate="";bkS=0}
         R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(scene,cam);
+        if(shaken){cam.position.copy(camBase);cam.quaternion.copy(camQ);cam.updateMatrixWorld(true)}
         {const act=!calm&&U.uP.value>.004;if(act||!wClean){R.setRenderTarget(wt);R.render(ws,qc);wClean=!act}U.uWa.value=wClean?0:1}   /* magnet map only while the cursor is (or just was) over the page */
         R.setRenderTarget(null);R.render(qs,qc);
         {const rs=String(Math.round(((yaw*180/Math.PI)%360+360)%360)).padStart(3,"0"),ss2="0"+(idx+1);if(rs!==lastRot){lastRot=rs;rotE.textContent=rs}if(ss2!==lastSec){lastSec=ss2;secE.textContent=ss2}}}
